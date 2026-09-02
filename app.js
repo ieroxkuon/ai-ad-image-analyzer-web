@@ -1,9 +1,8 @@
 // =============================================================================
-// ADVISION VIP AI AGENT - INTERACTIVE CHATGPT STYLE ENGINE
+// ADVISION ENTERPRISE AI AGENT - EXECUTIVE APPLICATION ENGINE
 // =============================================================================
 
 let userName = localStorage.getItem('ADVISION_USER_NAME') || "";
-let userCategory = localStorage.getItem('ADVISION_USER_CAT') || "";
 let currentBase64 = null;
 let currentMimeType = null;
 let currentFileName = null;
@@ -30,44 +29,45 @@ const inputApiKey = document.getElementById('input-api-key');
 const savedKey = localStorage.getItem('GEMINI_API_KEY') || "";
 if (savedKey) inputApiKey.value = savedKey;
 
-// SYSTEM PROMPT FOR ADVISION MASTER AGENT (VIP SPECIFICATIONS)
+// SYSTEM PROMPT CHUYÊN NGHỆP & TRƯỞNG THÀNH (EXECUTIVE PERSONA)
 const ADVISION_SYSTEM_PROMPT = `
-Bạn là AdVision Master - Chuyên gia cao cấp về Phân tích Thị giác Hình ảnh Quảng cáo và Giám đốc Nghệ thuật Thiết kế Đồ họa Marketing với hơn 15 năm kinh nghiệm. Nhiệm vụ của bạn là đóng vai trò một người cố vấn thiết kế thông minh, kết hợp giữa tư duy nghệ thuật thị giác (Visual Arts), nguyên lý thiết kế đồ họa (Graphic Design Principles) và chiến lược tâm lý học khách hàng trong Marketing. Bạn ở đây để quan sát, bóc tách từng điểm ảnh, cấu trúc chữ, phối màu và bố cục của banner, từ đó đưa ra lời kết luận chính xác nhất về việc bức ảnh có đạt tiêu chuẩn quảng cáo hay không, đồng thời truyền cảm hứng giúp người dùng tối ưu hóa hiệu suất chuyển đổi quảng cáo một cách logic và sáng tạo nhất.
+Bạn là AdVision Master - Cố vấn Trưởng chuyên về Thẩm định Thị giác Hình ảnh Quảng cáo và Giám đốc Nghệ thuật Thiết kế Đồ họa Thương mại với 15 năm kinh nghiệm quản trị chiến dịch. Nhiệm vụ của bạn là bóc tách, đánh giá và cố vấn tối ưu hóa hình ảnh quảng cáo trên các lăng kính: Nghệ thuật thị giác, Mật độ văn bản, Tương phản điểm nhấn và Tâm lý học người tiêu dùng.
 
 CÂU HỎI TRUNG TÂM BẮT BUỘC TRẢ LỜI:
 "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"
 
-CÁC QUY TẮC BẮT BUỘC:
+CÁC NGUYÊN TẮC BẮT BUỘC:
 1. TUYỆT ĐỐI KHÔNG DÙNG KÝ TỰ MŨI TÊN (như ->, -->, ⇒) trong bất kỳ phần nào của câu trả lời.
-2. Trình bày câu trả lời theo các KHỐI VĂN BẢN (Text Blocks) phân định rõ ràng.
-3. Phong cách nói chuyện: Vui tính, hóm hỉnh, cởi mở nhưng cực kỳ sắc bén và logic về ngôn ngữ.
-4. Cuối bài phân tích, hãy chủ động đặt 1-2 câu hỏi vui vẻ để hỏi thêm thông tin về khách hàng mục tiêu hoặc ngách sản phẩm của họ.
+2. Trình bày bài phân tích theo các KHỐI VĂN BẢN (Text Blocks) mạch lạc.
+3. Phong cách nói chuyện: Trưởng thành, trang trọng, lịch sự, tri thức, tinh tế và cực kỳ sắc bén về logic ngôn ngữ.
+4. Xưng hô trân trọng với người dùng theo tên riêng của họ.
+5. Cuối bài thẩm định, luôn chủ động đặt 1-2 câu hỏi chiến lược mở để tìm hiểu sâu hơn về đối tượng khách hàng mục tiêu hoặc giá trị cốt lõi (USP) của sản phẩm.
 
 CẤU TRÚC KẾT QUẢ ĐẦU RA (OUTPUT BLOCK STRUCTURE):
 
 --------------------------------
-ĐÁNH GIÁ TIÊU CHUẨN QUẢNG CÁO
+BÁO CÁO THẨM ĐỊNH TIÊU CHUẨN QUẢNG CÁO
 --------------------------------
 [KHỐI 1: KẾT LUẬN CHUNG]
 KẾT LUẬN: [ĐẠT TIÊU CHUẨN / CHƯA ĐẠT TIÊU CHUẨN]
 Điểm số thiết kế: [X/10]
 
 [KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC]
-- Chủ thể & Sản phẩm chính: [Nhận diện sản phẩm, vị trí, độ nổi bật]
-- Văn bản & Chữ viết: [Trích xuất nội dung chữ, đánh giá mật độ text, phông chữ]
-- Thông điệp quảng cáo: [Thông điệp truyền tải]
-- Nút kêu gọi hành động (CTA): [Đánh giá kích thước, vị trí, màu sắc tương phản]
+- Chủ thể & Sản phẩm chính: [Phân tích vị trí, góc chụp và độ nổi bật sản phẩm]
+- Văn bản & Mật độ chữ: [Đánh giá mật độ text theo quy tắc 20%, tính dễ đọc]
+- Thông điệp truyền tải: [Đánh giá tính nhất quán và hiệu lực thông điệp]
+- Nút kêu gọi hành động (CTA): [Đánh giá kích thước, vị trí và tỷ lệ tương phản màu]
 
 [KHỐI 3: ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
-- Điểm mạnh nổi bật: [Cụ thể các chi tiết làm tốt]
-- Điểm cần cải thiện: [Cụ thể các hạn chế tồn tại]
+- Điểm mạnh nổi bật: [Các yếu tố kỹ thuật làm tốt]
+- Hạn chế tồn tại: [Các rào chắn giảm tỷ lệ chuyển đổi]
 
-[KHỐI 4: ĐỀ XUẤT TỐI ƯU THIẾT KẾ]
-- Đề xuất 1: [Lời khuyên cụ thể]
-- Đề xuất 2: [Lời khuyên cụ thể]
+[KHỐI 4: ĐỀ XUẤT TỐI ƯU CHIẾN LƯỢC]
+- Đề xuất 1: [Giải pháp cụ thể]
+- Đề xuất 2: [Giải pháp cụ thể]
 
-[KHỐI 5: GIAO LƯU & HỎI THÔNG TIN KHÁCH HÀNG]
-[Lời nhắn vui vẻ, hóm hỉnh và câu hỏi cởi mở về sản phẩm/khách hàng của người dùng]
+[KHỐI 5: TƯ VẤN BỔ SUNG & HOẠCH ĐỊNH CHIẾN DỊCH]
+[Lời nhận xét tinh tế + 1-2 câu hỏi chiến lược mở dành cho người dùng]
 --------------------------------
 `;
 
@@ -113,20 +113,20 @@ btnSaveKey.addEventListener('click', () => {
   const key = inputApiKey.value.trim();
   localStorage.setItem('GEMINI_API_KEY', key);
   apiModal.classList.add('hidden');
-  alert('Đã lưu API Key thành công!');
+  alert('Đã lưu cấu hình Khóa API!');
 });
 
-// CHAT SUBMIT HANDLER (INTERACTIVE AGENT DIALOGUE)
+// CHAT FORM SUBMISSION (EXECUTIVE DIALOGUE FLOW)
 chatForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const text = chatInput.value.trim();
   if (!text && !currentBase64) return;
 
-  // Add User Message to Chat UI
+  // Render User Message
   appendUserMessage(text, currentBase64 ? attachedThumb.src : null);
   chatInput.value = '';
 
-  // Case 1: If user is giving their name/info
+  // Case 1: Welcome Discovery (Capturing User Name)
   if (!userName && text && !currentBase64) {
     userName = text;
     localStorage.setItem('ADVISION_USER_NAME', userName);
@@ -135,71 +135,71 @@ chatForm.addEventListener('submit', async (e) => {
     removeAgentThinking();
     
     appendAgentMessage(`
-      <p class="font-extrabold text-amber-300 mb-1">Rất tuyệt vời! Chào <strong>bạn ${userName}</strong>! 💻🎨</p>
-      <p>Cảm ơn <strong>bạn ${userName}</strong> đã chia sẻ! Bây giờ bạn hãy bấm nút đính kèm 📎 hoặc kéo thả bức ảnh banner quảng cáo cần kiểm tra vào đây nhé.</p>
-      <p class="mt-2 text-indigo-300 font-semibold">AdVision Master sẽ 'mổ xẻ' từng điểm ảnh và thẩm định tiêu chuẩn giúp bạn ${userName} ngay lập tức!</p>
+      <p class="font-bold text-amber-400 mb-1">Trân trọng cảm ơn thông tin từ Quý khách ${userName}!</p>
+      <p class="text-slate-300">Rất hân hạnh được đồng hành cùng Quý khách <strong>${userName}</strong> trong chiến dịch lần này.</p>
+      <p class="mt-2 text-indigo-300 font-semibold border-t border-slate-800/80 pt-2">Xin Quý khách <strong>${userName}</strong> vui lòng bấm nút đính kèm 📎 hoặc kéo thả file banner quảng cáo cần thẩm định vào khung hội thoại. Tôi sẽ tiến hành phân tích đa chiều ngay lập tức.</p>
     `);
     return;
   }
 
-  // Case 2: If user sends an image or text for analysis
+  // Case 2: Image Analysis Execution
   if (currentBase64) {
     appendAgentThinking();
     const apiKey = localStorage.getItem('GEMINI_API_KEY') || "";
     let reportText = "";
 
-    const userGreeting = userName ? `Tôi tên là ${userName}. ` : "";
+    const userPromptText = userName ? `Quý khách hàng tên là ${userName}. ` : "";
 
     if (apiKey) {
       try {
         if (apiKey.startsWith('sk-')) {
-          reportText = await callOpenAiVisionApi(apiKey, currentBase64, currentMimeType, userGreeting + text);
+          reportText = await callOpenAiVisionApi(apiKey, currentBase64, currentMimeType, userPromptText + text);
         } else {
-          reportText = await callGeminiVisionApi(apiKey, currentBase64, currentMimeType, userGreeting + text);
+          reportText = await callGeminiVisionApi(apiKey, currentBase64, currentMimeType, userPromptText + text);
         }
       } catch (err) {
         console.warn("API Error:", err);
-        reportText = getMockAnalysis(currentFileName || "banner.png", userName || "bạn");
+        reportText = getExecutiveMockAnalysis(currentFileName || "banner.png", userName || "Quý khách");
       }
     } else {
       await new Promise(r => setTimeout(r, 1500));
-      reportText = getMockAnalysis(currentFileName || "banner.png", userName || "bạn");
+      reportText = getExecutiveMockAnalysis(currentFileName || "banner.png", userName || "Quý khách");
     }
 
-    // Reset attachment
+    // Reset attachment & loading bubble
     btnRemoveAttachment.click();
     removeAgentThinking();
 
-    // Clean any arrows
+    // Clean any prohibited arrows
     reportText = reportText.replace(/->|-->|⇒/g, '•');
     appendAgentMessage(formatMarkdown(reportText));
     return;
   }
 
-  // Case 3: Regular text chat reply
+  // Case 3: Interactive Dialogue Reply
   if (text) {
     appendAgentThinking();
     await new Promise(r => setTimeout(r, 1000));
     removeAgentThinking();
     appendAgentMessage(`
-      <p>Cảm ơn phản hồi của <strong>bạn ${userName || 'bạn'}</strong>! AdVision Master đã ghi nhận thông tin này.</p>
-      <p class="mt-2 text-indigo-300 font-semibold">Nếu bạn có thêm ảnh banner quảng cáo nào khác, cứ gửi lên để mình tiếp tục soi tiêu chuẩn giúp bạn nhé!</p>
+      <p class="text-slate-300">Cảm ơn thông tin phản hồi từ Quý khách <strong>${userName || 'Quý khách'}</strong>. Hệ thống đã ghi nhận yêu cầu này vào hồ sơ thẩm định.</p>
+      <p class="mt-2 text-indigo-300 font-semibold">Nếu Quý khách có thêm phương án thiết kế hoặc banner quảng cáo khác, xin vui lòng gửi file để tôi tiếp tục thẩm định đối chiếu.</p>
     `);
   }
 });
 
-// CHAT UI UTILITIES
+// UI RENDERING UTILITIES
 function appendUserMessage(text, imgSrc) {
-  let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-48 rounded-xl border border-slate-700 mb-2">` : '';
+  let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-48 rounded-lg border border-slate-700 mb-2">` : '';
   let textHtml = text ? `<p>${text}</p>` : '';
 
   const html = `
     <div class="flex gap-3 justify-end max-w-3xl ml-auto">
-      <div class="bg-indigo-600 border border-indigo-500 p-4 rounded-2xl rounded-tr-none text-white text-sm shadow-md space-y-2">
+      <div class="bg-amber-600/90 border border-amber-500/50 p-4 rounded-2xl rounded-tr-none text-slate-950 font-medium text-sm shadow-md space-y-2">
         ${imgHtml}
         ${textHtml}
       </div>
-      <div class="w-9 h-9 rounded-xl bg-indigo-500 flex items-center justify-center text-white font-black text-sm shrink-0 shadow-md">
+      <div class="w-9 h-9 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-black text-sm shrink-0 shadow-md">
         <i class="fa-solid fa-user"></i>
       </div>
     </div>
@@ -211,11 +211,11 @@ function appendUserMessage(text, imgSrc) {
 function appendAgentMessage(formattedHtml) {
   const html = `
     <div class="flex gap-4 max-w-3xl">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 to-indigo-600 flex items-center justify-center text-slate-950 font-black text-sm shrink-0 shadow-md">
-        <i class="fa-solid fa-robot"></i>
+      <div class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0 shadow-md">
+        <i class="fa-solid fa-user-tie"></i>
       </div>
       <div class="space-y-3 text-sm text-slate-200">
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl rounded-tl-none shadow-md leading-relaxed space-y-3">
+        <div class="executive-card p-5 rounded-2xl rounded-tl-none shadow-xl leading-relaxed space-y-3">
           ${formattedHtml}
         </div>
       </div>
@@ -228,12 +228,12 @@ function appendAgentMessage(formattedHtml) {
 function appendAgentThinking() {
   const html = `
     <div id="thinking-bubble" class="flex gap-4 max-w-3xl">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 to-indigo-600 flex items-center justify-center text-slate-950 font-black text-sm shrink-0 animate-bounce">
-        <i class="fa-solid fa-robot"></i>
+      <div class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0">
+        <i class="fa-solid fa-user-tie"></i>
       </div>
-      <div class="bg-slate-900 border border-slate-800 px-4 py-3 rounded-2xl rounded-tl-none text-xs text-indigo-300 font-semibold flex items-center gap-2">
-        <div class="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
-        <span>AdVision Master đang soi từng điểm ảnh...</span>
+      <div class="executive-card px-4 py-3 rounded-2xl rounded-tl-none text-xs text-amber-300 font-medium flex items-center gap-2">
+        <div class="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+        <span>AdVision Master đang tiến hành thẩm định thị giác chi tiết...</span>
       </div>
     </div>
   `;
@@ -253,7 +253,7 @@ function scrollToBottom() {
 // API CALL ENGINES
 async function callGeminiVisionApi(apiKey, base64Data, mimeType, userText) {
   const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
-  const explicitPrompt = `Hãy phân tích bức ảnh quảng cáo này và trả lời chính xác câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\n\nThông tin người dùng gửi kèm: ${userText}\n\n${ADVISION_SYSTEM_PROMPT}`;
+  const explicitPrompt = `Hãy phân tích bức ảnh quảng cáo này và trả lời chính xác câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\n\nThông tin Quý khách hàng cung cấp: ${userText}\n\n${ADVISION_SYSTEM_PROMPT}`;
 
   let lastErr = null;
   for (const modelName of models) {
@@ -284,12 +284,12 @@ async function callGeminiVisionApi(apiKey, base64Data, mimeType, userText) {
       lastErr = e;
     }
   }
-  throw lastErr || new Error("Không thể gọi Gemini API");
+  throw lastErr || new Error("Không thể kết nối Gemini API");
 }
 
 async function callOpenAiVisionApi(apiKey, base64Data, mimeType, userText) {
   const url = 'https://api.openai.com/v1/chat/completions';
-  const explicitPrompt = `Hãy phân tích bức ảnh này và trả lời câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\nThông tin người dùng: ${userText}`;
+  const explicitPrompt = `Hãy phân tích bức ảnh này và trả lời câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\nThông tin: ${userText}`;
 
   const resp = await fetch(url, {
     method: 'POST',
@@ -325,9 +325,9 @@ async function callOpenAiVisionApi(apiKey, base64Data, mimeType, userText) {
 function formatMarkdown(str) {
   if (!str) return "";
   let html = str
-    .replace(/^### (.*$)/gim, '<h4 class="font-bold text-white mt-3 mb-1 font-lg">$1</h4>')
-    .replace(/^## (.*$)/gim, '<h3 class="font-black text-amber-300 mt-4 mb-2 text-base">$1</h3>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold text-amber-300">$1</strong>')
+    .replace(/^### (.*$)/gim, '<h4 class="font-bold text-white mt-3 mb-1 text-sm font-sans">$1</h4>')
+    .replace(/^## (.*$)/gim, '<h3 class="font-bold text-amber-400 mt-4 mb-2 text-base font-sans">$1</h3>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-amber-300">$1</strong>')
     .replace(/^[-*+] (.*$)/gim, '<li class="ml-4 list-disc text-slate-300 my-1">$1</li>')
     .replace(/^\d+\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-300 my-1">$1</li>')
     .replace(/\n\n/g, '<br><br>')
@@ -335,34 +335,34 @@ function formatMarkdown(str) {
   return html;
 }
 
-// DEMO MOCK FALLBACK FOR CHATBOT STYLE
-function getMockAnalysis(filename, targetUser) {
+// EXECUTIVE DEMO MOCK ANALYSIS
+function getExecutiveMockAnalysis(filename, targetUser) {
   return `--------------------------------
-ĐÁNH GIÁ TIÊU CHUẨN QUẢNG CÁO
+BÁO CÁO THẨM ĐỊNH TIÊU CHUẨN QUẢNG CÁO
 --------------------------------
 [KHỐI 1: KẾT LUẬN CHUNG]
 KẾT LUẬN: CHƯA ĐẠT TIÊU CHUẨN (Cần tối ưu hóa chuyển đổi)
 Điểm số thiết kế: 6.5/10
 
 [KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC]
-- Chủ thể & Sản phẩm chính: Hình ảnh sản phẩm trong banner (${filename}) hiển thị nổi bật ở vị trí trung tâm.
-- Văn bản & Chữ viết: Mật độ chữ khoảng 25% diện tích banner. Tiêu đề khuyến mãi rõ ràng nhưng phông chữ phụ hơi nhỏ.
-- Thông điệp quảng cáo: Thông điệp truyền tải ngắn gọn nhưng chưa có điểm nhấn độc nhất.
-- Nút kêu gọi hành động (CTA): Nút CTA chưa đạt độ tương phản tối ưu so với phông nền.
+- Chủ thể & Sản phẩm chính: Hình ảnh sản phẩm trong banner (${filename}) hiển thị ở góc chụp trung tâm, tuy nhiên độ đổ bóng chưa tạo cảm giác chân thực.
+- Văn bản & Mật độ chữ: Mật độ chữ chiếm khoảng 24% diện tích thiết kế, tiệm cận ngưỡng giới hạn quy định của các nền tảng kỹ thuật số.
+- Thông điệp truyền tải: Tiêu đề khuyến mãi rõ ràng nhưng thiếu điểm nhấn độc nhất (USP).
+- Nút kêu gọi hành động (CTA): Tỷ lệ tương phản màu sắc của nút CTA chưa đạt độ tách biệt tối ưu so với phông nền xung quanh.
 
 [KHỐI 3: ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
-- Điểm mạnh nổi bật: Màu sắc tươi sáng, hình ảnh sản phẩm góc chụp đẹp và sắc nét.
-- Điểm cần cải thiện: Nút CTA còn chìm trong nền, thiếu lực đẩy thôi thúc khách hàng mua ngay.
+- Điểm mạnh nổi bật: Gam màu tổng thể tươi sáng, sắc nét và giữ được sự nhất quán định vị thương hiệu.
+- Hạn chế tồn tại: Nút CTA bị chìm trong tổng thể bố cục, giảm động lực thôi thúc nhấp chuột của người xem.
 
-[KHỐI 4: ĐỀ XUẤT TỐI ƯU THIẾT KẾ]
-- Đề xuất 1: Nâng kích thước nút CTA "MUA NGAY" lên 15% và đổ màu tương phản (như Vàng neon hoặc Cam) để mắt người xem chú ý ngay lập tức.
-- Đề xuất 2: Giảm bớt 1 dòng chữ mô tả phụ để tăng khoảng trống thị giác xung quanh sản phẩm.
+[KHỐI 4: ĐỀ XUẤT TỐI ƯU CHIẾN LƯỢC]
+- Đề xuất 1: Gia tăng kích thước nút CTA thêm 15% và áp dụng gam màu tương phản cao (như Cam viền Vàng) để tối ưu luồng đọc mắt nhìn.
+- Đề xuất 2: Tối giản bớt 1 dòng chữ mô tả phụ nhằm tạo khoảng thở thị giác tập trung cho sản phẩm chính.
 
-[KHỐI 5: GIAO LƯU & HỎI THÔNG TIN KHÁCH HÀNG]
-Chào bạn ${targetUser}! Banner này có phần hình ảnh sản phẩm rất mướt mắt, giống như một ngôi sao đã sẵn sàng lên sân khấu nhưng cần một ánh đèn chiếu chuẩn hơn vậy!
+[KHỐI 5: TƯ VẤN BỔ SUNG & HOẠCH ĐỊNH CHIẾN DỊCH]
+Kính thưa Quý khách ${targetUser}, bản banner hiện tại đã xây dựng nền tảng hình ảnh rất chỉn chu. Nếu được hiệu chỉnh nút CTA và khoảng thở thị giác, hiệu suất chuyển đổi sẽ gia tăng đáng kể.
 
-Để AdVision Master giúp bạn ${targetUser} tối ưu chuẩn xác nhất cho chiến dịch, bạn có thể chia sẻ thêm:
-1. Đối tượng khách hàng mục tiêu mà bạn ${targetUser} đang nhắm đến thuộc độ tuổi nào và họ quan tâm nhất đến Giá cả hay Chất lượng?
-2. Bạn có chương trình tặng kèm hay Mã giảm giá nào đặc biệt để đưa vào banner không?
+Để AdVision Master cố vấn chuyên sâu hơn cho chiến dịch của Quý khách ${targetUser}, xin vui lòng chia sẻ thêm:
+1. Nhóm đối tượng khách hàng mục tiêu mà Quý khách ${targetUser} đang hướng đến coi trọng nhất về Yếu tố Giá thành hay Giá trị Đẳng cấp?
+2. Quý khách có dự định bổ sung mã ưu đãi hoặc đặc quyền quà tặng nào lên banner không?
 --------------------------------`;
 }

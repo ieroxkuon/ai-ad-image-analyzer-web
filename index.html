@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AdVision AI Agent - Interactive ChatGPT Style Platform</title>
+  <title>AdVision Enterprise AI - Hệ Thống Thẩm Định & Tư Vấn Quảng Cáo</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
@@ -11,72 +11,77 @@
   <!-- Google Fonts Inter & Plus Jakarta Sans -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .glass-chat { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
-    .chat-scroll::-webkit-scrollbar { width: 6px; }
-    .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 9999px; }
+    body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .executive-card { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(226, 232, 240, 0.12); }
+    .chat-scroll::-webkit-scrollbar { width: 5px; }
+    .chat-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 9999px; }
   </style>
 </head>
-<body class="h-full flex flex-col text-slate-100 antialiased bg-slate-950 selection:bg-indigo-500 selection:text-white">
+<body class="h-full flex flex-col text-slate-100 antialiased bg-slate-950 selection:bg-amber-500 selection:text-slate-950">
 
-  <!-- CHATBOT HEADER NAVBAR -->
-  <header class="h-16 border-b border-slate-800 bg-slate-900/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between z-10 shrink-0">
+  <!-- EXECUTIVE HEADER NAVBAR -->
+  <header class="h-16 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between z-10 shrink-0">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-        <i class="fa-solid fa-crown text-amber-300 text-lg"></i>
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 via-amber-600 to-indigo-700 flex items-center justify-center text-slate-950 font-black text-base shadow-sm">
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <span class="font-black text-lg text-white tracking-tight">AdVision Master</span>
-          <span class="text-[10px] font-black px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">AI AGENT ACTIVE</span>
+          <span class="font-extrabold text-base tracking-tight text-white">AdVision Enterprise</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wider">AI Agent v2.5</span>
         </div>
-        <p class="text-[11px] text-slate-400 font-medium">Chuyên gia Thẩm định Quảng cáo & Giám đốc Nghệ thuật Thiết kế</p>
+        <p class="text-[11px] text-slate-400 font-medium">Hệ thống Cố vấn Thẩm định Tiêu chuẩn Thị giác & Chiến lược Quảng cáo</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
-      <button id="btn-api-key-modal" class="text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-2">
+      <span class="hidden sm:inline-flex items-center gap-2 text-xs font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-3 py-1 rounded-full">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        Hệ thống Hoạt động
+      </span>
+      <button id="btn-api-key-modal" class="text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2">
         <i class="fa-solid fa-key text-amber-400"></i>
-        <span>API Key</span>
+        <span>Cấu hình API Key</span>
       </button>
     </div>
   </header>
 
-  <!-- CHATBOT MAIN CONTAINER (CHATGPT STYLE) -->
-  <main class="flex-1 overflow-hidden max-w-5xl w-full mx-auto flex flex-col p-2 sm:p-4">
+  <!-- MAIN CHAT & WORKSPACE AREA -->
+  <main class="flex-1 overflow-hidden max-w-5xl w-full mx-auto flex flex-col p-3 sm:p-5">
     
-    <!-- CHAT MESSAGES CONTAINER -->
+    <!-- CHAT MESSAGES DISPLAY CONTAINER -->
     <div id="chat-container" class="flex-1 overflow-y-auto chat-scroll p-4 space-y-6">
       
       <!-- INITIAL AGENT WELCOME MESSAGE -->
       <div class="flex gap-4 max-w-3xl">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 to-indigo-600 flex items-center justify-center text-slate-950 font-black text-sm shrink-0 shadow-md">
-          <i class="fa-solid fa-robot"></i>
+        <div class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0 shadow-sm">
+          <i class="fa-solid fa-user-tie"></i>
         </div>
         <div class="space-y-3 text-sm text-slate-200">
-          <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl rounded-tl-none shadow-md leading-relaxed">
-            <p class="font-extrabold text-amber-300 mb-1">Chào bạn! Rất vui được gặp bạn tại AdVision AI Agent Platform! 🎨🚀</p>
-            <p>Mình là <strong>AdVision Master</strong> - người cố vấn nghệ thuật và chuyên gia thẩm định tiêu chuẩn hình ảnh quảng cáo.</p>
-            <p class="mt-2 text-indigo-300 font-semibold">Để mình có thể xưng hô và tư vấn hỗ trợ một cách chu đáo nhất, bạn tên là gì (hoặc mình nên gọi bạn là Anh/Chị/Bạn) và bạn đang kinh doanh trong ngành hàng nào thế?</p>
+          <div class="executive-card p-5 rounded-2xl rounded-tl-none shadow-lg leading-relaxed space-y-2">
+            <h3 class="font-bold text-base text-amber-400">Kính chào Quý khách hàng!</h3>
+            <p class="text-slate-300">Tôi là <strong>AdVision Master</strong> - Cố vấn Trưởng bộ phận Thẩm định Thị giác Đồ họa và Chiến lược Chuyển đổi Quảng cáo.</p>
+            <p class="text-slate-300">Rất hân hạnh được đồng hành cùng Quý khách trong việc đánh giá chuyên sâu và tối ưu hóa hiệu suất hình ảnh banner thương mại.</p>
+            <p class="pt-2 text-indigo-300 font-semibold border-t border-slate-800/80">Để công tác xưng hô và tư vấn được trân trọng nhất, xin Quý khách vui lòng cho biết <strong>Quý danh (Tên)</strong> và <strong>Lĩnh vực / Ngành hàng</strong> đang vận hành?</p>
           </div>
         </div>
       </div>
 
     </div>
 
-    <!-- CHAT INPUT TOOLBAR (CHATGPT STYLE) -->
-    <div class="p-2 sm:p-4 bg-slate-900/90 border border-slate-800 rounded-3xl mt-2 shadow-2xl space-y-3">
+    <!-- ATTACHMENT & INPUT CONTROLS -->
+    <div class="p-3 sm:p-4 bg-slate-900/90 border border-slate-800 rounded-2xl mt-3 shadow-xl space-y-3 shrink-0">
       
-      <!-- IMAGE ATTACHMENT PREVIEW (HIDDEN INITIALLY) -->
-      <div id="attached-image-preview" class="hidden items-center justify-between bg-slate-950 p-2.5 px-4 rounded-2xl border border-slate-800">
+      <!-- IMAGE ATTACHMENT PREVIEW -->
+      <div id="attached-image-preview" class="hidden items-center justify-between bg-slate-950 p-2.5 px-4 rounded-xl border border-slate-800">
         <div class="flex items-center gap-3">
-          <img id="attached-thumb" src="" class="w-12 h-12 object-cover rounded-xl border border-slate-700">
+          <img id="attached-thumb" src="" class="w-11 h-11 object-cover rounded-lg border border-slate-700">
           <div>
             <span id="attached-filename" class="text-xs font-bold text-slate-200 block truncate max-w-xs"></span>
-            <span class="text-[10px] text-emerald-400 font-semibold">✓ Đã đính kèm ảnh banner</span>
+            <span class="text-[11px] text-emerald-400 font-medium">✓ Đã tiếp nhận file banner quảng cáo</span>
           </div>
         </div>
-        <button id="btn-remove-attachment" class="text-xs text-rose-400 hover:text-rose-300 font-bold bg-rose-950/60 p-2 rounded-xl border border-rose-800/80">
-          <i class="fa-solid fa-trash-can"></i> Xóa
+        <button id="btn-remove-attachment" class="text-xs text-rose-400 hover:text-rose-300 font-semibold bg-rose-950/60 hover:bg-rose-900/60 px-3 py-1.5 rounded-lg border border-rose-800/80 transition-all">
+          <i class="fa-solid fa-xmark"></i> Hủy chọn
         </button>
       </div>
 
@@ -84,13 +89,13 @@
       <form id="chat-form" class="flex items-center gap-2">
         <input type="file" id="file-input" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden">
         
-        <button type="button" id="btn-attach-image" class="w-11 h-11 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-lg border border-slate-700 transition-all shadow-sm" title="Đính kèm ảnh banner quảng cáo">
+        <button type="button" id="btn-attach-image" class="w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-base border border-slate-700 transition-all shadow-sm shrink-0" title="Chọn file hình ảnh banner">
           <i class="fa-solid fa-paperclip"></i>
         </button>
 
-        <input type="text" id="chat-input" placeholder="Nhập tên của bạn, ngành hàng hoặc hỏi AI Agent..." class="flex-1 text-sm px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 focus:border-indigo-500 outline-none">
+        <input type="text" id="chat-input" placeholder="Nhập Quý danh, Ngành hàng hoặc câu hỏi tư vấn..." class="flex-1 text-sm px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:border-amber-500 outline-none transition-all">
 
-        <button type="submit" id="btn-send-message" class="w-11 h-11 rounded-2xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-slate-950 font-black flex items-center justify-center text-lg shadow-lg shadow-indigo-500/20 transition-all">
+        <button type="submit" id="btn-send-message" class="w-11 h-11 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold flex items-center justify-center text-base shadow-md transition-all shrink-0">
           <i class="fa-solid fa-paper-plane"></i>
         </button>
       </form>
@@ -101,22 +106,22 @@
 
   <!-- API KEY MODAL -->
   <div id="api-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="glass-chat rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700">
+    <div class="executive-card rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-700">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-key text-amber-400"></i> Cấu hình Gemini / OpenAI API Key
+          <i class="fa-solid fa-key text-amber-400"></i> Cấu hình Khóa API
         </h3>
         <button id="btn-close-modal" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <p class="text-xs text-slate-300 leading-relaxed">
-        Nhập mã <strong>Google Gemini API Key</strong> hoặc <strong>OpenAI Key</strong> của bạn để AI Agent thẩm định ảnh thực tế. Nếu để trống, hệ thống sẽ chạy Chế độ Demo Mock AI Agent.
+        Quý khách vui lòng nhập mã <strong>Google Gemini API Key</strong> hoặc <strong>OpenAI Key</strong> để hệ thống thực hiện thẩm định thị giác trực tiếp. Nếu chưa cấu hình, hệ thống sẽ vận hành theo chế độ Thẩm định Mẫu (Demo Engine).
       </p>
       <div>
-        <label for="input-api-key" class="block text-xs font-bold text-slate-300 mb-1">API Key</label>
-        <input type="password" id="input-api-key" placeholder="AIzaSy... hoặc sk-..." class="w-full text-sm font-mono px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-indigo-500">
+        <label for="input-api-key" class="block text-xs font-bold text-slate-300 mb-1">Mã API Key</label>
+        <input type="password" id="input-api-key" placeholder="AIzaSy... hoặc sk-..." class="w-full text-sm font-mono px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none focus:border-amber-500">
       </div>
       <div class="flex justify-end gap-2 pt-2">
-        <button id="btn-save-key" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md">Lưu Key</button>
+        <button id="btn-save-key" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shadow-md">Lưu Khóa API</button>
       </div>
     </div>
   </div>
