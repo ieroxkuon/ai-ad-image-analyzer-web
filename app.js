@@ -1,5 +1,5 @@
 // =============================================================================
-// ADVISION AI - MINIMALIST CHATGPT ENGINE
+// ADVISION AI - HIGH CONTRAST & ULTRA LEGIBLE APPLICATION ENGINE
 // =============================================================================
 
 let userName = localStorage.getItem('ADVISION_USER_NAME') || "";
@@ -29,9 +29,9 @@ const inputApiKey = document.getElementById('input-api-key');
 const savedKey = localStorage.getItem('GEMINI_API_KEY') || "";
 if (savedKey) inputApiKey.value = savedKey;
 
-// SYSTEM PROMPT KHIÊM TỐN, ĐƠN GIẢN, CHUẨN XÁC (MINIMALIST PERSONA)
+// SYSTEM PROMPT CHUẨN XÁC, KHIÊM TỐN (HIGH CONTRAST PROMPT)
 const ADVISION_SYSTEM_PROMPT = `
-Bạn là AdVision - Chuyên gia phân tích hình ảnh và thiết kế banner quảng cáo. Nhiệm vụ của bạn là bóc tách, đánh giá và nhận xét các yếu tố hình ảnh trên banner: Mật độ văn bản (quy tắc 20%), nút kêu gọi hành động (CTA), tỷ lệ tương phản và bố cục thị giác.
+Bạn là AdVision - Chuyên gia thẩm định hình ảnh và thiết kế banner quảng cáo. Nhiệm vụ của bạn là bóc tách, đánh giá và nhận xét các yếu tố hình ảnh trên banner: Mật độ văn bản (quy tắc 20%), nút kêu gọi hành động (CTA), tỷ lệ tương phản và bố cục thị giác.
 
 CÂU HỎI TRUNG TÂM BẮT BUỘC TRẢ LỜI:
 "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"
@@ -134,7 +134,7 @@ chatForm.addEventListener('submit', async (e) => {
     removeAgentThinking();
     
     appendAgentMessage(`
-      <p>Chào <strong>${userName}</strong>!</p>
+      <p class="font-bold">Chào <strong>${userName}</strong>!</p>
       <p>Bây giờ bạn có thể bấm biểu tượng 📎 để đính kèm hình ảnh banner quảng cáo cần đánh giá nhé.</p>
     `);
     return;
@@ -184,18 +184,18 @@ chatForm.addEventListener('submit', async (e) => {
   }
 });
 
-// UI RENDERING UTILITIES (CHATGPT MINIMALIST STYLE)
+// HIGH CONTRAST UI RENDERING UTILITIES
 function appendUserMessage(text, imgSrc) {
-  let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-48 rounded border border-slate-200 dark:border-slate-700 mb-2">` : '';
+  let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-48 rounded border-2 border-slate-400 dark:border-slate-600 mb-2">` : '';
   let textHtml = text ? `<p>${text}</p>` : '';
 
   const html = `
-    <div class="flex gap-4 justify-end">
-      <div class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-3.5 px-4 rounded-2xl rounded-tr-none text-sm max-w-2xl leading-relaxed space-y-2">
+    <div class="flex gap-3 justify-end">
+      <div class="bg-slate-900 dark:bg-slate-800 text-white p-4 rounded-2xl rounded-tr-none text-base font-medium max-w-xl leading-relaxed shadow-sm border border-slate-700">
         ${imgHtml}
         ${textHtml}
       </div>
-      <div class="w-8 h-8 rounded-sm bg-slate-400 dark:bg-slate-600 flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5">
+      <div class="w-9 h-9 rounded-lg bg-slate-800 dark:bg-slate-700 flex items-center justify-center text-white font-black text-sm shrink-0 border border-slate-600">
         <i class="fa-solid fa-user"></i>
       </div>
     </div>
@@ -207,11 +207,13 @@ function appendUserMessage(text, imgSrc) {
 function appendAgentMessage(formattedHtml) {
   const html = `
     <div class="flex gap-4">
-      <div class="w-8 h-8 rounded-sm bg-emerald-600 flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5">
+      <div class="w-9 h-9 rounded-lg bg-blue-700 text-white font-bold flex items-center justify-center text-sm shrink-0 shadow">
         <i class="fa-solid fa-robot"></i>
       </div>
-      <div class="space-y-2 text-sm text-slate-800 dark:text-slate-200 leading-relaxed flex-1">
-        ${formattedHtml}
+      <div class="space-y-3 text-base text-slate-950 dark:text-slate-100 leading-relaxed flex-1 prose-contrast">
+        <div class="bg-slate-100 dark:bg-[#161e2e] border-2 border-slate-300 dark:border-slate-700 p-5 rounded-2xl shadow-sm space-y-2">
+          ${formattedHtml}
+        </div>
       </div>
     </div>
   `;
@@ -222,12 +224,12 @@ function appendAgentMessage(formattedHtml) {
 function appendAgentThinking() {
   const html = `
     <div id="thinking-bubble" class="flex gap-4">
-      <div class="w-8 h-8 rounded-sm bg-emerald-600 flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5">
+      <div class="w-9 h-9 rounded-lg bg-blue-700 text-white font-bold flex items-center justify-center text-sm shrink-0">
         <i class="fa-solid fa-robot"></i>
       </div>
-      <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 py-2">
-        <div class="w-3 h-3 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-        <span>Đang phân tích hình ảnh...</span>
+      <div class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-3 bg-slate-100 dark:bg-[#161e2e] border-2 border-slate-300 dark:border-slate-700 px-4 py-3 rounded-xl">
+        <div class="w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></div>
+        <span>Đang bóc tách và phân tích hình ảnh...</span>
       </div>
     </div>
   `;
@@ -319,17 +321,17 @@ async function callOpenAiVisionApi(apiKey, base64Data, mimeType, userText) {
 function formatMarkdown(str) {
   if (!str) return "";
   let html = str
-    .replace(/^### (.*$)/gim, '<h4 class="font-bold mt-3 mb-1 text-sm">$1</h4>')
-    .replace(/^## (.*$)/gim, '<h3 class="font-bold text-emerald-600 dark:text-emerald-400 mt-4 mb-2 text-base">$1</h3>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-900 dark:text-white">$1</strong>')
-    .replace(/^[-*+] (.*$)/gim, '<li class="ml-4 list-disc text-slate-700 dark:text-slate-300 my-1">$1</li>')
-    .replace(/^\d+\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-700 dark:text-slate-300 my-1">$1</li>')
+    .replace(/^### (.*$)/gim, '<h4 class="font-extrabold text-slate-950 dark:text-white mt-3 mb-1 text-base">$1</h4>')
+    .replace(/^## (.*$)/gim, '<h3 class="font-black text-blue-700 dark:text-blue-400 mt-4 mb-2 text-lg border-b pb-1 border-slate-300 dark:border-slate-700">$1</h3>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-black text-slate-950 dark:text-white">$1</strong>')
+    .replace(/^[-*+] (.*$)/gim, '<li class="ml-4 list-disc font-medium text-slate-900 dark:text-slate-200 my-1">$1</li>')
+    .replace(/^\d+\.\s+(.*$)/gim, '<li class="ml-4 list-decimal font-medium text-slate-900 dark:text-slate-200 my-1">$1</li>')
     .replace(/\n\n/g, '<br><br>')
     .replace(/\n/g, '<br>');
   return html;
 }
 
-// MINIMAL MOCK ANALYSIS
+// MINIMAL HIGH CONTRAST MOCK ANALYSIS
 function getMinimalMockAnalysis(filename, targetUser) {
   return `--------------------------------
 ĐÁNH GIÁ TIÊU CHUẨN QUẢNG CÁO
