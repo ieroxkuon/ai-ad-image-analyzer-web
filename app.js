@@ -1,5 +1,5 @@
 // =============================================================================
-// ADVISION VIP AI AGENT - FRONTEND ENGINE (EXPLICIT PROMPT + IMAGE PAYLOAD)
+// ADVISION VIP AI AGENT - FRONTEND ENGINE (ENHANCED PARSING & UI FORMATTING)
 // =============================================================================
 
 let currentFile = null;
@@ -195,10 +195,8 @@ btnAnalyze.addEventListener('click', async () => {
   if (apiKey) {
     try {
       if (apiKey.startsWith('sk-')) {
-        // Call OpenAI Vision API
         reportText = await callOpenAiVisionApi(apiKey, currentBase64, currentMimeType, category, platform);
       } else {
-        // Call Google Gemini Vision API
         reportText = await callGeminiVisionApi(apiKey, currentBase64, currentMimeType, category, platform);
       }
     } catch (err) {
@@ -224,11 +222,9 @@ btnAnalyze.addEventListener('click', async () => {
   resultsSection.scrollIntoView({ behavior: 'smooth' });
 });
 
-// GOOGLE GEMINI VISION API ENGINE - TRUYỀN ẢNH VÀ PROMPT CÙNG LÚC
+// GOOGLE GEMINI VISION API ENGINE
 async function callGeminiVisionApi(apiKey, base64Data, mimeType, category, platform) {
   const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
-  
-  // PROMPT TRUNG TÂM CHUẨN XÁC THEO CHỈ ĐẠO
   const explicitPrompt = `Hãy phân tích bức ảnh quảng cáo này và trả lời chính xác câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\n\n- Ngành hàng sản phẩm: ${category}\n- Nền tảng quảng cáo target: ${platform}\n\n${ADVISION_SYSTEM_PROMPT}`;
 
   let lastErr = null;
@@ -263,7 +259,7 @@ async function callGeminiVisionApi(apiKey, base64Data, mimeType, category, platf
   throw lastErr || new Error("Không thể gọi Gemini API");
 }
 
-// OPENAI VISION API ENGINE (GPT-4o) - TRUYỀN ẢNH VÀ PROMPT CÙNG LÚC
+// OPENAI VISION API ENGINE (GPT-4o)
 async function callOpenAiVisionApi(apiKey, base64Data, mimeType, category, platform) {
   const url = 'https://api.openai.com/v1/chat/completions';
   const explicitPrompt = `Hãy phân tích bức ảnh này và trả lời câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\nNgành hàng: ${category}\nNền tảng target: ${platform}`;
@@ -333,7 +329,7 @@ function renderResults(rawText) {
     verdictCard.className = "rounded-3xl p-6 sm:p-8 border shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6 bg-amber-950/40 border-amber-500/40 shadow-amber-500/10";
     verdictIcon.className = "w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-xl bg-gradient-to-tr from-amber-500 to-rose-500 text-slate-950";
     verdictIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
-    verdictBadge.className = "inline-block text-[11px] font-black px-3.5 py-1 rounded-full uppercase tracking-widest mb-1.5 bg-amber-100 text-amber-800 border border-amber-300";
+    verdictBadge.className = "inline-block text-[11px] font-black px-3.5 py-1 rounded-full uppercase tracking-widest mb-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/30";
     verdictBadge.textContent = "KẾT LUẬN THẨM ĐỊNH CHÍNH THỨC";
     verdictTitle.textContent = "⚠️ CHƯA ĐẠT TIÊU CHUẨN (CẦN TỐI ƯU CHUYỂN ĐỔI)";
     verdictScore.className = "text-3xl font-black bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-transparent";
@@ -364,10 +360,12 @@ function extractSection(text, startKey, endKey) {
 function formatMarkdown(str) {
   if (!str) return "";
   let html = str
-    .replace(/^### (.*$)/gim, '<h4 class="font-bold text-white mt-2 mb-1">$1</h4>')
-    .replace(/^## (.*$)/gim, '<h3 class="font-bold text-white mt-3 mb-1 text-base">$1</h3>')
+    .replace(/^### (.*$)/gim, '<h4 class="font-bold text-white mt-3 mb-1.5">$1</h4>')
+    .replace(/^## (.*$)/gim, '<h3 class="font-bold text-amber-300 mt-4 mb-2 text-base">$1</h3>')
     .replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold text-amber-300">$1</strong>')
-    .replace(/^- (.*$)/gim, '<li class="ml-4 list-disc text-slate-300">$1</li>')
+    .replace(/^[-*+] (.*$)/gim, '<li class="ml-4 list-disc text-slate-300 my-1">$1</li>')
+    .replace(/^\d+\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-300 my-1">$1</li>')
+    .replace(/\n\n/g, '<br><br>')
     .replace(/\n/g, '<br>');
   return html;
 }
