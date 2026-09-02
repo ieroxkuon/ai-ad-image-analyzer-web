@@ -1,5 +1,5 @@
 // =============================================================================
-// ADVISION AI - HIGH CONTRAST & ULTRA LEGIBLE APPLICATION ENGINE
+// ADVISION AI - ENGINE HUẤN LUYỆN CHUẨN KHUNG 8 PHẦN (CTO TUẤN NGUYỄN)
 // =============================================================================
 
 let userName = localStorage.getItem('ADVISION_USER_NAME') || "";
@@ -29,19 +29,40 @@ const inputApiKey = document.getElementById('input-api-key');
 const savedKey = localStorage.getItem('GEMINI_API_KEY') || "";
 if (savedKey) inputApiKey.value = savedKey;
 
-// SYSTEM PROMPT CHUẨN XÁC, KHIÊM TỐN (HIGH CONTRAST PROMPT)
+// SYSTEM PROMPT CHUẨN 100% THEO KHUNG 8 PHẦN CỦA CTO TUẤN NGUYỄN
 const ADVISION_SYSTEM_PROMPT = `
-Bạn là AdVision - Chuyên gia thẩm định hình ảnh và thiết kế banner quảng cáo. Nhiệm vụ của bạn là bóc tách, đánh giá và nhận xét các yếu tố hình ảnh trên banner: Mật độ văn bản (quy tắc 20%), nút kêu gọi hành động (CTA), tỷ lệ tương phản và bố cục thị giác.
+1. VAI TRÒ:
+Bạn là AI Training hỗ trợ người dùng (nhà sáng tạo, marketer, nhà thiết kế) trong việc thẩm định hình ảnh quảng cáo, đánh giá tiêu chuẩn thị giác, phân tích mật độ chữ (Text Ratio) và tư vấn phương án tối ưu hiệu suất cho banner thương mại.
 
-CÂU HỎI TRUNG TÂM BẮT BUỘC TRẢ LỜI:
-"BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"
+2. NĂNG LỰC (KIẾN THỨC):
+Bạn có kiến thức về quy chuẩn thị giác quảng cáo (Meta Ads, Google Ads, TikTok Ads, Shopee Ads), luật mật độ chữ < 20%, quy tắc 1/3 và tỷ lệ tương phản nút CTA. Bạn khai thác dữ liệu riêng là hình ảnh banner và tài liệu hướng dẫn do người dùng nạp kèm.
 
-CÁC NGUYÊN TẮC BẮT BUỘC:
-1. TUYỆT ĐỐI KHÔNG DÙNG KÝ TỰ MŨI TÊN (như ->, -->, ⇒) trong bất kỳ phần nào của câu trả lời.
-2. Trình bày bài phân tích theo các KHỐI VĂN BẢN (Text Blocks) rõ ràng.
-3. Phong cách nói chuyện: Khiêm tốn, lịch sự, ngắn gọn, đi thẳng vào vấn đề, mạch lạc và logic.
-4. Xưng hô tự nhiên theo tên của người dùng nếu có.
-5. Cuối bài đánh giá, gợi ý 1-2 câu hỏi ngắn để hỗ trợ người dùng tối ưu hơn.
+3. NGUYÊN TẮC:
+Luôn chính xác, khách quan, không tự tạo thông tin nếu thiếu dữ liệu. Ưu tiên sử dụng dữ liệu hình ảnh của người dùng. Bảo mật tài sản thiết kế.
+
+4. ĐỐI TƯỢNG PHỤC VỤ:
+Bạn phục vụ người dùng trực tiếp. Bạn gọi người dùng là Anh/Chị hoặc Bạn, và bạn xưng là Em. Dù bạn là chuyên gia nhưng bạn là trợ lý của người dùng.
+
+5. NHIỆM VỤ:
+- Phân tích bóc tách ảnh banner quảng cáo.
+- Đưa ra kết luận chính xác: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?" kèm điểm số trên thang điểm 10.
+- Đánh giá mật độ chữ, font chữ, vị trí sản phẩm và nút kêu gọi hành động (CTA).
+- Đưa ra 2-3 đề xuất tối ưu cụ thể, tiết kiệm thời gian, dễ áp dụng.
+
+6. TƯ DUY:
+- Luôn thực hiện theo quy trình: 1. Hiểu yêu cầu; 2. Phân tích dữ liệu; 3. Đưa ra giải pháp phù hợp.
+- Trả lời ngắn gọn từng ý, mỗi ý viết thành các khối văn bản, mỗi khối từ 2 đến 5 câu (từ 2-3 dòng), sau đó xuống dòng tiếp ý khác.
+- Phải có tư duy tìm hiểu và phân tích hệ thống sau đó tổng hợp kiến thức có đóng mở để hiểu cho người dùng với tư cách là người mới vào nghề.
+
+7. PHONG CÁCH:
+- Thân thiện, dễ hiểu, ngắn gọn, rõ ràng, luôn mang tính khuyến khích và tích cực.
+- Bạn là người vui tính, nhưng rất logic trong ngôn ngữ.
+- Hạn chế dùng icon, hoặc không dùng nếu không được đề nghị.
+- Trong nội dung KHÔNG dùng ký tự ">" và KHÔNG dùng mũi tên "->".
+- Sử dụng dấu chấm phẩy ";" hoặc dấu gạch đầu dòng "-" chuẩn xác, hoặc diễn đạt tự nhiên.
+
+8. BẠN ĐÓNG VAI:
+Bạn là Nguyễn Hoàng An, 32 tuổi, Chuyên gia Thẩm định Thị giác & Giám đốc Đồ họa Quảng cáo với 10 năm kinh nghiệm. Bạn luôn hỗ trợ người dùng bằng những giải pháp thực tế, tiết kiệm thời gian và dễ áp dụng.
 
 CẤU TRÚC KẾT QUẢ ĐẦU RA (OUTPUT BLOCK STRUCTURE):
 
@@ -134,8 +155,8 @@ chatForm.addEventListener('submit', async (e) => {
     removeAgentThinking();
     
     appendAgentMessage(`
-      <p class="font-bold">Chào <strong>${userName}</strong>!</p>
-      <p>Bây giờ bạn có thể bấm biểu tượng 📎 để đính kèm hình ảnh banner quảng cáo cần đánh giá nhé.</p>
+      <p class="font-bold">Em chào <strong>${userName}</strong>!</p>
+      <p>Em là Nguyễn Hoàng An, rất vui được hỗ trợ ${userName}. Bây giờ ${userName} có thể bấm biểu tượng 📎 để gửi hình ảnh banner quảng cáo cần đánh giá nhé.</p>
     `);
     return;
   }
@@ -167,8 +188,8 @@ chatForm.addEventListener('submit', async (e) => {
     btnRemoveAttachment.click();
     removeAgentThinking();
 
-    // Clean forbidden arrows
-    reportText = reportText.replace(/->|-->|⇒/g, '•');
+    // Clean forbidden characters (> and ->)
+    reportText = reportText.replace(/->|-->|⇒|>/g, '•');
     appendAgentMessage(formatMarkdown(reportText));
     return;
   }
@@ -179,12 +200,12 @@ chatForm.addEventListener('submit', async (e) => {
     await new Promise(r => setTimeout(r, 800));
     removeAgentThinking();
     appendAgentMessage(`
-      <p>Cảm ơn thông tin của <strong>${userName || 'bạn'}</strong>. Bạn có thể tải thêm ảnh banner khác nếu muốn tiếp tục phân tích nhé.</p>
+      <p>Em cảm ơn thông tin của <strong>${userName || 'bạn'}</strong>. ${userName || 'Bạn'} có thể gửi thêm ảnh banner khác để em tiếp tục thẩm định nhé.</p>
     `);
   }
 });
 
-// HIGH CONTRAST UI RENDERING UTILITIES
+// UI RENDERING UTILITIES
 function appendUserMessage(text, imgSrc) {
   let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-48 rounded border-2 border-slate-400 dark:border-slate-600 mb-2">` : '';
   let textHtml = text ? `<p>${text}</p>` : '';
@@ -229,7 +250,7 @@ function appendAgentThinking() {
       </div>
       <div class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-3 bg-slate-100 dark:bg-[#161e2e] border-2 border-slate-300 dark:border-slate-700 px-4 py-3 rounded-xl">
         <div class="w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></div>
-        <span>Đang bóc tách và phân tích hình ảnh...</span>
+        <span>Em đang phân tích dữ liệu hình ảnh...</span>
       </div>
     </div>
   `;
@@ -331,7 +352,7 @@ function formatMarkdown(str) {
   return html;
 }
 
-// MINIMAL HIGH CONTRAST MOCK ANALYSIS
+// MINIMAL MOCK ANALYSIS
 function getMinimalMockAnalysis(filename, targetUser) {
   return `--------------------------------
 ĐÁNH GIÁ TIÊU CHUẨN QUẢNG CÁO
@@ -344,7 +365,7 @@ KẾT LUẬN: CHƯA ĐẠT TIÊU CHUẨN (Cần tối ưu thêm)
 - Chủ thể & Sản phẩm chính: Sản phẩm trong file ${filename} được đặt ở trung tâm, góc nhìn tương đối rõ ràng.
 - Văn bản & Mật độ chữ: Mật độ văn bản chiếm khoảng 24% diện tích thiết kế.
 - Thông điệp quảng cáo: Tiêu đề hiển thị rõ nhưng chưa nổi bật ý chính.
-- Nút kêu gọi hành động (CTA): Nút CTA chưa có độ tương phản đủ cao so với phông nền.
+- Nút kêu gọi hành động (CTA): Nút CTA chưa có độ tương phản đủ cao so me với phông nền.
 
 [KHỐI 3: ƯU ĐIỂM & HẠN CHẾ]
 - Ưu điểm: Màu sắc tổng thể hài hòa, hình ảnh sản phẩm nét.
@@ -355,6 +376,6 @@ KẾT LUẬN: CHƯA ĐẠT TIÊU CHUẨN (Cần tối ưu thêm)
 - Đề xuất 2: Bớt 1 dòng chữ phụ để tạo không gian thoáng hơn xung quanh sản phẩm.
 
 [KHỐI 5: TƯ VẤN THÊM]
-Chào ${targetUser}, bạn có thể điều chỉnh nút CTA và bớt bớt chữ phụ để banner đạt hiệu quả tốt hơn nhé. Nếu cần hỗ trợ thêm về ngách sản phẩm cụ thể, bạn cứ cho tôi biết!
+Chào ${targetUser}, ${targetUser} có thể điều chỉnh nút CTA và bớt chữ phụ để banner đạt hiệu quả tốt hơn nhé. Nếu cần hỗ trợ thêm về ngách sản phẩm cụ thể, ${targetUser} cứ cho em biết!
 --------------------------------`;
 }
