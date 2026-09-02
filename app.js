@@ -1,5 +1,5 @@
 // =============================================================================
-// ADVISION VIP AI AGENT - FRONTEND ENGINE (ENTERPRISE EDITION)
+// ADVISION VIP AI AGENT - FRONTEND ENGINE (DUAL GEMINI & OPENAI VISION ENGINE)
 // =============================================================================
 
 let currentFile = null;
@@ -20,7 +20,6 @@ const btnRemoveImage = document.getElementById('btn-remove-image');
 const inputCategory = document.getElementById('input-category');
 const selectPlatform = document.getElementById('select-platform');
 const btnAnalyze = document.getElementById('btn-analyze');
-const btnAnalyzeText = document.getElementById('btn-analyze-text');
 
 const loadingState = document.getElementById('loading-state');
 const resultsSection = document.getElementById('results-section');
@@ -55,7 +54,7 @@ const btnCloseModal = document.getElementById('btn-close-modal');
 const btnSaveKey = document.getElementById('btn-save-key');
 const inputApiKey = document.getElementById('input-api-key');
 
-// Load stored API Key if any
+// Load stored API Key
 const savedKey = localStorage.getItem('GEMINI_API_KEY') || "";
 if (savedKey) inputApiKey.value = savedKey;
 
@@ -176,7 +175,7 @@ btnSaveKey.addEventListener('click', () => {
   const key = inputApiKey.value.trim();
   localStorage.setItem('GEMINI_API_KEY', key);
   apiModal.classList.add('hidden');
-  alert('Đã lưu Gemini API Key!');
+  alert('Đã lưu API Key thành công!');
 });
 
 // ANALYZE ACTION
@@ -188,14 +187,20 @@ btnAnalyze.addEventListener('click', async () => {
   resultsSection.classList.add('hidden');
 
   const apiKey = localStorage.getItem('GEMINI_API_KEY') || "";
-  const category = inputCategory.value.trim() || "Chưa xác định";
+  const category = inputCategory.value.trim() || "Mỹ phẩm / Chung";
   const platform = selectPlatform.value;
 
   let reportText = "";
 
   if (apiKey) {
     try {
-      reportText = await callGeminiVisionApi(apiKey, currentBase64, currentMimeType, category, platform);
+      if (apiKey.startsWith('sk-')) {
+        // Call OpenAI Vision API
+        reportText = await callOpenAiVisionApi(apiKey, currentBase64, currentMimeType, category, platform);
+      } else {
+        // Call Google Gemini Vision API
+        reportText = await callGeminiVisionApi(apiKey, currentBase64, currentMimeType, category, platform);
+      }
     } catch (err) {
       console.warn("API Error:", err);
       reportText = getMockAnalysis(currentFile ? currentFile.name : "banner.png", category, platform);
@@ -219,7 +224,7 @@ btnAnalyze.addEventListener('click', async () => {
   resultsSection.scrollIntoView({ behavior: 'smooth' });
 });
 
-// GEMINI VISION API CALL
+// GOOGLE GEMINI VISION API ENGINE
 async function callGeminiVisionApi(apiKey, base64Data, mimeType, category, platform) {
   const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
   const userPrompt = `${ADVISION_SYSTEM_PROMPT}\n\nThông tin bổ sung:\n- Ngành hàng: ${category}\n- Nền tảng quảng cáo target: ${platform}`;
@@ -256,6 +261,42 @@ async function callGeminiVisionApi(apiKey, base64Data, mimeType, category, platf
   throw lastErr || new Error("Không thể gọi Gemini API");
 }
 
+// OPENAI VISION API ENGINE (GPT-4o / GPT-4o-mini)
+async function callOpenAiVisionApi(apiKey, base64Data, mimeType, category, platform) {
+  const url = 'https://api.openai.com/v1/chat/completions';
+  const userPrompt = `Ngành hàng: ${category}\nNền tảng target: ${platform}\nHãy phân tích ảnh này theo đúng System Prompt.`;
+
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: ADVISION_SYSTEM_PROMPT },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: userPrompt },
+            { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+          ]
+        }
+      ],
+      max_tokens: 1000
+    })
+  });
+
+  if (!resp.ok) {
+    const errData = await resp.json();
+    throw new Error(errData.error?.message || "OpenAI API Error");
+  }
+
+  const json = await resp.json();
+  return json.choices?.[0]?.message?.content || "";
+}
+
 // RENDER RESULTS IN BLOCK CARDS
 function renderResults(rawText) {
   const isPass = rawText.includes("ĐẠT TIÊU CHUẨN") && !rawText.includes("CHƯA ĐẠT TIÊU CHUẨN");
@@ -263,7 +304,6 @@ function renderResults(rawText) {
   // Match score
   const scoreMatch = rawText.match(/(\d+(\.\d+)?)\s*\/\s*10/);
   const scoreStr = scoreMatch ? `${scoreMatch[1]}/10` : (isPass ? "8.5/10" : "6.5/10");
-  const scoreVal = scoreMatch ? parseFloat(scoreMatch[1]) : (isPass ? 8.5 : 6.5);
 
   // Meter values calculation
   const productVal = isPass ? 90 : 85;
@@ -322,7 +362,7 @@ function extractSection(text, startKey, endKey) {
 function formatMarkdown(str) {
   if (!str) return "";
   let html = str
-    .replace(/^### (.*$)/gim, '<h4 class="font-bold text-white mt-2 mb-1">$1</h4>')
+    .replace(/^### (.*$)/gim, '<h4 class="font-bold text-white mt-2 mb-1">$1 Pik</h4>')
     .replace(/^## (.*$)/gim, '<h3 class="font-bold text-white mt-3 mb-1 text-base">$1</h3>')
     .replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold text-amber-300">$1</strong>')
     .replace(/^- (.*$)/gim, '<li class="ml-4 list-disc text-slate-300">$1</li>')
