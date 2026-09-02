@@ -1,5 +1,5 @@
 // =============================================================================
-// ADVISION VIP AI AGENT - FRONTEND ENGINE (DUAL GEMINI & OPENAI VISION ENGINE)
+// ADVISION VIP AI AGENT - FRONTEND ENGINE (EXPLICIT PROMPT + IMAGE PAYLOAD)
 // =============================================================================
 
 let currentFile = null;
@@ -62,8 +62,8 @@ if (savedKey) inputApiKey.value = savedKey;
 const ADVISION_SYSTEM_PROMPT = `
 Bạn là AdVision Master - Chuyên gia cao cấp về Phân tích Thị giác Hình ảnh Quảng cáo và Giám đốc Nghệ thuật Thiết kế Đồ họa Marketing với hơn 15 năm kinh nghiệm. Nhiệm vụ của bạn là đóng vai trò một người cố vấn thiết kế thông minh, kết hợp giữa tư duy nghệ thuật thị giác (Visual Arts), nguyên lý thiết kế đồ họa (Graphic Design Principles) và chiến lược tâm lý học khách hàng trong Marketing. Bạn ở đây để quan sát, bóc tách từng điểm ảnh, cấu trúc chữ, phối màu và bố cục của banner, từ đó đưa ra lời kết luận chính xác nhất về việc bức ảnh có đạt tiêu chuẩn quảng cáo hay không, đồng thời truyền cảm hứng giúp người dùng tối ưu hóa hiệu suất chuyển đổi quảng cáo một cách logic và sáng tạo nhất.
 
-NHIỆM VỤ TRUNG TÂM:
-Đánh giá bức ảnh được cung cấp và trả lời chính xác câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"
+CÂU HỎI TRUNG TÂM BẮT BUỘC TRẢ LỜI:
+"BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"
 
 CÁC QUY TẮC BẮT BUỘC:
 1. TUYỆT ĐỐI KHÔNG DÙNG KÝ TỰ MŨI TÊN (như ->, -->, ⇒) trong bất kỳ phần nào của câu trả lời.
@@ -224,10 +224,12 @@ btnAnalyze.addEventListener('click', async () => {
   resultsSection.scrollIntoView({ behavior: 'smooth' });
 });
 
-// GOOGLE GEMINI VISION API ENGINE
+// GOOGLE GEMINI VISION API ENGINE - TRUYỀN ẢNH VÀ PROMPT CÙNG LÚC
 async function callGeminiVisionApi(apiKey, base64Data, mimeType, category, platform) {
   const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
-  const userPrompt = `${ADVISION_SYSTEM_PROMPT}\n\nThông tin bổ sung:\n- Ngành hàng: ${category}\n- Nền tảng quảng cáo target: ${platform}`;
+  
+  // PROMPT TRUNG TÂM CHUẨN XÁC THEO CHỈ ĐẠO
+  const explicitPrompt = `Hãy phân tích bức ảnh quảng cáo này và trả lời chính xác câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\n\n- Ngành hàng sản phẩm: ${category}\n- Nền tảng quảng cáo target: ${platform}\n\n${ADVISION_SYSTEM_PROMPT}`;
 
   let lastErr = null;
   for (const modelName of models) {
@@ -239,7 +241,7 @@ async function callGeminiVisionApi(apiKey, base64Data, mimeType, category, platf
         body: JSON.stringify({
           contents: [{
             parts: [
-              { text: userPrompt },
+              { text: explicitPrompt },
               { inline_data: { mime_type: mimeType, data: base64Data } }
             ]
           }]
@@ -261,10 +263,10 @@ async function callGeminiVisionApi(apiKey, base64Data, mimeType, category, platf
   throw lastErr || new Error("Không thể gọi Gemini API");
 }
 
-// OPENAI VISION API ENGINE (GPT-4o / GPT-4o-mini)
+// OPENAI VISION API ENGINE (GPT-4o) - TRUYỀN ẢNH VÀ PROMPT CÙNG LÚC
 async function callOpenAiVisionApi(apiKey, base64Data, mimeType, category, platform) {
   const url = 'https://api.openai.com/v1/chat/completions';
-  const userPrompt = `Ngành hàng: ${category}\nNền tảng target: ${platform}\nHãy phân tích ảnh này theo đúng System Prompt.`;
+  const explicitPrompt = `Hãy phân tích bức ảnh này và trả lời câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\nNgành hàng: ${category}\nNền tảng target: ${platform}`;
 
   const resp = await fetch(url, {
     method: 'POST',
@@ -279,7 +281,7 @@ async function callOpenAiVisionApi(apiKey, base64Data, mimeType, category, platf
         {
           role: 'user',
           content: [
-            { type: 'text', text: userPrompt },
+            { type: 'text', text: explicitPrompt },
             { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } }
           ]
         }
@@ -331,7 +333,7 @@ function renderResults(rawText) {
     verdictCard.className = "rounded-3xl p-6 sm:p-8 border shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6 bg-amber-950/40 border-amber-500/40 shadow-amber-500/10";
     verdictIcon.className = "w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-xl bg-gradient-to-tr from-amber-500 to-rose-500 text-slate-950";
     verdictIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
-    verdictBadge.className = "inline-block text-[11px] font-black px-3.5 py-1 rounded-full uppercase tracking-widest mb-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/30";
+    verdictBadge.className = "inline-block text-[11px] font-black px-3.5 py-1 rounded-full uppercase tracking-widest mb-1.5 bg-amber-100 text-amber-800 border border-amber-300";
     verdictBadge.textContent = "KẾT LUẬN THẨM ĐỊNH CHÍNH THỨC";
     verdictTitle.textContent = "⚠️ CHƯA ĐẠT TIÊU CHUẨN (CẦN TỐI ƯU CHUYỂN ĐỔI)";
     verdictScore.className = "text-3xl font-black bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-transparent";
@@ -362,7 +364,7 @@ function extractSection(text, startKey, endKey) {
 function formatMarkdown(str) {
   if (!str) return "";
   let html = str
-    .replace(/^### (.*$)/gim, '<h4 class="font-bold text-white mt-2 mb-1">$1 Pik</h4>')
+    .replace(/^### (.*$)/gim, '<h4 class="font-bold text-white mt-2 mb-1">$1</h4>')
     .replace(/^## (.*$)/gim, '<h3 class="font-bold text-white mt-3 mb-1 text-base">$1</h3>')
     .replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold text-amber-300">$1</strong>')
     .replace(/^- (.*$)/gim, '<li class="ml-4 list-disc text-slate-300">$1</li>')
