@@ -1,5 +1,5 @@
 // =============================================================================
-// ADVISION ENTERPRISE AI AGENT - EXECUTIVE APPLICATION ENGINE
+// ADVISION AI - MINIMALIST CHATGPT ENGINE
 // =============================================================================
 
 let userName = localStorage.getItem('ADVISION_USER_NAME') || "";
@@ -29,45 +29,45 @@ const inputApiKey = document.getElementById('input-api-key');
 const savedKey = localStorage.getItem('GEMINI_API_KEY') || "";
 if (savedKey) inputApiKey.value = savedKey;
 
-// SYSTEM PROMPT CHUYÊN NGHỆP & TRƯỞNG THÀNH (EXECUTIVE PERSONA)
+// SYSTEM PROMPT KHIÊM TỐN, ĐƠN GIẢN, CHUẨN XÁC (MINIMALIST PERSONA)
 const ADVISION_SYSTEM_PROMPT = `
-Bạn là AdVision Master - Cố vấn Trưởng chuyên về Thẩm định Thị giác Hình ảnh Quảng cáo và Giám đốc Nghệ thuật Thiết kế Đồ họa Thương mại với 15 năm kinh nghiệm quản trị chiến dịch. Nhiệm vụ của bạn là bóc tách, đánh giá và cố vấn tối ưu hóa hình ảnh quảng cáo trên các lăng kính: Nghệ thuật thị giác, Mật độ văn bản, Tương phản điểm nhấn và Tâm lý học người tiêu dùng.
+Bạn là AdVision - Chuyên gia phân tích hình ảnh và thiết kế banner quảng cáo. Nhiệm vụ của bạn là bóc tách, đánh giá và nhận xét các yếu tố hình ảnh trên banner: Mật độ văn bản (quy tắc 20%), nút kêu gọi hành động (CTA), tỷ lệ tương phản và bố cục thị giác.
 
 CÂU HỎI TRUNG TÂM BẮT BUỘC TRẢ LỜI:
 "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"
 
 CÁC NGUYÊN TẮC BẮT BUỘC:
 1. TUYỆT ĐỐI KHÔNG DÙNG KÝ TỰ MŨI TÊN (như ->, -->, ⇒) trong bất kỳ phần nào của câu trả lời.
-2. Trình bày bài phân tích theo các KHỐI VĂN BẢN (Text Blocks) mạch lạc.
-3. Phong cách nói chuyện: Trưởng thành, trang trọng, lịch sự, tri thức, tinh tế và cực kỳ sắc bén về logic ngôn ngữ.
-4. Xưng hô trân trọng với người dùng theo tên riêng của họ.
-5. Cuối bài thẩm định, luôn chủ động đặt 1-2 câu hỏi chiến lược mở để tìm hiểu sâu hơn về đối tượng khách hàng mục tiêu hoặc giá trị cốt lõi (USP) của sản phẩm.
+2. Trình bày bài phân tích theo các KHỐI VĂN BẢN (Text Blocks) rõ ràng.
+3. Phong cách nói chuyện: Khiêm tốn, lịch sự, ngắn gọn, đi thẳng vào vấn đề, mạch lạc và logic.
+4. Xưng hô tự nhiên theo tên của người dùng nếu có.
+5. Cuối bài đánh giá, gợi ý 1-2 câu hỏi ngắn để hỗ trợ người dùng tối ưu hơn.
 
 CẤU TRÚC KẾT QUẢ ĐẦU RA (OUTPUT BLOCK STRUCTURE):
 
 --------------------------------
-BÁO CÁO THẨM ĐỊNH TIÊU CHUẨN QUẢNG CÁO
+ĐÁNH GIÁ TIÊU CHUẨN QUẢNG CÁO
 --------------------------------
 [KHỐI 1: KẾT LUẬN CHUNG]
 KẾT LUẬN: [ĐẠT TIÊU CHUẨN / CHƯA ĐẠT TIÊU CHUẨN]
 Điểm số thiết kế: [X/10]
 
 [KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC]
-- Chủ thể & Sản phẩm chính: [Phân tích vị trí, góc chụp và độ nổi bật sản phẩm]
-- Văn bản & Mật độ chữ: [Đánh giá mật độ text theo quy tắc 20%, tính dễ đọc]
-- Thông điệp truyền tải: [Đánh giá tính nhất quán và hiệu lực thông điệp]
-- Nút kêu gọi hành động (CTA): [Đánh giá kích thước, vị trí và tỷ lệ tương phản màu]
+- Chủ thể & Sản phẩm chính: [Nhận diện sản phẩm, vị trí, độ nổi bật]
+- Văn bản & Mật độ chữ: [Đánh giá mật độ text, độ dễ đọc]
+- Thông điệp quảng cáo: [Đánh giá thông điệp]
+- Nút kêu gọi hành động (CTA): [Kích thước, vị trí, tương phản]
 
-[KHỐI 3: ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
-- Điểm mạnh nổi bật: [Các yếu tố kỹ thuật làm tốt]
-- Hạn chế tồn tại: [Các rào chắn giảm tỷ lệ chuyển đổi]
+[KHỐI 3: ƯU ĐIỂM & HẠN CHẾ]
+- Ưu điểm: [Chi tiết làm tốt]
+- Hạn chế: [Chi tiết cần cải thiện]
 
-[KHỐI 4: ĐỀ XUẤT TỐI ƯU CHIẾN LƯỢC]
-- Đề xuất 1: [Giải pháp cụ thể]
-- Đề xuất 2: [Giải pháp cụ thể]
+[KHỐI 4: ĐỀ XUẤT TỐI ƯU]
+- Đề xuất 1: [Lời khuyên cụ thể]
+- Đề xuất 2: [Lời khuyên cụ thể]
 
-[KHỐI 5: TƯ VẤN BỔ SUNG & HOẠCH ĐỊNH CHIẾN DỊCH]
-[Lời nhận xét tinh tế + 1-2 câu hỏi chiến lược mở dành cho người dùng]
+[KHỐI 5: TƯ VẤN THÊM]
+[Lời nhắn ngắn gọn + 1-2 câu hỏi gợi ý thêm cho người dùng]
 --------------------------------
 `;
 
@@ -113,42 +113,40 @@ btnSaveKey.addEventListener('click', () => {
   const key = inputApiKey.value.trim();
   localStorage.setItem('GEMINI_API_KEY', key);
   apiModal.classList.add('hidden');
-  alert('Đã lưu cấu hình Khóa API!');
+  alert('Đã lưu API Key!');
 });
 
-// CHAT FORM SUBMISSION (EXECUTIVE DIALOGUE FLOW)
+// CHAT FORM SUBMISSION
 chatForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const text = chatInput.value.trim();
   if (!text && !currentBase64) return;
 
-  // Render User Message
   appendUserMessage(text, currentBase64 ? attachedThumb.src : null);
   chatInput.value = '';
 
-  // Case 1: Welcome Discovery (Capturing User Name)
+  // Capturing User Name if first message
   if (!userName && text && !currentBase64) {
     userName = text;
     localStorage.setItem('ADVISION_USER_NAME', userName);
     appendAgentThinking();
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 800));
     removeAgentThinking();
     
     appendAgentMessage(`
-      <p class="font-bold text-amber-400 mb-1">Trân trọng cảm ơn thông tin từ Quý khách ${userName}!</p>
-      <p class="text-slate-300">Rất hân hạnh được đồng hành cùng Quý khách <strong>${userName}</strong> trong chiến dịch lần này.</p>
-      <p class="mt-2 text-indigo-300 font-semibold border-t border-slate-800/80 pt-2">Xin Quý khách <strong>${userName}</strong> vui lòng bấm nút đính kèm 📎 hoặc kéo thả file banner quảng cáo cần thẩm định vào khung hội thoại. Tôi sẽ tiến hành phân tích đa chiều ngay lập tức.</p>
+      <p>Chào <strong>${userName}</strong>!</p>
+      <p>Bây giờ bạn có thể bấm biểu tượng 📎 để đính kèm hình ảnh banner quảng cáo cần đánh giá nhé.</p>
     `);
     return;
   }
 
-  // Case 2: Image Analysis Execution
+  // Image Analysis Execution
   if (currentBase64) {
     appendAgentThinking();
     const apiKey = localStorage.getItem('GEMINI_API_KEY') || "";
     let reportText = "";
 
-    const userPromptText = userName ? `Quý khách hàng tên là ${userName}. ` : "";
+    const userPromptText = userName ? `Người dùng tên là ${userName}. ` : "";
 
     if (apiKey) {
       try {
@@ -159,47 +157,45 @@ chatForm.addEventListener('submit', async (e) => {
         }
       } catch (err) {
         console.warn("API Error:", err);
-        reportText = getExecutiveMockAnalysis(currentFileName || "banner.png", userName || "Quý khách");
+        reportText = getMinimalMockAnalysis(currentFileName || "banner.png", userName || "bạn");
       }
     } else {
-      await new Promise(r => setTimeout(r, 1500));
-      reportText = getExecutiveMockAnalysis(currentFileName || "banner.png", userName || "Quý khách");
+      await new Promise(r => setTimeout(r, 1200));
+      reportText = getMinimalMockAnalysis(currentFileName || "banner.png", userName || "bạn");
     }
 
-    // Reset attachment & loading bubble
     btnRemoveAttachment.click();
     removeAgentThinking();
 
-    // Clean any prohibited arrows
+    // Clean forbidden arrows
     reportText = reportText.replace(/->|-->|⇒/g, '•');
     appendAgentMessage(formatMarkdown(reportText));
     return;
   }
 
-  // Case 3: Interactive Dialogue Reply
+  // Interactive Dialogue Reply
   if (text) {
     appendAgentThinking();
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 800));
     removeAgentThinking();
     appendAgentMessage(`
-      <p class="text-slate-300">Cảm ơn thông tin phản hồi từ Quý khách <strong>${userName || 'Quý khách'}</strong>. Hệ thống đã ghi nhận yêu cầu này vào hồ sơ thẩm định.</p>
-      <p class="mt-2 text-indigo-300 font-semibold">Nếu Quý khách có thêm phương án thiết kế hoặc banner quảng cáo khác, xin vui lòng gửi file để tôi tiếp tục thẩm định đối chiếu.</p>
+      <p>Cảm ơn thông tin của <strong>${userName || 'bạn'}</strong>. Bạn có thể tải thêm ảnh banner khác nếu muốn tiếp tục phân tích nhé.</p>
     `);
   }
 });
 
-// UI RENDERING UTILITIES
+// UI RENDERING UTILITIES (CHATGPT MINIMALIST STYLE)
 function appendUserMessage(text, imgSrc) {
-  let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-48 rounded-lg border border-slate-700 mb-2">` : '';
+  let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-48 rounded border border-slate-200 dark:border-slate-700 mb-2">` : '';
   let textHtml = text ? `<p>${text}</p>` : '';
 
   const html = `
-    <div class="flex gap-3 justify-end max-w-3xl ml-auto">
-      <div class="bg-amber-600/90 border border-amber-500/50 p-4 rounded-2xl rounded-tr-none text-slate-950 font-medium text-sm shadow-md space-y-2">
+    <div class="flex gap-4 justify-end">
+      <div class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 p-3.5 px-4 rounded-2xl rounded-tr-none text-sm max-w-2xl leading-relaxed space-y-2">
         ${imgHtml}
         ${textHtml}
       </div>
-      <div class="w-9 h-9 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-black text-sm shrink-0 shadow-md">
+      <div class="w-8 h-8 rounded-sm bg-slate-400 dark:bg-slate-600 flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5">
         <i class="fa-solid fa-user"></i>
       </div>
     </div>
@@ -210,14 +206,12 @@ function appendUserMessage(text, imgSrc) {
 
 function appendAgentMessage(formattedHtml) {
   const html = `
-    <div class="flex gap-4 max-w-3xl">
-      <div class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0 shadow-md">
-        <i class="fa-solid fa-user-tie"></i>
+    <div class="flex gap-4">
+      <div class="w-8 h-8 rounded-sm bg-emerald-600 flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5">
+        <i class="fa-solid fa-robot"></i>
       </div>
-      <div class="space-y-3 text-sm text-slate-200">
-        <div class="executive-card p-5 rounded-2xl rounded-tl-none shadow-xl leading-relaxed space-y-3">
-          ${formattedHtml}
-        </div>
+      <div class="space-y-2 text-sm text-slate-800 dark:text-slate-200 leading-relaxed flex-1">
+        ${formattedHtml}
       </div>
     </div>
   `;
@@ -227,13 +221,13 @@ function appendAgentMessage(formattedHtml) {
 
 function appendAgentThinking() {
   const html = `
-    <div id="thinking-bubble" class="flex gap-4 max-w-3xl">
-      <div class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0">
-        <i class="fa-solid fa-user-tie"></i>
+    <div id="thinking-bubble" class="flex gap-4">
+      <div class="w-8 h-8 rounded-sm bg-emerald-600 flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5">
+        <i class="fa-solid fa-robot"></i>
       </div>
-      <div class="executive-card px-4 py-3 rounded-2xl rounded-tl-none text-xs text-amber-300 font-medium flex items-center gap-2">
-        <div class="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-        <span>AdVision Master đang tiến hành thẩm định thị giác chi tiết...</span>
+      <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 py-2">
+        <div class="w-3 h-3 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+        <span>Đang phân tích hình ảnh...</span>
       </div>
     </div>
   `;
@@ -253,7 +247,7 @@ function scrollToBottom() {
 // API CALL ENGINES
 async function callGeminiVisionApi(apiKey, base64Data, mimeType, userText) {
   const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
-  const explicitPrompt = `Hãy phân tích bức ảnh quảng cáo này và trả lời chính xác câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\n\nThông tin Quý khách hàng cung cấp: ${userText}\n\n${ADVISION_SYSTEM_PROMPT}`;
+  const explicitPrompt = `Hãy phân tích bức ảnh quảng cáo này và trả lời chính xác câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"\n\nThông tin kèm theo: ${userText}\n\n${ADVISION_SYSTEM_PROMPT}`;
 
   let lastErr = null;
   for (const modelName of models) {
@@ -325,44 +319,40 @@ async function callOpenAiVisionApi(apiKey, base64Data, mimeType, userText) {
 function formatMarkdown(str) {
   if (!str) return "";
   let html = str
-    .replace(/^### (.*$)/gim, '<h4 class="font-bold text-white mt-3 mb-1 text-sm font-sans">$1</h4>')
-    .replace(/^## (.*$)/gim, '<h3 class="font-bold text-amber-400 mt-4 mb-2 text-base font-sans">$1</h3>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-amber-300">$1</strong>')
-    .replace(/^[-*+] (.*$)/gim, '<li class="ml-4 list-disc text-slate-300 my-1">$1</li>')
-    .replace(/^\d+\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-300 my-1">$1</li>')
+    .replace(/^### (.*$)/gim, '<h4 class="font-bold mt-3 mb-1 text-sm">$1</h4>')
+    .replace(/^## (.*$)/gim, '<h3 class="font-bold text-emerald-600 dark:text-emerald-400 mt-4 mb-2 text-base">$1</h3>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-900 dark:text-white">$1</strong>')
+    .replace(/^[-*+] (.*$)/gim, '<li class="ml-4 list-disc text-slate-700 dark:text-slate-300 my-1">$1</li>')
+    .replace(/^\d+\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-700 dark:text-slate-300 my-1">$1</li>')
     .replace(/\n\n/g, '<br><br>')
     .replace(/\n/g, '<br>');
   return html;
 }
 
-// EXECUTIVE DEMO MOCK ANALYSIS
-function getExecutiveMockAnalysis(filename, targetUser) {
+// MINIMAL MOCK ANALYSIS
+function getMinimalMockAnalysis(filename, targetUser) {
   return `--------------------------------
-BÁO CÁO THẨM ĐỊNH TIÊU CHUẨN QUẢNG CÁO
+ĐÁNH GIÁ TIÊU CHUẨN QUẢNG CÁO
 --------------------------------
 [KHỐI 1: KẾT LUẬN CHUNG]
-KẾT LUẬN: CHƯA ĐẠT TIÊU CHUẨN (Cần tối ưu hóa chuyển đổi)
+KẾT LUẬN: CHƯA ĐẠT TIÊU CHUẨN (Cần tối ưu thêm)
 Điểm số thiết kế: 6.5/10
 
 [KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC]
-- Chủ thể & Sản phẩm chính: Hình ảnh sản phẩm trong banner (${filename}) hiển thị ở góc chụp trung tâm, tuy nhiên độ đổ bóng chưa tạo cảm giác chân thực.
-- Văn bản & Mật độ chữ: Mật độ chữ chiếm khoảng 24% diện tích thiết kế, tiệm cận ngưỡng giới hạn quy định của các nền tảng kỹ thuật số.
-- Thông điệp truyền tải: Tiêu đề khuyến mãi rõ ràng nhưng thiếu điểm nhấn độc nhất (USP).
-- Nút kêu gọi hành động (CTA): Tỷ lệ tương phản màu sắc của nút CTA chưa đạt độ tách biệt tối ưu so với phông nền xung quanh.
+- Chủ thể & Sản phẩm chính: Sản phẩm trong file ${filename} được đặt ở trung tâm, góc nhìn tương đối rõ ràng.
+- Văn bản & Mật độ chữ: Mật độ văn bản chiếm khoảng 24% diện tích thiết kế.
+- Thông điệp quảng cáo: Tiêu đề hiển thị rõ nhưng chưa nổi bật ý chính.
+- Nút kêu gọi hành động (CTA): Nút CTA chưa có độ tương phản đủ cao so với phông nền.
 
-[KHỐI 3: ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
-- Điểm mạnh nổi bật: Gam màu tổng thể tươi sáng, sắc nét và giữ được sự nhất quán định vị thương hiệu.
-- Hạn chế tồn tại: Nút CTA bị chìm trong tổng thể bố cục, giảm động lực thôi thúc nhấp chuột của người xem.
+[KHỐI 3: ƯU ĐIỂM & HẠN CHẾ]
+- Ưu điểm: Màu sắc tổng thể hài hòa, hình ảnh sản phẩm nét.
+- Hạn chế: Nút CTA còn mờ nhạt, mật độ chữ hơi nhiều.
 
-[KHỐI 4: ĐỀ XUẤT TỐI ƯU CHIẾN LƯỢC]
-- Đề xuất 1: Gia tăng kích thước nút CTA thêm 15% và áp dụng gam màu tương phản cao (như Cam viền Vàng) để tối ưu luồng đọc mắt nhìn.
-- Đề xuất 2: Tối giản bớt 1 dòng chữ mô tả phụ nhằm tạo khoảng thở thị giác tập trung cho sản phẩm chính.
+[KHỐI 4: ĐỀ XUẤT TỐI ƯU]
+- Đề xuất 1: Thêm màu sắc tương phản cho nút CTA (như màu cam hoặc vàng) để tăng tỷ lệ nhấp.
+- Đề xuất 2: Bớt 1 dòng chữ phụ để tạo không gian thoáng hơn xung quanh sản phẩm.
 
-[KHỐI 5: TƯ VẤN BỔ SUNG & HOẠCH ĐỊNH CHIẾN DỊCH]
-Kính thưa Quý khách ${targetUser}, bản banner hiện tại đã xây dựng nền tảng hình ảnh rất chỉn chu. Nếu được hiệu chỉnh nút CTA và khoảng thở thị giác, hiệu suất chuyển đổi sẽ gia tăng đáng kể.
-
-Để AdVision Master cố vấn chuyên sâu hơn cho chiến dịch của Quý khách ${targetUser}, xin vui lòng chia sẻ thêm:
-1. Nhóm đối tượng khách hàng mục tiêu mà Quý khách ${targetUser} đang hướng đến coi trọng nhất về Yếu tố Giá thành hay Giá trị Đẳng cấp?
-2. Quý khách có dự định bổ sung mã ưu đãi hoặc đặc quyền quà tặng nào lên banner không?
+[KHỐI 5: TƯ VẤN THÊM]
+Chào ${targetUser}, bạn có thể điều chỉnh nút CTA và bớt bớt chữ phụ để banner đạt hiệu quả tốt hơn nhé. Nếu cần hỗ trợ thêm về ngách sản phẩm cụ thể, bạn cứ cho tôi biết!
 --------------------------------`;
 }
