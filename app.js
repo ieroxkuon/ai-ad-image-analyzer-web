@@ -1,14 +1,13 @@
 // =============================================================================
 // ADVISION AI - HỆ THỐNG CỐ VẤN THẨM ĐỊNH HÌNH ẢNH QUẢNG CÁO
-// NHÂN VẬT: HOÀNG AN - TỰ XƯNG LÀ "MÌNH", GỌI NGƯỜI DÙNG BẰNG "TÊN" LINH HOẠT
-// TỰ ĐỘNG HIỆU ỨNG GÕ CHỮ (TYPING INDICATOR) VÀ FADE TỪ TRÁI SANG PHẢI THEO DÒNG
+// NHÂN VẬT: HOÀNG AN - TỰ XƯNG LÀ "MÌNH", GỌI ĐỐI PHƯƠNG BẰNG "TÊN" LINH HOẠT
+// CÂU TỪ MẠCH LẠC, ĐẦY ĐỦ CHỦ NGỮ VỊ NGỮ, HIỆU ỨNG GÕ CHỮ NGAY TỪ LỜI CHÀO ĐẦU
 // =============================================================================
 
 // Trạng thái người dùng và hội thoại
 let userName = localStorage.getItem('ADVISION_USER_NAME') || "";
 let userIndustry = localStorage.getItem('ADVISION_USER_INDUSTRY') || "";
 let nameVariations = JSON.parse(localStorage.getItem('ADVISION_NAME_VARIATIONS') || "[]");
-let hasGreeted = Boolean(userName);
 
 let currentBase64 = null;
 let currentMimeType = null;
@@ -49,7 +48,7 @@ const badgeIndustryName = document.getElementById('badge-industry-name');
 const savedKey = localStorage.getItem('GEMINI_API_KEY') || "";
 if (savedKey) inputApiKey.value = savedKey;
 
-// Khởi tạo giao diện badge
+// Cập nhật giao diện badge
 updateUserBadge();
 
 // HÀM XỬ LÝ TRÍCH XUẤT TÊN THÔNG MINH VÀ TẠO CÁC BIẾN THỂ GỌI TÊN
@@ -86,7 +85,6 @@ function extractSmartName(rawText) {
     variations.push("bạn");
   }
 
-  // Tên hiển thị chính là biến thể ngắn gọn nhất (thường là tên gọi)
   const mainName = variations[0];
   return { mainName, fullName: parts.join(' ') || mainName, variations };
 }
@@ -100,40 +98,55 @@ function getDynamicCallName() {
   return nameVariations[randomIndex];
 }
 
-// SYSTEM PROMPT CHUẨN XÁC: XƯNG "MÌNH", GỌI ĐỐI PHƯƠNG BẰNG TÊN, KHÔNG DÙNG TỪ BANNER, KHÔNG CHỮ ĐẬM NHẠT
+// SYSTEM PROMPT: XƯNG "MÌNH", GỌI BẰNG TÊN, MẠCH LẠC, ĐẦY ĐỦ CHỦ NGỮ VỊ NGỮ
 const ADVISION_SYSTEM_PROMPT = `
 1. MÔ TẢ VÀ XƯNG HÔ:
 Bạn là Hoàng An, chuyên gia phân tích hình ảnh quảng cáo và thiết kế đồ họa.
-QUY TẮC XƯNG HÔ BẮT BUỘC: Bạn luôn tự xưng là "mình" và gọi người dùng bằng tên của họ (ví dụ: Cương, Thái Cương, Trần Cương). Tuyệt đối không xưng "em" hay "tôi".
+QUY TẮC XƯNG HÔ: Bạn luôn tự xưng là "mình" và gọi người dùng bằng tên của họ (ví dụ: Cương, Thái Cương, Trần Cương). Tuyệt đối không xưng "em" hay "tôi".
 
-2. VAI TRÒ VÀ NĂNG LỰC:
-Bạn có nhiều năm kinh nghiệm thực chiến trong lĩnh vực marketing thị giác. Bạn có khả năng bóc tách toàn bộ ngôn ngữ của một bức ảnh quảng cáo: bố cục một phần ba, hướng nhìn của mắt (Z-pattern, F-pattern), mật độ chữ viết dưới 20 phần trăm, độ tương phản màu của nút bấm kêu gọi hành động tối thiểu 4.5:1, và vùng an toàn trên các nền tảng Facebook, TikTok. Nhiệm vụ của bạn là cố vấn trực tiếp, giúp người dùng biết bức ảnh đạt hay chưa đạt tiêu chuẩn và cần làm gì tiếp theo.
-
-3. NGUYÊN TẮC BẮT BUỘC:
+2. CÂU TỪ VÀ NGỮ PHÁP:
+- Mọi câu nói của bạn phải mạch lạc, trau chuốt, có đầy đủ chủ ngữ và vị ngữ, tự nhiên như một người bạn đồng hành giàu chuyên môn.
+- Không viết câu cộc lốc hoặc thiếu ý.
+- Không dùng chữ in đậm nhạt xen kẽ từng dòng gây rối mắt. Viết văn tự nhiên, đều chữ, rõ ràng.
+- ĐANG TRONG CUỘC TRÒ CHUYỆN THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC CHÀO LẠI. Phải tiếp nối mạch lạc câu chuyện.
 - Tuyệt đối KHÔNG sử dụng từ tiếng Anh "banner". Luôn dùng: "hình ảnh quảng cáo", "ảnh quảng cáo" hoặc "bức ảnh".
 - Tuyệt đối KHÔNG dùng các dòng kẻ nét đứt như "--------------------------------".
 - Bắt buộc dùng TIẾNG VIỆT CÓ DẤU ĐẦY ĐỦ, chuẩn ngữ pháp.
 - Tuyệt đối KHÔNG dùng ký tự mũi tên "->", "-->", "⇒", "→" và không dùng ký tự ">".
-- KHÔNG dùng chữ in đậm nhạt xen kẽ từng dòng gây rối mắt. Viết văn tự nhiên, đều chữ, rõ ràng.
-- ĐANG TRONG CUỘC TRÒ CHUYỆN THÌ TUYỆT ĐỐI KHÔNG CHÀO LẠI. Phải tiếp nối mạch lạc câu chuyện.
-- QUY TẮC TƯƠNG TÁC TỪNG KHỐI: Khi người dùng gửi hình ảnh, TUYỆT ĐỐI KHÔNG trả lời dồn dập toàn bộ các khối một lúc. Bạn chỉ trả lời [Khối 1: Kết luận chung] (kết luận đạt hay chưa đạt, điểm số trên thang 10, nhận xét tổng quan 2-3 câu). Sau đó, HỎI người dùng xem có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không. Chỉ khi người dùng đồng ý hoặc yêu cầu xem tiếp, bạn mới trả lời khối tiếp theo.
 
-4. CẤU TRÚC CÁC KHỐI KHI PHÂN TÍCH:
-[Khối 1: Kết luận chung]
-Kết luận ĐẠT TIÊU CHUẨN hoặc CHƯA ĐẠT TIÊU CHUẨN, điểm số trên thang 10. Nhận xét ngắn gọn 2-3 câu. Kèm câu hỏi xem người dùng có muốn phân tích chi tiết bố cục và chữ viết không.
-
-[Khối 2: Phân tích thị giác]
-Mô tả bố cục, mật độ chữ, màu sắc, vị trí sản phẩm và nút bấm. Kèm câu hỏi xem người dùng có muốn xem ưu và nhược điểm không.
-
-[Khối 3: Ưu điểm và hạn chế]
-Chỉ ra điểm làm tốt và điểm hạn chế cụ thể. Kèm câu hỏi xem người dùng có muốn nhận đề xuất chỉnh sửa không.
-
-[Khối 4: Đề xuất cụ thể]
-2 đến 3 lời khuyên thực tế để chỉnh sửa ngay.
-
-[Khối 5: Câu hỏi tiếp theo]
-Hỏi người dùng về kênh chạy quảng cáo hoặc mục tiêu tiếp theo để tư vấn thêm.
+3. QUY TẮC TƯƠNG TÁC TỪNG KHỐI:
+Khi người dùng gửi hình ảnh, TUYỆT ĐỐI KHÔNG trả lời dồn dập toàn bộ các khối một lúc vì sẽ làm người dùng lười đọc. Bạn chỉ trả lời [Khối 1: Kết luận chung] (kết luận đạt hay chưa đạt tiêu chuẩn, điểm số trên thang 10, nhận xét tổng quan 2-3 câu có chủ vị đầy đủ). Sau đó, bạn HỎI người dùng xem họ có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không. Chỉ khi người dùng đồng ý hoặc yêu cầu xem tiếp, bạn mới trả lời khối tiếp theo.
 `;
+
+// KHỞI ĐỘNG TRANG: PHÁT HIỆU ỨNG GÕ CHỮ CHO CÂU CHÀO ĐẦU TIÊN
+async function playInitialGreeting() {
+  chatContainer.innerHTML = '';
+  showTypingIndicator("Hoàng An đang soạn lời chào...");
+  await delay(800);
+  hideTypingIndicator();
+
+  const greetingLines = [
+    "Chào bạn, mình là Hoàng An.",
+    "Mình rất vui được đồng hành cùng bạn trong việc xem xét và tối ưu hóa các hình ảnh quảng cáo.",
+    "Trước khi bắt đầu, bạn có thể chia sẻ cho mình biết tên của bạn để chúng mình tiện xưng hô được không?"
+  ];
+  await streamLines(greetingLines);
+}
+
+// Chạy hiệu ứng chào đầu tiên khi tải trang
+window.addEventListener('DOMContentLoaded', () => {
+  if (!userName) {
+    playInitialGreeting();
+  } else {
+    // Nếu đã có tên từ phiên trước, hiển thị lời chào tiếp nối tự nhiên
+    const callName = getDynamicCallName();
+    const welcomeBackLines = [
+      `Chào ${callName}, mình rất vui được gặp lại bạn.`,
+      `Bạn có thể gửi hình ảnh quảng cáo mới vào đây để chúng mình cùng phân tích tiếp nhé.`
+    ];
+    streamLines(welcomeBackLines);
+  }
+});
 
 // XỬ LÝ SỰ KIỆN ĐÍNH KÈM HÌNH ẢNH
 btnAttachImage.addEventListener('click', () => fileInput.click());
@@ -198,7 +211,6 @@ btnResetChat.addEventListener('click', () => {
     userName = "";
     userIndustry = "";
     nameVariations = [];
-    hasGreeted = false;
     activeAnalysis = null;
     localStorage.removeItem('ADVISION_USER_NAME');
     localStorage.removeItem('ADVISION_USER_INDUSTRY');
@@ -206,21 +218,7 @@ btnResetChat.addEventListener('click', () => {
     clearAttachment();
     updateUserBadge();
     updateInputPlaceholder();
-    
-    // Khôi phục khung chat về lời chào ban đầu chuẩn
-    chatContainer.innerHTML = `
-      <div class="flex gap-4">
-        <div class="w-9 h-9 rounded-lg bg-blue-700 text-white font-bold flex items-center justify-center text-sm shrink-0 shadow">
-          <i class="fa-solid fa-user-tie"></i>
-        </div>
-        <div class="space-y-3 text-base text-slate-950 dark:text-slate-100 leading-relaxed flex-1 prose-contrast">
-          <div class="bg-slate-100 dark:bg-[#161e2e] border-2 border-slate-300 dark:border-slate-700 p-4 rounded-xl shadow-sm text-slate-900 dark:text-slate-100">
-            <p>Chào bạn! Mình là Hoàng An, hỗ trợ bạn đánh giá và tối ưu hình ảnh quảng cáo.</p>
-            <p class="mt-2">Cho mình biết tên của bạn để tiện xưng hô nhé.</p>
-          </div>
-        </div>
-      </div>
-    `;
+    playInitialGreeting();
   }
 });
 
@@ -254,13 +252,10 @@ function updateInputPlaceholder() {
   }
 }
 
-// Khởi tạo placeholder ban đầu
-updateInputPlaceholder();
-
 // XỬ LÝ SUBMIT FORM CHAT
 chatForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (isAiTyping) return; // Tránh gửi đè khi AI đang gõ
+  if (isAiTyping) return;
   
   const text = chatInput.value.trim();
   if (!text && !currentBase64) return;
@@ -275,21 +270,26 @@ chatForm.addEventListener('submit', async (e) => {
   clearAttachment();
   updateInputPlaceholder();
 
-  // BƯỚC 1: NHẬN DIỆN VÀ XỬ LÝ TÊN THÔNG MINH
+  // BƯỚC 1: NHẬN DIỆN VÀ TRÍCH XUẤT TÊN THÔNG MINH
   if (!userName && !sentBase64) {
     const parsed = extractSmartName(text);
     userName = parsed.mainName;
     nameVariations = parsed.variations;
     localStorage.setItem('ADVISION_USER_NAME', userName);
     localStorage.setItem('ADVISION_NAME_VARIATIONS', JSON.stringify(nameVariations));
-    hasGreeted = true;
     updateUserBadge();
     updateInputPlaceholder();
 
     const callName = getDynamicCallName();
-    const reply = `Chào ${callName}! Rất vui được đồng hành cùng ${callName}. Để mình hiểu rõ hơn trước khi xem ảnh, sản phẩm ${callName} đang làm thuộc ngành nào vậy (ví dụ: thời trang, mỹ phẩm, đồ ăn, công nghệ)?`;
+    const replyLines = [
+      `Chào ${callName}, mình rất vui được làm quen với bạn.`,
+      `Để mình có thể nắm bắt đúng bối cảnh thiết kế trước khi xem ảnh, bạn có thể chia sẻ cho mình biết sản phẩm bạn đang làm thuộc ngành hàng nào không?`
+    ];
     
-    await streamAgentResponse(reply);
+    showTypingIndicator("Hoàng An đang soạn câu trả lời...");
+    await delay(1000);
+    hideTypingIndicator();
+    await streamLines(replyLines);
     return;
   }
 
@@ -301,9 +301,15 @@ chatForm.addEventListener('submit', async (e) => {
     updateInputPlaceholder();
 
     const callName = getDynamicCallName();
-    const reply = `Mình đã ghi nhận ngành ${userIndustry} của ${callName} rồi nhé! Bây giờ ${callName} bấm vào biểu tượng chiếc kẹp giấy 📎 ở góc dưới để đính kèm hình ảnh quảng cáo cần thẩm định, mình sẽ bắt tay vào xem xét ngay!`;
+    const replyLines = [
+      `Mình đã nắm được thông tin ngành hàng ${userIndustry} của ${callName} rồi.`,
+      `Bây giờ, bạn có thể bấm vào biểu tượng chiếc kẹp giấy ở phía dưới để gửi hình ảnh quảng cáo qua cho mình xem nhé.`
+    ];
     
-    await streamAgentResponse(reply);
+    showTypingIndicator("Hoàng An đang soạn câu trả lời...");
+    await delay(1000);
+    hideTypingIndicator();
+    await streamLines(replyLines);
     return;
   }
 
@@ -313,48 +319,46 @@ chatForm.addEventListener('submit', async (e) => {
     activeAnalysis = buildAnalysisSteps(sentFileName || "ảnh quảng cáo", userIndustry || "sản phẩm");
     activeAnalysis.currentStep = 1;
 
-    let responseText = "";
+    let responseLines = [];
     if (apiKey) {
       try {
         const callName = getDynamicCallName();
         const prompt = `Người dùng gửi hình ảnh quảng cáo. Thông tin người dùng: xưng là mình, gọi đối phương là ${callName}, ngành hàng ${userIndustry || "sản phẩm"}.
 QUY TẮC BẮT BUỘC:
-- Không được chào lại nếu đã chào trước đó.
-- BẮT BUỘC CHỈ TRẢ LỜI DUY NHẤT [Khối 1: Kết luận chung] gồm: Kết luận đạt hay chưa đạt tiêu chuẩn, điểm số trên thang 10, nhận xét tổng quan 2-3 câu.
-- Sau đó, HỎI người dùng ngắn gọn xem họ có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không.
+- Đang trong cuộc trò chuyện, tuyệt đối không chào lại.
+- BẮT BUỘC CHỈ TRẢ LỜI DUY NHẤT [Khối 1: Kết luận chung] gồm: Đạt hay chưa đạt tiêu chuẩn, điểm số trên thang 10, nhận xét tổng quan 2-3 câu có chủ ngữ vị ngữ đầy đủ.
+- Sau đó, HỎI người dùng một cách tự nhiên xem họ có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không.
 - Tuyệt đối không trả lời dồn dập các khối 2, 3, 4, 5 ngay bây giờ.
-- Viết tiếng Việt có dấu đầy đủ, đều màu chữ, tuyệt đối không dùng từ "banner", không dùng dòng kẻ nét đứt, không dùng ký tự mũi tên "->".`;
+- Viết tiếng Việt có dấu đầy đủ, đều màu chữ, không dùng từ "banner", không dùng dòng kẻ nét đứt, không dùng ký tự mũi tên "->".`;
 
-        // Hiển thị typing giả lập
-        showTypingIndicator();
+        showTypingIndicator("Hoàng An đang phân tích hình ảnh...");
+        let rawResult = "";
         if (apiKey.startsWith('sk-')) {
-          responseText = await callOpenAiVisionApi(apiKey, sentBase64, sentMimeType, prompt);
+          rawResult = await callOpenAiVisionApi(apiKey, sentBase64, sentMimeType, prompt);
         } else {
-          responseText = await callGeminiVisionApi(apiKey, sentBase64, sentMimeType, prompt);
+          rawResult = await callGeminiVisionApi(apiKey, sentBase64, sentMimeType, prompt);
         }
         hideTypingIndicator();
+        responseLines = rawResult.split('\n').map(l => sanitizeStrictRules(l)).filter(l => l.length > 0);
       } catch (err) {
-        console.warn("Lỗi kết nối API, sử dụng chế độ mô phỏng:", err);
+        console.warn("Lỗi kết nối API, sử dụng dữ liệu phân tích mẫu:", err);
         hideTypingIndicator();
-        responseText = activeAnalysis.block1;
+        responseLines = activeAnalysis.block1;
       }
     } else {
-      showTypingIndicator();
-      await delay(1200);
+      showTypingIndicator("Hoàng An đang phân tích hình ảnh...");
+      await delay(1300);
       hideTypingIndicator();
-      responseText = activeAnalysis.block1;
+      responseLines = activeAnalysis.block1;
     }
 
-    responseText = sanitizeStrictRules(responseText);
-
-    const callName = getDynamicCallName();
     const quickActions = [
-      { text: `Phân tích bố cục & chữ`, action: "step_block2" },
-      { text: `Xem ưu điểm & hạn chế`, action: "step_block3" },
-      { text: `Xem đề xuất chỉnh sửa`, action: "step_block4" }
+      { text: "Phân tích bố cục & chữ", action: "step_block2" },
+      { text: "Xem ưu điểm & hạn chế", action: "step_block3" },
+      { text: "Xem đề xuất chỉnh sửa", action: "step_block4" }
     ];
 
-    await streamAgentResponse(responseText, quickActions);
+    await streamLines(responseLines, quickActions);
     return;
   }
 
@@ -365,30 +369,30 @@ QUY TẮC BẮT BUỘC:
     // Kiểm tra xem người dùng có muốn xem các khối tiếp theo của ảnh không
     const handledByStep = handleInteractiveSteps(text);
     if (handledByStep) {
-      showTypingIndicator();
+      showTypingIndicator("Hoàng An đang soạn câu trả lời...");
       await delay(900);
       hideTypingIndicator();
-      await streamAgentResponse(handledByStep.text, handledByStep.actions);
+      await streamLines(handledByStep.lines, handledByStep.actions);
       return;
     }
 
     // Cuộc trò chuyện tự nhiên tiếp nối
-    showTypingIndicator();
-    let replyText = "";
+    showTypingIndicator("Hoàng An đang soạn câu trả lời...");
+    let replyLines = [];
     if (apiKey) {
       try {
-        replyText = await callChatApi(apiKey, text);
+        const rawReply = await callChatApi(apiKey, text);
+        replyLines = rawReply.split('\n').map(l => sanitizeStrictRules(l)).filter(l => l.length > 0);
       } catch (e) {
-        replyText = getConversationalReply(text, userIndustry || "sản phẩm");
+        replyLines = getConversationalReply(text, userIndustry || "sản phẩm");
       }
     } else {
       await delay(1000);
-      replyText = getConversationalReply(text, userIndustry || "sản phẩm");
+      replyLines = getConversationalReply(text, userIndustry || "sản phẩm");
     }
 
     hideTypingIndicator();
-    replyText = sanitizeStrictRules(replyText);
-    await streamAgentResponse(replyText);
+    await streamLines(replyLines);
   }
 });
 
@@ -403,7 +407,7 @@ function handleInteractiveSteps(inputText) {
     if (activeAnalysis.currentStep <= 1 || lower.includes('bố cục') || lower.includes('chữ')) {
       activeAnalysis.currentStep = 2;
       return {
-        text: activeAnalysis.block2,
+        lines: activeAnalysis.block2,
         actions: [
           { text: "Xem ưu điểm & hạn chế", action: "step_block3" },
           { text: "Xem đề xuất chỉnh sửa", action: "step_block4" }
@@ -416,7 +420,7 @@ function handleInteractiveSteps(inputText) {
   if (lower.includes('ưu điểm') || lower.includes('hạn chế') || lower.includes('nhược điểm') || lower.includes('điểm mạnh')) {
     activeAnalysis.currentStep = 3;
     return {
-      text: activeAnalysis.block3,
+      lines: activeAnalysis.block3,
       actions: [
         { text: "Xem đề xuất chỉnh sửa", action: "step_block4" }
       ]
@@ -427,7 +431,7 @@ function handleInteractiveSteps(inputText) {
   if (lower.includes('đề xuất') || lower.includes('chỉnh sửa') || lower.includes('tối ưu') || lower.includes('giải pháp')) {
     activeAnalysis.currentStep = 4;
     return {
-      text: activeAnalysis.block4_5,
+      lines: activeAnalysis.block4_5,
       actions: [
         { text: "Chạy trên Facebook", action: "reply_facebook" },
         { text: "Chạy trên TikTok", action: "reply_tiktok" }
@@ -438,33 +442,39 @@ function handleInteractiveSteps(inputText) {
   return null;
 }
 
-// BỘ NỘI DUNG TỪNG KHỐI CHUẨN XÁC, TIẾNG VIỆT ĐẦY ĐỦ DẤU, ĐỀU MÀU CHỮ, GỌI TÊN LINH HOẠT
+// BỘ DỮ LIỆU TỪNG KHỐI MẠCH LẠC, ĐẦY ĐỦ CHỦ NGỮ VỊ NGỮ
 function buildAnalysisSteps(filename, industry) {
   const callName = getDynamicCallName();
   return {
-    block1: `[Khối 1: Kết luận chung]
-Kết luận: Chưa đạt tiêu chuẩn (Cần tối ưu thêm để đạt hiệu quả cao nhất).
-Điểm số đánh giá: 6.8/10.
+    block1: [
+      `[Khối 1: Kết luận chung]`,
+      `Về tổng quan, mình nhận thấy bức ảnh quảng cáo ngành ${industry} này hiện tại chưa đạt tiêu chuẩn tối ưu để chạy chiến dịch. Điểm số đánh giá của bức ảnh đạt 6.8 trên thang điểm 10.`,
+      `Mặc dù chủ thể sản phẩm trong ảnh đã được làm nổi bật, nhưng độ tương phản của nút bấm kêu gọi hành động và mật độ chữ viết vẫn cần được điều chỉnh thêm để thu hút người xem tốt hơn.`,
+      `${callName} có muốn mình đi sâu phân tích chi tiết về phần bố cục thị giác và mật độ chữ viết của bức ảnh này không?`
+    ],
 
-Bức ảnh quảng cáo ngành ${industry} đã làm nổi bật được chủ thể sản phẩm chính, nhưng vẫn còn một số điểm nghẽn về độ tương phản của nút bấm và mật độ chữ viết trước khi đưa vào chạy quảng cáo.
+    block2: [
+      `[Khối 2: Phân tích thị giác]`,
+      `Mình nhận thấy chủ thể sản phẩm đã được sắp xếp ở vị trí trung tâm khá ngay ngắn và ánh sáng làm rõ được các chi tiết quan trọng.`,
+      `Tuy nhiên, phần chữ viết hiện đang chiếm khoảng 24 phần trăm diện tích, vượt nhẹ so với mức tiêu chuẩn 20 phần trăm của các nền tảng quảng cáo. Nút kêu gọi hành động có kích thước vừa vặn nhưng màu sắc vẫn hơi chìm so với phông nền xung quanh.`,
+      `${callName} có muốn mình chỉ ra cụ thể những ưu điểm và những điểm còn hạn chế của bức ảnh này không?`
+    ],
 
-${callName} có muốn mình phân tích chi tiết về bố cục thị giác và mật độ chữ của bức ảnh này không?`,
+    block3: [
+      `[Khối 3: Ưu điểm và hạn chế]`,
+      `Về mặt ưu điểm, bức ảnh có chất lượng hình ảnh sắc nét và tông màu chủ đạo tạo được cảm giác tin cậy cho thương hiệu của bạn.`,
+      `Về điểm hạn chế, phần chữ phụ hơi dài khiến người xem dễ bị phân tán chú ý, đồng thời nút bấm kêu gọi hành động chưa tạo được độ tương phản rõ rệt để thôi thúc người xem bấm vào.`,
+      `${callName} có muốn mình đưa ra các giải pháp cụ thể để bạn chỉnh sửa và tối ưu bức ảnh này ngay không?`
+    ],
 
-    block2: `[Khối 2: Phân tích thị giác]
-Chủ thể sản phẩm được định vị khá tốt ở khu vực trung tâm và ánh sáng làm rõ được chi tiết sản phẩm. Tuy nhiên, mật độ chữ viết đang chiếm khoảng 24 phần trăm diện tích, hơi vượt mức quy chuẩn 20 phần trăm. Nút bấm kêu gọi hành động có kích thước vừa vặn nhưng màu sắc chưa tạo được độ tương phản 4.5:1 so với phông nền xung quanh.
-
-${callName} có muốn mình chỉ ra các ưu điểm và điểm hạn chế cụ thể của bức ảnh không?`,
-
-    block3: `[Khối 3: Ưu điểm và hạn chế]
-Ưu điểm nổi bật là hình ảnh sản phẩm có độ phân giải sắc nét, tông màu chủ đạo tạo được cảm giác tin cậy cho thương hiệu. Điểm hạn chế là phần tiêu đề phụ hơi nhiều chữ gây nhiễu mắt người xem, đồng thời nút bấm kêu gọi hành động bị chìm do dùng màu tiệp với lớp nền.
-
-${callName} có muốn mình đưa ra các đề xuất cụ thể để chỉnh sửa và tối ưu bức ảnh này không?`,
-
-    block4_5: `[Khối 4: Đề xuất cụ thể]
-Thứ nhất, bạn nên rút gọn bớt một dòng chữ phụ để người xem nắm bắt thông điệp cốt lõi ngay trong 2 giây đầu tiên. Thứ hai, hãy đổi màu nút kêu gọi hành động sang tông màu tương phản mạnh hơn như vàng cam hoặc đỏ tươi để tăng tỷ lệ nhấp chuột. Thứ ba, bạn hãy giữ khoảng cách thoáng ở các mép ngoài để đảm bảo vùng an toàn khi hiển thị trên điện thoại.
-
-[Khối 5: Câu hỏi tiếp theo]
-Bức ảnh này ${callName} dự định chạy quảng cáo trên Facebook hay TikTok vậy? Bạn chia sẻ thêm để mình tư vấn căn chỉnh kích thước chuẩn xác nhất nhé!`
+    block4_5: [
+      `[Khối 4: Đề xuất cụ thể]`,
+      `Đầu tiên, bạn nên rút gọn bớt một dòng chữ phụ để người xem có thể nắm bắt thông điệp cốt lõi ngay trong 2 giây đầu tiên.`,
+      `Thứ hai, bạn hãy đổi màu nút kêu gọi hành động sang một tông màu tương phản mạnh hơn như vàng cam hoặc đỏ tươi để gia tăng phản xạ nhấp chuột.`,
+      `Thứ ba, bạn nên chừa khoảng trống an toàn ở các mép viền để hình ảnh không bị che khuất khi hiển thị trên màn hình điện thoại.`,
+      `[Khối 5: Câu hỏi tiếp theo]`,
+      `Bức ảnh này ${callName} dự định sẽ chạy chiến dịch quảng cáo trên Facebook hay TikTok vậy? Bạn chia sẻ thêm để mình tư vấn kích thước và vùng an toàn chuẩn xác nhất cho bạn nhé.`
+    ]
   };
 }
 
@@ -472,16 +482,12 @@ Bức ảnh này ${callName} dự định chạy quảng cáo trên Facebook hay
 function sanitizeStrictRules(str) {
   if (!str) return "";
   return str
-    // Loại bỏ dòng kẻ nét đứt
     .replace(/^-{3,}$/gm, '')
     .replace(/-{5,}/g, '')
-    // Thay thế từ banner bằng từ thuần Việt
     .replace(/banner\b/gi, 'hình ảnh quảng cáo')
     .replace(/banners\b/gi, 'các hình ảnh quảng cáo')
-    // Thay thế em thành mình nếu còn sót
     .replace(/\bEm chào\b/gi, 'Chào')
     .replace(/\bem\b/gi, 'mình')
-    // Loại bỏ mũi tên và ký tự >
     .replace(/->|-->|=>|⇒|→/g, '•')
     .replace(/^> /gm, '')
     .replace(/>/g, '')
@@ -492,7 +498,7 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// UI RENDERING UTILITIES
+// GIAO DIỆN NGƯỜI DÙNG GỬI TIN NHẮN
 function appendUserMessage(text, imgSrc) {
   let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-52 rounded-lg border-2 border-slate-400 dark:border-slate-600 mb-2 object-cover">` : '';
   let textHtml = text ? `<p>${text}</p>` : '';
@@ -513,7 +519,7 @@ function appendUserMessage(text, imgSrc) {
 }
 
 // HIỂN THỊ ICON ĐANG NHẬP CHỮ (TYPING INDICATOR)
-function showTypingIndicator() {
+function showTypingIndicator(message = "Hoàng An đang soạn câu trả lời...") {
   isAiTyping = true;
   const html = `
     <div id="typing-indicator" class="flex gap-4">
@@ -526,7 +532,7 @@ function showTypingIndicator() {
           <div class="typing-dot"></div>
           <div class="typing-dot"></div>
         </div>
-        <span class="text-xs text-slate-600 dark:text-slate-400">Hoàng An đang soạn câu trả lời...</span>
+        <span class="text-xs text-slate-600 dark:text-slate-400">${message}</span>
       </div>
     </div>
   `;
@@ -540,14 +546,10 @@ function hideTypingIndicator() {
   if (el) el.remove();
 }
 
-// HIỆU ỨNG GÕ CHỮ TỪ TỪ VÀ FADE TỪ TRÁI SANG PHẢI THEO DÒNG
-async function streamAgentResponse(rawText, actionButtons = null) {
+// HIỆU ỨNG GÕ CHỮ TỪNG DÒNG MƯỢT MÀ VÀ FADE TỪ TRÁI SANG PHẢI
+async function streamLines(linesArray, actionButtons = null) {
   isAiTyping = true;
   
-  // Tách nội dung thành các khối dòng
-  const lines = rawText.split('\n').filter(line => line.trim().length > 0);
-
-  // Tạo bubble khung tin nhắn ban đầu
   const messageWrapperId = 'agent-msg-' + Date.now();
   const html = `
     <div class="flex gap-4">
@@ -564,8 +566,8 @@ async function streamAgentResponse(rawText, actionButtons = null) {
   const container = document.getElementById(messageWrapperId);
 
   // In ra từng dòng với hiệu ứng fade-in từ trái sang phải
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+  for (let i = 0; i < linesArray.length; i++) {
+    const line = linesArray[i].trim();
     if (!line) continue;
 
     const p = document.createElement('p');
@@ -574,11 +576,10 @@ async function streamAgentResponse(rawText, actionButtons = null) {
     container.appendChild(p);
     scrollToBottom();
 
-    // Tốc độ gõ tự nhiên giữa các dòng
     await delay(180);
   }
 
-  // Nếu có các nút bấm nhanh, xuất hiện sau khi in xong
+  // Nếu có nút hành động nhanh, hiển thị nhẹ nhàng phía dưới
   if (actionButtons && actionButtons.length > 0) {
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'flex flex-wrap gap-2 pt-2 border-t border-slate-200 dark:border-slate-700/60 mt-3 fade-in-text';
@@ -676,7 +677,7 @@ async function callChatApi(apiKey, userText) {
   const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-flash-latest'];
   const callName = getDynamicCallName();
   const prompt = `Bạn là Hoàng An (chuyên gia thiết kế và phân tích thị giác quảng cáo). Hãy trả lời ${callName} (ngành ${userIndustry || 'sản phẩm'}) một cách vui tính, logic, thực tế. 
-QUY TẮC: Bạn tự xưng là "mình", gọi đối phương là ${callName}. ĐANG TRONG CUỘC TRÒ CHUYỆN THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC CHÀO LẠI. Không dùng từ "banner", không dùng dòng kẻ nét đứt, không dùng ký tự mũi tên "->", viết đều màu chữ.\n\nTin nhắn của ${callName}: ${userText}\n\n${ADVISION_SYSTEM_PROMPT}`;
+QUY TẮC: Bạn tự xưng là "mình", gọi đối phương là ${callName}. ĐANG TRONG CUỘC TRÒ CHUYỆN THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC CHÀO LẠI. Phải có đầy đủ chủ ngữ và vị ngữ, câu từ mạch lạc. Không dùng từ "banner", không dùng dòng kẻ nét đứt, không dùng ký tự mũi tên "->", viết đều màu chữ.\n\nTin nhắn của ${callName}: ${userText}\n\n${ADVISION_SYSTEM_PROMPT}`;
 
   for (const modelName of models) {
     try {
@@ -697,16 +698,25 @@ QUY TẮC: Bạn tự xưng là "mình", gọi đối phương là ${callName}. 
   return getConversationalReply(userText, userIndustry || "sản phẩm");
 }
 
-// CÂU TRẢ LỜI HỘI THOẠI SAU PHÂN TÍCH (KHÔNG CHÀO LẠI, NỐI TIẾP MẠCH LẠC)
+// CÂU TRẢ LỜI HỘI THOẠI SAU PHÂN TÍCH (CÓ ĐẦY ĐỦ CHỦ NGỮ VỊ NGỮ, NỐI TIẾP MẠCH LẠC)
 function getConversationalReply(text, ind) {
   const lower = text.toLowerCase();
   const callName = getDynamicCallName();
 
   if (lower.includes('facebook') || lower.includes('fb') || lower.includes('meta')) {
-    return `Với nền tảng Facebook và Instagram, ${callName} nên giữ tỷ lệ ảnh vuông 1:1 (1080x1080 px) cho bài viết thông thường, hoặc 4:5 (1080x1350 px) để chiếm trọn diện tích lướt bảng tin trên điện thoại. Điểm cốt lõi là luôn giữ mật độ chữ dưới 20 phần trăm để được thuật toán phân phối giá thầu rẻ nhất nhé!`;
+    return [
+      `Đối với nền tảng Facebook và Instagram, ${callName} nên ưu tiên sử dụng tỷ lệ ảnh vuông 1:1 cho bài viết thông thường, hoặc tỷ lệ 4:5 để tận dụng tối đa không gian lướt bảng tin trên điện thoại.`,
+      `Một điều cốt lõi mà bạn cần lưu ý là luôn giữ mật độ chữ viết dưới 20 phần trăm diện tích để thuật toán phân phối quảng cáo hiệu quả nhất với chi phí tiết kiệm nhé.`
+    ];
   }
   if (lower.includes('tiktok')) {
-    return `Đối với TikTok Ads, khung hình chuẩn bắt buộc là dạng dọc 9:16 (1080x1920 px). ${callName} cần đặc biệt chú ý vùng an toàn Safe Zone: chừa trống 140px ở phần đỉnh đầu và 280px ở đáy dưới vì TikTok sẽ đặt nút thả tim, bình luận và tiêu đề bài viết đè lên khu vực đó.`;
+    return [
+      `Đối với kênh TikTok, bạn bắt buộc phải dùng định dạng ảnh hoặc video dọc 9:16.`,
+      `${callName} cần đặc biệt chú ý chừa vùng an toàn Safe Zone ở đỉnh đầu và đáy dưới, vì giao diện của TikTok sẽ hiển thị tên tài khoản, nút thả tim và phần mô tả đè lên các khu vực đó.`
+    ];
   }
-  return `Mình hiểu ý của ${callName} rồi! Với sản phẩm ngành ${ind}, việc giữ cho thiết kế tinh gọn và thông điệp ngắn gọn luôn là chìa khóa gia tăng tỷ lệ nhấp chuột. ${callName} có thể chỉnh sửa lại thiết kế rồi gửi hình ảnh mới vào đây, mình sẽ tiếp tục đồng hành xem xét giúp bạn nhé!`;
+  return [
+    `Mình hoàn toàn hiểu góc nhìn của ${callName}. Đối với sản phẩm ngành ${ind || 'này'}, việc giữ cho bố cục tinh gọn và thông điệp rõ ràng luôn là yếu tố quyết định để giữ chân khách hàng.`,
+    `${callName} có thể chỉnh sửa lại thiết kế theo các gợi ý vừa rồi, sau đó gửi lại bức ảnh mới vào đây để chúng mình cùng xem xét tiếp nhé.`
+  ];
 }
