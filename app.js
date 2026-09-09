@@ -1,7 +1,7 @@
 // =============================================================================
 // ADVISION AI - HỆ THỐNG CỐ VẤN THẨM ĐỊNH HÌNH ẢNH QUẢNG CÁO
-// NHÂN VẬT: HOÀNG AN - TỰ XƯNG LÀ "MÌNH", GỌI ĐỐI PHƯƠNG BẰNG "TÊN" LINH HOẠT
-// CÂU TỪ MẠCH LẠC, ĐẦY ĐỦ CHỦ NGỮ VỊ NGỮ, HIỆU ỨNG GÕ CHỮ NGAY TỪ LỜI CHÀO ĐẦU
+// 100% KẾT NỐI VÀ SINH CÂU TRẢ LỜI ĐỘNG TỪ API (GEMINI / OPENAI)
+// NHÂN VẬT: HOÀNG AN - TỰ XƯNG "MÌNH", GỌI BẰNG TÊN, GÕ CHỮ TỰ NHIÊN
 // =============================================================================
 
 // Trạng thái người dùng và hội thoại
@@ -12,7 +12,10 @@ let nameVariations = JSON.parse(localStorage.getItem('ADVISION_NAME_VARIATIONS')
 let currentBase64 = null;
 let currentMimeType = null;
 let currentFileName = null;
-let activeAnalysis = null;
+
+// Lưu trữ ảnh đang thẩm định và toàn bộ lịch sử trao đổi đa lượt để gửi lên API
+let activeImageData = null; 
+let conversationHistory = []; // Chứa các lượt trao đổi [{ role: 'user' | 'model', text: '...' }]
 let isAiTyping = false;
 
 // Element Selectors
@@ -55,7 +58,6 @@ updateUserBadge();
 function extractSmartName(rawText) {
   if (!rawText) return { mainName: "bạn", variations: ["bạn"] };
   
-  // Loại bỏ các từ đệm mở đầu thông thường
   let cleaned = rawText.trim()
     .replace(/^(mình tên là|tên mình là|tôi tên là|tên tôi là|tên em là|tên anh là|tên chị là)/gi, '')
     .replace(/^(mình là|tôi là|em là|anh là|chị là|cứ gọi mình là|cứ gọi tôi là|gọi là|gọi mình là)/gi, '')
@@ -65,19 +67,18 @@ function extractSmartName(rawText) {
 
   if (!cleaned) cleaned = rawText.trim();
 
-  // Tách các từ trong tên (Ví dụ: "Trần Thái Cương")
   const parts = cleaned.split(/\s+/).filter(Boolean);
   const variations = [];
 
   if (parts.length >= 3) {
-    const lastName = parts[parts.length - 1]; // "Cương"
-    const middleLast = parts.slice(parts.length - 2).join(' '); // "Thái Cương"
-    const firstLast = `${parts[0]} ${lastName}`; // "Trần Cương"
-    const fullName = parts.join(' '); // "Trần Thái Cương"
+    const lastName = parts[parts.length - 1]; // Ví dụ: Cương
+    const middleLast = parts.slice(parts.length - 2).join(' '); // Thái Cương
+    const firstLast = `${parts[0]} ${lastName}`; // Trần Cương
+    const fullName = parts.join(' '); // Trần Thái Cương
     variations.push(lastName, middleLast, firstLast, fullName);
   } else if (parts.length === 2) {
-    const lastName = parts[1]; // "Cương"
-    const fullName = parts.join(' '); // "Thái Cương" hoặc "Trần Cương"
+    const lastName = parts[1];
+    const fullName = parts.join(' ');
     variations.push(lastName, fullName);
   } else if (parts.length === 1) {
     variations.push(parts[0]);
@@ -89,7 +90,7 @@ function extractSmartName(rawText) {
   return { mainName, fullName: parts.join(' ') || mainName, variations };
 }
 
-// HÀM LẤY TÊN NGẪU NHIÊN ĐỂ XƯNG HÔ TỰ NHIÊN, KHÔNG MÁY MÓC
+// HÀM LẤY TÊN NGẪU NHIÊN ĐỂ XƯNG HÔ TỰ NHIÊN
 function getDynamicCallName() {
   if (!nameVariations || nameVariations.length === 0) {
     return userName || "bạn";
@@ -98,27 +99,33 @@ function getDynamicCallName() {
   return nameVariations[randomIndex];
 }
 
-// SYSTEM PROMPT: XƯNG "MÌNH", GỌI BẰNG TÊN, MẠCH LẠC, ĐẦY ĐỦ CHỦ NGỮ VỊ NGỮ
-const ADVISION_SYSTEM_PROMPT = `
-1. MÔ TẢ VÀ XƯNG HÔ:
-Bạn là Hoàng An, chuyên gia phân tích hình ảnh quảng cáo và thiết kế đồ họa.
-QUY TẮC XƯNG HÔ: Bạn luôn tự xưng là "mình" và gọi người dùng bằng tên của họ (ví dụ: Cương, Thái Cương, Trần Cương). Tuyệt đối không xưng "em" hay "tôi".
+// SYSTEM PROMPT TRUYỀN THẲNG VÀO API
+function getSystemPrompt() {
+  const callName = getDynamicCallName();
+  return `Bạn là Hoàng An, chuyên gia phân tích hình ảnh quảng cáo và thiết kế đồ họa.
 
-2. CÂU TỪ VÀ NGỮ PHÁP:
-- Mọi câu nói của bạn phải mạch lạc, trau chuốt, có đầy đủ chủ ngữ và vị ngữ, tự nhiên như một người bạn đồng hành giàu chuyên môn.
-- Không viết câu cộc lốc hoặc thiếu ý.
-- Không dùng chữ in đậm nhạt xen kẽ từng dòng gây rối mắt. Viết văn tự nhiên, đều chữ, rõ ràng.
-- ĐANG TRONG CUỘC TRÒ CHUYỆN THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC CHÀO LẠI. Phải tiếp nối mạch lạc câu chuyện.
-- Tuyệt đối KHÔNG sử dụng từ tiếng Anh "banner". Luôn dùng: "hình ảnh quảng cáo", "ảnh quảng cáo" hoặc "bức ảnh".
-- Tuyệt đối KHÔNG dùng các dòng kẻ nét đứt như "--------------------------------".
-- Bắt buộc dùng TIẾNG VIỆT CÓ DẤU ĐẦY ĐỦ, chuẩn ngữ pháp.
-- Tuyệt đối KHÔNG dùng ký tự mũi tên "->", "-->", "⇒", "→" và không dùng ký tự ">".
+QUY TẮC CỐT LÕI:
+1. Xưng hô: Bạn luôn tự xưng là "mình" và gọi đối phương bằng tên của họ (${callName}). Tuyệt đối không xưng "em" hay "tôi".
+2. Giọng điệu và ngôn ngữ: Mọi câu nói phải mạch lạc, trau chuốt, có đầy đủ chủ ngữ và vị ngữ. Viết văn tự nhiên, đều chữ, rõ ràng, không in đậm nhạt lung tung theo dòng.
+3. Đang trong cuộc trò chuyện thì TUYỆT ĐỐI KHÔNG ĐƯỢC CHÀO LẠI (không nói "Chào bạn, mình là Hoàng An..."). Tiếp nối mạch lạc câu chuyện.
+4. Tuyệt đối KHÔNG dùng từ tiếng Anh "banner". Luôn dùng tiếng Việt: "hình ảnh quảng cáo", "ảnh quảng cáo" hoặc "bức ảnh".
+5. Tuyệt đối KHÔNG dùng các dòng kẻ nét đứt như "--------------------------------".
+6. Tuyệt đối KHÔNG dùng ký tự mũi tên "->", "-->", "⇒", "→" và không dùng ký tự ">".
+7. Bắt buộc dùng TIẾNG VIỆT CÓ DẤU ĐẦY ĐỦ, chuẩn ngữ pháp và chính tả.
 
-3. QUY TẮC TƯƠNG TÁC TỪNG KHỐI:
-Khi người dùng gửi hình ảnh, TUYỆT ĐỐI KHÔNG trả lời dồn dập toàn bộ các khối một lúc vì sẽ làm người dùng lười đọc. Bạn chỉ trả lời [Khối 1: Kết luận chung] (kết luận đạt hay chưa đạt tiêu chuẩn, điểm số trên thang 10, nhận xét tổng quan 2-3 câu có chủ vị đầy đủ). Sau đó, bạn HỎI người dùng xem họ có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không. Chỉ khi người dùng đồng ý hoặc yêu cầu xem tiếp, bạn mới trả lời khối tiếp theo.
-`;
+QUY TẮC TƯƠNG TÁC TỪNG KHỐI THEO YÊU CẦU:
+- Khi người dùng gửi một bức ảnh quảng cáo mới, bạn CHỈ TRẢ LỜI DUY NHẤT [Khối 1: Kết luận chung]:
+  + Kết luận bức ảnh ĐẠT TIÊU CHUẨN hoặc CHƯA ĐẠT TIÊU CHUẨN để chạy quảng cáo.
+  + Chấm điểm thiết kế cụ thể trên thang điểm 10 dựa trên các tiêu chí thị giác thực tế của bức ảnh (sản phẩm, chữ viết, màu sắc, nút bấm).
+  + Đưa ra 2-3 câu nhận xét tổng quan có đầy đủ chủ ngữ vị ngữ.
+  + Sau đó, bạn HỎI người dùng ngắn gọn xem họ có muốn mình phân tích chi tiết về bố cục thị giác và mật độ chữ viết của bức ảnh này không.
+  + TUYỆT ĐỐI KHÔNG trả lời dồn dập các khối 2, 3, 4, 5 cùng một lúc để tránh làm người đọc bị ngợp.
+- Khi người dùng đồng ý hoặc yêu cầu xem tiếp (ví dụ: xem bố cục chữ, xem ưu nhược điểm, xem đề xuất):
+  + Bạn nhìn lại bức ảnh thực tế và trả lời sâu về phần đó.
+  + Cuối mỗi phần, tiếp tục hỏi xem họ có muốn xem phần tiếp theo hay không.`;
+}
 
-// KHỞI ĐỘNG TRANG: PHÁT HIỆU ỨNG GÕ CHỮ CHO CÂU CHÀO ĐẦU TIÊN
+// HIỂN THỊ LỜI CHÀO BAN ĐẦU VỚI HIỆU ỨNG GÕ CHỮ
 async function playInitialGreeting() {
   chatContainer.innerHTML = '';
   showTypingIndicator("Hoàng An đang soạn lời chào...");
@@ -133,12 +140,11 @@ async function playInitialGreeting() {
   await streamLines(greetingLines);
 }
 
-// Chạy hiệu ứng chào đầu tiên khi tải trang
+// Khởi động trang web
 window.addEventListener('DOMContentLoaded', () => {
   if (!userName) {
     playInitialGreeting();
   } else {
-    // Nếu đã có tên từ phiên trước, hiển thị lời chào tiếp nối tự nhiên
     const callName = getDynamicCallName();
     const welcomeBackLines = [
       `Chào ${callName}, mình rất vui được gặp lại bạn.`,
@@ -197,7 +203,7 @@ btnSaveKey.addEventListener('click', () => {
   const key = inputApiKey.value.trim();
   localStorage.setItem('GEMINI_API_KEY', key);
   apiModal.classList.add('hidden');
-  alert('Đã lưu API Key thành công!');
+  alert('Đã lưu API Key thành công! Bây giờ mọi câu trả lời sẽ được sinh trực tiếp từ AI.');
 });
 
 // MODAL TÀI LIỆU ĐÀO TẠO PDF
@@ -211,7 +217,8 @@ btnResetChat.addEventListener('click', () => {
     userName = "";
     userIndustry = "";
     nameVariations = [];
-    activeAnalysis = null;
+    activeImageData = null;
+    conversationHistory = [];
     localStorage.removeItem('ADVISION_USER_NAME');
     localStorage.removeItem('ADVISION_USER_INDUSTRY');
     localStorage.removeItem('ADVISION_NAME_VARIATIONS');
@@ -270,7 +277,7 @@ chatForm.addEventListener('submit', async (e) => {
   clearAttachment();
   updateInputPlaceholder();
 
-  // BƯỚC 1: NHẬN DIỆN VÀ TRÍCH XUẤT TÊN THÔNG MINH
+  // BƯỚC 1: TRÍCH XUẤT TÊN THÔNG MINH
   if (!userName && !sentBase64) {
     const parsed = extractSmartName(text);
     userName = parsed.mainName;
@@ -287,7 +294,7 @@ chatForm.addEventListener('submit', async (e) => {
     ];
     
     showTypingIndicator("Hoàng An đang soạn câu trả lời...");
-    await delay(1000);
+    await delay(900);
     hideTypingIndicator();
     await streamLines(replyLines);
     return;
@@ -307,178 +314,138 @@ chatForm.addEventListener('submit', async (e) => {
     ];
     
     showTypingIndicator("Hoàng An đang soạn câu trả lời...");
-    await delay(1000);
+    await delay(900);
     hideTypingIndicator();
     await streamLines(replyLines);
     return;
   }
 
-  // BƯỚC 3: NGƯỜI DÙNG GỬI ẢNH ➔ CHỈ TRẢ VỀ [KHỐI 1] VÀ HỎI XEM CÓ MUỐN PHÂN TÍCH TIẾP KHÔNG
+  // BƯỚC 3: NGƯỜI DÙNG GỬI ẢNH ➔ GỌI VISION API TRỰC TIẾP TỪ GEMINI / OPENAI
   if (sentBase64) {
     const apiKey = localStorage.getItem('GEMINI_API_KEY') || "";
-    activeAnalysis = buildAnalysisSteps(sentFileName || "ảnh quảng cáo", userIndustry || "sản phẩm");
-    activeAnalysis.currentStep = 1;
 
-    let responseLines = [];
-    if (apiKey) {
-      try {
-        const callName = getDynamicCallName();
-        const prompt = `Người dùng gửi hình ảnh quảng cáo. Thông tin người dùng: xưng là mình, gọi đối phương là ${callName}, ngành hàng ${userIndustry || "sản phẩm"}.
-QUY TẮC BẮT BUỘC:
-- Đang trong cuộc trò chuyện, tuyệt đối không chào lại.
-- BẮT BUỘC CHỈ TRẢ LỜI DUY NHẤT [Khối 1: Kết luận chung] gồm: Đạt hay chưa đạt tiêu chuẩn, điểm số trên thang 10, nhận xét tổng quan 2-3 câu có chủ ngữ vị ngữ đầy đủ.
-- Sau đó, HỎI người dùng một cách tự nhiên xem họ có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không.
-- Tuyệt đối không trả lời dồn dập các khối 2, 3, 4, 5 ngay bây giờ.
-- Viết tiếng Việt có dấu đầy đủ, đều màu chữ, không dùng từ "banner", không dùng dòng kẻ nét đứt, không dùng ký tự mũi tên "->".`;
-
-        showTypingIndicator("Hoàng An đang phân tích hình ảnh...");
-        let rawResult = "";
-        if (apiKey.startsWith('sk-')) {
-          rawResult = await callOpenAiVisionApi(apiKey, sentBase64, sentMimeType, prompt);
-        } else {
-          rawResult = await callGeminiVisionApi(apiKey, sentBase64, sentMimeType, prompt);
-        }
-        hideTypingIndicator();
-        responseLines = rawResult.split('\n').map(l => sanitizeStrictRules(l)).filter(l => l.length > 0);
-      } catch (err) {
-        console.warn("Lỗi kết nối API, sử dụng dữ liệu phân tích mẫu:", err);
-        hideTypingIndicator();
-        responseLines = activeAnalysis.block1;
-      }
-    } else {
-      showTypingIndicator("Hoàng An đang phân tích hình ảnh...");
-      await delay(1300);
+    // Nếu chưa có API Key, nhắc người dùng dán mã để AI kết nối trực tiếp
+    if (!apiKey) {
+      showTypingIndicator("Hoàng An đang kiểm tra kết nối AI...");
+      await delay(800);
       hideTypingIndicator();
-      responseLines = activeAnalysis.block1;
+
+      const noKeyNotice = [
+        "Để mình có thể kết nối với trí tuệ nhân tạo và trực tiếp bóc tách hình ảnh quảng cáo thực tế của bạn, bạn hãy bấm vào nút **API Key** ở góc trên để dán mã vào nhé.",
+        "Mã Gemini API Key được Google cấp hoàn toàn miễn phí tại trang Google AI Studio (aistudio.google.com). Sau khi lưu Key, mình sẽ phân tích ngay lập tức!"
+      ];
+      await streamLines(noKeyNotice);
+      apiModal.classList.remove('hidden');
+      return;
     }
 
+    // Lưu dữ liệu ảnh đang hoạt động
+    activeImageData = {
+      base64: sentBase64,
+      mimeType: sentMimeType,
+      fileName: sentFileName
+    };
+    conversationHistory = []; // Reset lịch sử cho bức ảnh mới
+
+    showTypingIndicator("Hoàng An đang gửi ảnh lên AI để bóc tách...");
+
+    const callName = getDynamicCallName();
+    const userPromptText = `Đây là bức ảnh quảng cáo sản phẩm ngành ${userIndustry || "thương mại"} của ${callName}. Ghi chú kèm theo: "${text || "Hãy thẩm định bức ảnh này"}".
+Hãy phân tích bức ảnh và BẮT ĐẦU bằng [Khối 1: Kết luận chung] gồm: Đạt hay chưa đạt tiêu chuẩn, điểm số trên thang điểm 10, nhận xét tổng quan 2-3 câu có đầy đủ chủ ngữ vị ngữ. Sau đó hỏi ${callName} xem có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không.`;
+
+    let apiResponse = "";
+    try {
+      if (apiKey.startsWith('sk-')) {
+        apiResponse = await callOpenAiVisionApi(apiKey, sentBase64, sentMimeType, userPromptText);
+      } else {
+        apiResponse = await callGeminiVisionApi(apiKey, sentBase64, sentMimeType, userPromptText);
+      }
+    } catch (err) {
+      console.error("Lỗi API Vision:", err);
+      apiResponse = `Mình gặp sự cố khi kết nối với máy chủ AI (${err.message}). Bạn vui lòng kiểm tra lại mã API Key ở nút góc trên màn hình nhé.`;
+    }
+
+    hideTypingIndicator();
+
+    // Lưu lại lượt thoại vào lịch sử
+    conversationHistory.push({ role: 'user', text: userPromptText });
+    conversationHistory.push({ role: 'model', text: apiResponse });
+
+    const lines = apiResponse.split('\n').map(l => sanitizeStrictRules(l)).filter(l => l.length > 0);
     const quickActions = [
       { text: "Phân tích bố cục & chữ", action: "step_block2" },
       { text: "Xem ưu điểm & hạn chế", action: "step_block3" },
       { text: "Xem đề xuất chỉnh sửa", action: "step_block4" }
     ];
 
-    await streamLines(responseLines, quickActions);
+    await streamLines(lines, quickActions);
     return;
   }
 
-  // BƯỚC 4: NGƯỜI DÙNG PHẢN HỒI NỐI TIẾP CUỘC TRÒ CHUYỆN (KHÔNG CHÀO LẠI)
+  // BƯỚC 4: NGƯỜI DÙNG PHẢN HỒI TIẾP THEO ➔ GỌI API THEO ĐA LƯỢT (MULTI-TURN CHAT API)
   if (text) {
     const apiKey = localStorage.getItem('GEMINI_API_KEY') || "";
 
-    // Kiểm tra xem người dùng có muốn xem các khối tiếp theo của ảnh không
-    const handledByStep = handleInteractiveSteps(text);
-    if (handledByStep) {
-      showTypingIndicator("Hoàng An đang soạn câu trả lời...");
-      await delay(900);
+    if (!apiKey) {
+      showTypingIndicator("Hoàng An đang kiểm tra kết nối AI...");
+      await delay(800);
       hideTypingIndicator();
-      await streamLines(handledByStep.lines, handledByStep.actions);
+
+      const noKeyNotice = [
+        "Bạn hãy bấm vào nút **API Key** ở góc trên màn hình để nhập mã Gemini API Key trước nhé.",
+        "Khi có API Key, mọi câu trả lời đều sẽ được AI sinh tự động dựa trên ngữ cảnh thực tế của bạn!"
+      ];
+      await streamLines(noKeyNotice);
+      apiModal.classList.remove('hidden');
       return;
     }
 
-    // Cuộc trò chuyện tự nhiên tiếp nối
-    showTypingIndicator("Hoàng An đang soạn câu trả lời...");
-    let replyLines = [];
-    if (apiKey) {
-      try {
-        const rawReply = await callChatApi(apiKey, text);
-        replyLines = rawReply.split('\n').map(l => sanitizeStrictRules(l)).filter(l => l.length > 0);
-      } catch (e) {
-        replyLines = getConversationalReply(text, userIndustry || "sản phẩm");
+    showTypingIndicator("Hoàng An đang gửi câu hỏi tới AI...");
+
+    let apiResponse = "";
+    try {
+      if (apiKey.startsWith('sk-')) {
+        apiResponse = await callOpenAiMultiTurnChat(apiKey, text);
+      } else {
+        apiResponse = await callGeminiMultiTurnChat(apiKey, text);
       }
-    } else {
-      await delay(1000);
-      replyLines = getConversationalReply(text, userIndustry || "sản phẩm");
+    } catch (err) {
+      console.error("Lỗi Chat API:", err);
+      apiResponse = `Đã xảy ra lỗi khi kết nối với AI (${err.message}). Bạn vui lòng thử lại sau giây lát nhé.`;
     }
 
     hideTypingIndicator();
-    await streamLines(replyLines);
+
+    // Lưu vào lịch sử hội thoại
+    conversationHistory.push({ role: 'user', text: text });
+    conversationHistory.push({ role: 'model', text: apiResponse });
+
+    const lines = apiResponse.split('\n').map(l => sanitizeStrictRules(l)).filter(l => l.length > 0);
+
+    // Gợi ý nút hành động tiếp theo tùy theo ngữ cảnh
+    let nextActions = null;
+    const lower = text.toLowerCase();
+    if (lower.includes('bố cục') || lower.includes('chữ')) {
+      nextActions = [
+        { text: "Xem ưu điểm & hạn chế", action: "step_block3" },
+        { text: "Xem đề xuất chỉnh sửa", action: "step_block4" }
+      ];
+    } else if (lower.includes('ưu điểm') || lower.includes('hạn chế')) {
+      nextActions = [
+        { text: "Xem đề xuất chỉnh sửa", action: "step_block4" }
+      ];
+    } else if (lower.includes('đề xuất') || lower.includes('chỉnh sửa')) {
+      nextActions = [
+        { text: "Chạy trên Facebook", action: "reply_facebook" },
+        { text: "Chạy trên TikTok", action: "reply_tiktok" }
+      ];
+    }
+
+    await streamLines(lines, nextActions);
   }
 });
 
-// XỬ LÝ ĐIỀU HƯỚNG TỪNG KHỐI THEO YÊU CẦU CỦA NGƯỜI DÙNG
-function handleInteractiveSteps(inputText) {
-  if (!activeAnalysis) return null;
-
-  const lower = inputText.toLowerCase();
-
-  // Khối 2: Bố cục, chữ viết
-  if (lower.includes('bố cục') || lower.includes('chữ') || lower.includes('thị giác') || lower.includes('phân tích') || lower === 'có' || lower === 'ok' || lower === 'tiếp' || lower === 'tiếp tục') {
-    if (activeAnalysis.currentStep <= 1 || lower.includes('bố cục') || lower.includes('chữ')) {
-      activeAnalysis.currentStep = 2;
-      return {
-        lines: activeAnalysis.block2,
-        actions: [
-          { text: "Xem ưu điểm & hạn chế", action: "step_block3" },
-          { text: "Xem đề xuất chỉnh sửa", action: "step_block4" }
-        ]
-      };
-    }
-  }
-
-  // Khối 3: Ưu điểm và hạn chế
-  if (lower.includes('ưu điểm') || lower.includes('hạn chế') || lower.includes('nhược điểm') || lower.includes('điểm mạnh')) {
-    activeAnalysis.currentStep = 3;
-    return {
-      lines: activeAnalysis.block3,
-      actions: [
-        { text: "Xem đề xuất chỉnh sửa", action: "step_block4" }
-      ]
-    };
-  }
-
-  // Khối 4 & 5: Đề xuất cụ thể và định hướng kênh quảng cáo
-  if (lower.includes('đề xuất') || lower.includes('chỉnh sửa') || lower.includes('tối ưu') || lower.includes('giải pháp')) {
-    activeAnalysis.currentStep = 4;
-    return {
-      lines: activeAnalysis.block4_5,
-      actions: [
-        { text: "Chạy trên Facebook", action: "reply_facebook" },
-        { text: "Chạy trên TikTok", action: "reply_tiktok" }
-      ]
-    };
-  }
-
-  return null;
-}
-
-// BỘ DỮ LIỆU TỪNG KHỐI MẠCH LẠC, ĐẦY ĐỦ CHỦ NGỮ VỊ NGỮ
-function buildAnalysisSteps(filename, industry) {
-  const callName = getDynamicCallName();
-  return {
-    block1: [
-      `[Khối 1: Kết luận chung]`,
-      `Về tổng quan, mình nhận thấy bức ảnh quảng cáo ngành ${industry} này hiện tại chưa đạt tiêu chuẩn tối ưu để chạy chiến dịch. Điểm số đánh giá của bức ảnh đạt 6.8 trên thang điểm 10.`,
-      `Mặc dù chủ thể sản phẩm trong ảnh đã được làm nổi bật, nhưng độ tương phản của nút bấm kêu gọi hành động và mật độ chữ viết vẫn cần được điều chỉnh thêm để thu hút người xem tốt hơn.`,
-      `${callName} có muốn mình đi sâu phân tích chi tiết về phần bố cục thị giác và mật độ chữ viết của bức ảnh này không?`
-    ],
-
-    block2: [
-      `[Khối 2: Phân tích thị giác]`,
-      `Mình nhận thấy chủ thể sản phẩm đã được sắp xếp ở vị trí trung tâm khá ngay ngắn và ánh sáng làm rõ được các chi tiết quan trọng.`,
-      `Tuy nhiên, phần chữ viết hiện đang chiếm khoảng 24 phần trăm diện tích, vượt nhẹ so với mức tiêu chuẩn 20 phần trăm của các nền tảng quảng cáo. Nút kêu gọi hành động có kích thước vừa vặn nhưng màu sắc vẫn hơi chìm so với phông nền xung quanh.`,
-      `${callName} có muốn mình chỉ ra cụ thể những ưu điểm và những điểm còn hạn chế của bức ảnh này không?`
-    ],
-
-    block3: [
-      `[Khối 3: Ưu điểm và hạn chế]`,
-      `Về mặt ưu điểm, bức ảnh có chất lượng hình ảnh sắc nét và tông màu chủ đạo tạo được cảm giác tin cậy cho thương hiệu của bạn.`,
-      `Về điểm hạn chế, phần chữ phụ hơi dài khiến người xem dễ bị phân tán chú ý, đồng thời nút bấm kêu gọi hành động chưa tạo được độ tương phản rõ rệt để thôi thúc người xem bấm vào.`,
-      `${callName} có muốn mình đưa ra các giải pháp cụ thể để bạn chỉnh sửa và tối ưu bức ảnh này ngay không?`
-    ],
-
-    block4_5: [
-      `[Khối 4: Đề xuất cụ thể]`,
-      `Đầu tiên, bạn nên rút gọn bớt một dòng chữ phụ để người xem có thể nắm bắt thông điệp cốt lõi ngay trong 2 giây đầu tiên.`,
-      `Thứ hai, bạn hãy đổi màu nút kêu gọi hành động sang một tông màu tương phản mạnh hơn như vàng cam hoặc đỏ tươi để gia tăng phản xạ nhấp chuột.`,
-      `Thứ ba, bạn nên chừa khoảng trống an toàn ở các mép viền để hình ảnh không bị che khuất khi hiển thị trên màn hình điện thoại.`,
-      `[Khối 5: Câu hỏi tiếp theo]`,
-      `Bức ảnh này ${callName} dự định sẽ chạy chiến dịch quảng cáo trên Facebook hay TikTok vậy? Bạn chia sẻ thêm để mình tư vấn kích thước và vùng an toàn chuẩn xác nhất cho bạn nhé.`
-    ]
-  };
-}
-
-// HÀM LÀM SẠCH VÀ CHUẨN HÓA CÂU CHỮ
+// HÀM LÀM SẠCH VÀ CHUẨN HÓA CÂU CHỮ TRẢ VỀ TỪ API
 function sanitizeStrictRules(str) {
   if (!str) return "";
   return str
@@ -576,10 +543,10 @@ async function streamLines(linesArray, actionButtons = null) {
     container.appendChild(p);
     scrollToBottom();
 
-    await delay(180);
+    await delay(160);
   }
 
-  // Nếu có nút hành động nhanh, hiển thị nhẹ nhàng phía dưới
+  // Nếu có nút hành động nhanh, hiển thị phía dưới
   if (actionButtons && actionButtons.length > 0) {
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'flex flex-wrap gap-2 pt-2 border-t border-slate-200 dark:border-slate-700/60 mt-3 fade-in-text';
@@ -605,10 +572,15 @@ function scrollToBottom() {
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// API CALL ENGINES
+// =============================================================================
+// CÁC HÀM GỌI API THỰC TẾ (REAL API ENGINE CHO GEMINI VÀ OPENAI)
+// =============================================================================
+
+// 1. GỌI GEMINI VISION API CHO ẢNH MỚI
 async function callGeminiVisionApi(apiKey, base64Data, mimeType, userText) {
   const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
   let lastErr = null;
+
   for (const modelName of models) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
@@ -617,8 +589,9 @@ async function callGeminiVisionApi(apiKey, base64Data, mimeType, userText) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{
+            role: 'user',
             parts: [
-              { text: `${userText}\n\n${ADVISION_SYSTEM_PROMPT}` },
+              { text: `${getSystemPrompt()}\n\n${userText}` },
               { inline_data: { mime_type: mimeType, data: base64Data } }
             ]
           }]
@@ -627,7 +600,7 @@ async function callGeminiVisionApi(apiKey, base64Data, mimeType, userText) {
 
       if (!resp.ok) {
         const errData = await resp.json();
-        throw new Error(errData.error?.message || "Lỗi kết nối Gemini API");
+        throw new Error(errData.error?.message || `HTTP ${resp.status}`);
       }
 
       const json = await resp.json();
@@ -637,9 +610,68 @@ async function callGeminiVisionApi(apiKey, base64Data, mimeType, userText) {
       lastErr = e;
     }
   }
-  throw lastErr || new Error("Không thể kết nối Gemini API");
+  throw lastErr || new Error("Không thể kết nối với Gemini API");
 }
 
+// 2. GỌI GEMINI MULTI-TURN CHAT (GỬI KÈM NGỮ CẢNH ẢNH + LỊCH SỬ TRAO ĐỔI)
+async function callGeminiMultiTurnChat(apiKey, newText) {
+  const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-flash-latest'];
+  let lastErr = null;
+
+  // Xây dựng contents array chứa toàn bộ lịch sử và ảnh ban đầu
+  const contents = [];
+
+  // Thêm lượt đầu tiên kèm ảnh (nếu có)
+  if (activeImageData) {
+    const firstTurnParts = [
+      { text: `${getSystemPrompt()}\n\nBức ảnh quảng cáo người dùng đã tải lên:` },
+      { inline_data: { mime_type: activeImageData.mimeType, data: activeImageData.base64 } }
+    ];
+    contents.push({ role: 'user', parts: firstTurnParts });
+  } else {
+    contents.push({ role: 'user', parts: [{ text: getSystemPrompt() }] });
+  }
+
+  // Thêm các lượt hội thoại tiếp theo
+  for (let i = 0; i < conversationHistory.length; i++) {
+    const item = conversationHistory[i];
+    contents.push({
+      role: item.role === 'model' ? 'model' : 'user',
+      parts: [{ text: item.text }]
+    });
+  }
+
+  // Thêm câu hỏi mới của người dùng
+  contents.push({
+    role: 'user',
+    parts: [{ text: `${newText}\n(Lưu ý: Bạn là Hoàng An, tự xưng là mình, gọi người dùng bằng tên, không chào lại, trả lời có đầy đủ chủ vị, không dùng từ banner, không dùng dòng kẻ)` }]
+  });
+
+  for (const modelName of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: contents })
+      });
+
+      if (!resp.ok) {
+        const errData = await resp.json();
+        throw new Error(errData.error?.message || `HTTP ${resp.status}`);
+      }
+
+      const json = await resp.json();
+      const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) return text;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error("Không thể kết nối với Gemini Chat API");
+}
+
+// 3. GỌI OPENAI VISION API
 async function callOpenAiVisionApi(apiKey, base64Data, mimeType, userText) {
   const url = 'https://api.openai.com/v1/chat/completions';
   const resp = await fetch(url, {
@@ -651,7 +683,7 @@ async function callOpenAiVisionApi(apiKey, base64Data, mimeType, userText) {
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: ADVISION_SYSTEM_PROMPT },
+        { role: 'system', content: getSystemPrompt() },
         {
           role: 'user',
           content: [
@@ -673,50 +705,48 @@ async function callOpenAiVisionApi(apiKey, base64Data, mimeType, userText) {
   return json.choices?.[0]?.message?.content || "";
 }
 
-async function callChatApi(apiKey, userText) {
-  const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-flash-latest'];
-  const callName = getDynamicCallName();
-  const prompt = `Bạn là Hoàng An (chuyên gia thiết kế và phân tích thị giác quảng cáo). Hãy trả lời ${callName} (ngành ${userIndustry || 'sản phẩm'}) một cách vui tính, logic, thực tế. 
-QUY TẮC: Bạn tự xưng là "mình", gọi đối phương là ${callName}. ĐANG TRONG CUỘC TRÒ CHUYỆN THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC CHÀO LẠI. Phải có đầy đủ chủ ngữ và vị ngữ, câu từ mạch lạc. Không dùng từ "banner", không dùng dòng kẻ nét đứt, không dùng ký tự mũi tên "->", viết đều màu chữ.\n\nTin nhắn của ${callName}: ${userText}\n\n${ADVISION_SYSTEM_PROMPT}`;
+// 4. GỌI OPENAI MULTI-TURN CHAT
+async function callOpenAiMultiTurnChat(apiKey, newText) {
+  const url = 'https://api.openai.com/v1/chat/completions';
+  const messages = [{ role: 'system', content: getSystemPrompt() }];
 
-  for (const modelName of models) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
-      });
-      if (resp.ok) {
-        const json = await resp.json();
-        return json.candidates?.[0]?.content?.parts?.[0]?.text || "";
-      }
-    } catch (e) {}
+  if (activeImageData) {
+    messages.push({
+      role: 'user',
+      content: [
+        { type: 'text', text: 'Đây là hình ảnh quảng cáo đang trao đổi:' },
+        { type: 'image_url', image_url: { url: `data:${activeImageData.mimeType};base64,${activeImageData.base64}` } }
+      ]
+    });
   }
-  return getConversationalReply(userText, userIndustry || "sản phẩm");
-}
 
-// CÂU TRẢ LỜI HỘI THOẠI SAU PHÂN TÍCH (CÓ ĐẦY ĐỦ CHỦ NGỮ VỊ NGỮ, NỐI TIẾP MẠCH LẠC)
-function getConversationalReply(text, ind) {
-  const lower = text.toLowerCase();
-  const callName = getDynamicCallName();
+  for (const item of conversationHistory) {
+    messages.push({
+      role: item.role === 'model' ? 'assistant' : 'user',
+      content: item.text
+    });
+  }
 
-  if (lower.includes('facebook') || lower.includes('fb') || lower.includes('meta')) {
-    return [
-      `Đối với nền tảng Facebook và Instagram, ${callName} nên ưu tiên sử dụng tỷ lệ ảnh vuông 1:1 cho bài viết thông thường, hoặc tỷ lệ 4:5 để tận dụng tối đa không gian lướt bảng tin trên điện thoại.`,
-      `Một điều cốt lõi mà bạn cần lưu ý là luôn giữ mật độ chữ viết dưới 20 phần trăm diện tích để thuật toán phân phối quảng cáo hiệu quả nhất với chi phí tiết kiệm nhé.`
-    ];
+  messages.push({ role: 'user', content: newText });
+
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: messages,
+      max_tokens: 1000
+    })
+  });
+
+  if (!resp.ok) {
+    const errData = await resp.json();
+    throw new Error(errData.error?.message || "OpenAI Chat Error");
   }
-  if (lower.includes('tiktok')) {
-    return [
-      `Đối với kênh TikTok, bạn bắt buộc phải dùng định dạng ảnh hoặc video dọc 9:16.`,
-      `${callName} cần đặc biệt chú ý chừa vùng an toàn Safe Zone ở đỉnh đầu và đáy dưới, vì giao diện của TikTok sẽ hiển thị tên tài khoản, nút thả tim và phần mô tả đè lên các khu vực đó.`
-    ];
-  }
-  return [
-    `Mình hoàn toàn hiểu góc nhìn của ${callName}. Đối với sản phẩm ngành ${ind || 'này'}, việc giữ cho bố cục tinh gọn và thông điệp rõ ràng luôn là yếu tố quyết định để giữ chân khách hàng.`,
-    `${callName} có thể chỉnh sửa lại thiết kế theo các gợi ý vừa rồi, sau đó gửi lại bức ảnh mới vào đây để chúng mình cùng xem xét tiếp nhé.`
-  ];
+
+  const json = await resp.json();
+  return json.choices?.[0]?.message?.content || "";
 }
