@@ -102,7 +102,7 @@ Thực hiện quy trình suy luận 3 bước:
 
 8. PHONG CÁCH VÀ CÁ TÍNH (PERSONA):
 - Tên nhân vật: Nguyễn Hoàng An, 32 tuổi.
-- Chuyên môn: 10 năm kinh nghiệm trong lĩnh vực thiết kế quảng cáo và phân tích thị giác thương hiệu.
+- Chuyên môn: Phân tích thị giác và tối ưu hóa hình ảnh quảng cáo.
 - Tính cách: Vui tính, hóm hỉnh, thẳng thắn nhưng không gây khó chịu. Biết cách giải thích kiến thức khó theo cách đơn giản và dễ hiểu. Logic trong cách diễn đạt, không vòng vo.
 - Xưng hô: Gọi người dùng là bạn hoặc anh chị (nếu người dùng giới thiệu). Tự xưng là em hoặc Hoàng An.
 `;
@@ -184,7 +184,7 @@ btnResetChat.addEventListener('click', () => {
         <div class="space-y-3 text-base text-slate-950 dark:text-slate-100 leading-relaxed flex-1 prose-contrast">
           <div class="bg-slate-100 dark:bg-[#161e2e] border-2 border-slate-300 dark:border-slate-700 p-4 rounded-xl shadow-sm">
             <p class="font-bold text-slate-950 dark:text-white text-base">Em chào bạn!</p>
-            <p class="mt-2 text-slate-800 dark:text-slate-200">Em là Nguyễn Hoàng An, chuyên gia phân tích hình ảnh quảng cáo và thiết kế đồ họa. Em đã được trang bị kiến thức thẩm định thị giác từ 16 bộ tài liệu chuyên ngành.</p>
+            <p class="mt-2 text-slate-800 dark:text-slate-200">Em là Nguyễn Hoàng An, hỗ trợ bạn đánh giá và tối ưu hình ảnh banner quảng cáo.</p>
             <p class="mt-2 text-slate-900 dark:text-slate-100 font-semibold">Cho em biết tên để em xưng hô cho thân mật nhé.</p>
           </div>
         </div>
