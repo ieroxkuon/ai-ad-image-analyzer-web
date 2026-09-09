@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AdVision - Phân tích & Đánh giá Hình ảnh Quảng cáo</title>
+  <title>AdVision - Nguyễn Hoàng An | Cố vấn Thẩm định Hình ảnh Quảng cáo</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -37,18 +37,35 @@
   <!-- HIGH CONTRAST HEADER NAVBAR -->
   <header class="h-16 border-b-2 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#111827] px-4 sm:px-8 flex items-center justify-between z-10 shrink-0 shadow-sm">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-blue-700 text-white flex items-center justify-center font-black text-base shadow">
-        <i class="fa-solid fa-layer-group"></i>
+      <div class="w-10 h-10 rounded-xl bg-blue-700 text-white flex items-center justify-center font-black text-base shadow shrink-0">
+        <i class="fa-solid fa-user-tie"></i>
       </div>
       <div>
-        <h1 class="font-black text-lg tracking-tight text-slate-950 dark:text-white">AdVision</h1>
-        <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">Phân tích & đánh giá hình ảnh quảng cáo</p>
+        <div class="flex items-center gap-2">
+          <h1 class="font-black text-base sm:text-lg tracking-tight text-slate-950 dark:text-white">Nguyễn Hoàng An</h1>
+          <span class="bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300 text-[10px] font-black px-2 py-0.5 rounded-full border border-blue-300 dark:border-blue-700">AI Agent</span>
+        </div>
+        <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">Cố vấn Thẩm định Thị giác & Thiết kế Đồ họa (10 năm kinh nghiệm)</p>
       </div>
     </div>
+    
     <div class="flex items-center gap-2">
-      <button id="btn-api-key-modal" class="text-xs font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-2 border-slate-400 dark:border-slate-600 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 shadow-sm">
+      <!-- Nút xem danh mục tài liệu đào tạo PDF -->
+      <button id="btn-docs-modal" class="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shadow-sm" title="Xem 16 tài liệu PDF huấn luyện chuyên sâu">
+        <i class="fa-solid fa-book-bookmark text-blue-600 dark:text-blue-400"></i>
+        <span class="hidden sm:inline">Tài liệu đào tạo</span>
+        <span class="bg-blue-600 text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">16</span>
+      </button>
+
+      <!-- Nút cài đặt API Key -->
+      <button id="btn-api-key-modal" class="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
         <i class="fa-solid fa-key text-blue-600 dark:text-blue-400"></i>
-        <span>API Key</span>
+        <span class="hidden sm:inline">API Key</span>
+      </button>
+
+      <!-- Nút đặt lại hội thoại -->
+      <button id="btn-reset-chat" class="text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 p-2 rounded-lg transition-colors" title="Bắt đầu lại cuộc trò chuyện">
+        <i class="fa-solid fa-arrow-rotate-right"></i>
       </button>
     </div>
   </header>
@@ -59,15 +76,16 @@
     <!-- CHAT MESSAGES CONTAINER -->
     <div id="chat-container" class="flex-1 overflow-y-auto chat-scroll py-6 space-y-6">
       
-      <!-- INITIAL AGENT WELCOME MESSAGE -->
+      <!-- INITIAL AGENT WELCOME MESSAGE THEO ĐÚNG MỤC 9 KẾ HOẠCH -->
       <div class="flex gap-4">
         <div class="w-9 h-9 rounded-lg bg-blue-700 text-white font-bold flex items-center justify-center text-sm shrink-0 shadow">
-          <i class="fa-solid fa-robot"></i>
+          <i class="fa-solid fa-user-tie"></i>
         </div>
         <div class="space-y-3 text-base text-slate-950 dark:text-slate-100 leading-relaxed flex-1 prose-contrast">
           <div class="bg-slate-100 dark:bg-[#161e2e] border-2 border-slate-300 dark:border-slate-700 p-4 rounded-xl shadow-sm">
-            <p class="font-bold text-slate-950 dark:text-white text-base">Xin chào! Tôi là công cụ AI hỗ trợ thẩm định hình ảnh banner quảng cáo.</p>
-            <p class="mt-2 text-slate-800 dark:text-slate-200">Để bắt đầu, bạn có thể nhập tên và sản phẩm quảng cáo, sau đó tải bức ảnh banner lên để phân tích mật độ chữ (20%), nút CTA và bố cục thị giác nhé.</p>
+            <p class="font-bold text-slate-950 dark:text-white text-base">Em chào bạn!</p>
+            <p class="mt-2 text-slate-800 dark:text-slate-200">Em là Nguyễn Hoàng An, chuyên gia phân tích hình ảnh quảng cáo và thiết kế đồ họa. Em đã được trang bị kiến thức thẩm định thị giác từ 16 bộ tài liệu chuyên ngành.</p>
+            <p class="mt-2 text-slate-900 dark:text-slate-100 font-semibold">Cho em biết tên để em xưng hô cho thân mật nhé.</p>
           </div>
         </div>
       </div>
@@ -91,6 +109,16 @@
         </button>
       </div>
 
+      <!-- USER STATE BADGE -->
+      <div id="user-info-badge" class="hidden items-center gap-2 mb-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+        <span class="bg-slate-200 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-300 dark:border-slate-700">
+          <i class="fa-solid fa-user text-blue-600 mr-1"></i> <span id="badge-user-name">Bạn</span>
+        </span>
+        <span id="badge-industry-container" class="hidden bg-slate-200 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-300 dark:border-slate-700">
+          <i class="fa-solid fa-tag text-blue-600 mr-1"></i> <span id="badge-industry-name">Chưa rõ</span>
+        </span>
+      </div>
+
       <!-- INPUT FORM -->
       <form id="chat-form" class="relative flex items-center rounded-xl bg-white dark:bg-[#161e2e] border-2 border-slate-400 dark:border-slate-600 shadow-md focus-within:border-blue-600 dark:focus-within:border-blue-500">
         <input type="file" id="file-input" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden">
@@ -99,7 +127,7 @@
           <i class="fa-solid fa-paperclip text-lg"></i>
         </button>
 
-        <input type="text" id="chat-input" placeholder="Gửi tin nhắn hoặc đính kèm ảnh banner..." class="w-full text-base font-medium bg-transparent px-3 py-3.5 text-slate-950 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none">
+        <input type="text" id="chat-input" placeholder="Nhập tên của bạn hoặc gửi tin nhắn..." class="w-full text-base font-medium bg-transparent px-3 py-3.5 text-slate-950 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none">
 
         <button type="submit" id="btn-send-message" class="p-2.5 mr-2 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold transition-all shadow">
           <i class="fa-solid fa-paper-plane text-base"></i>
@@ -107,12 +135,101 @@
       </form>
 
       <p class="text-xs font-semibold text-center text-slate-600 dark:text-slate-400 mt-2">
-        AdVision phân tích tiêu chuẩn thị giác và hỗ trợ tối ưu hiệu suất quảng cáo.
+        Nguyễn Hoàng An phân tích bố cục, mật độ chữ 20%, tương phản CTA và tâm lý học màu sắc.
       </p>
 
     </div>
 
   </main>
+
+  <!-- MODAL TÀI LIỆU ĐÀO TẠO PDF (TRAINING DOCS MODAL) -->
+  <div id="docs-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#161e2e] rounded-xl max-w-2xl w-full p-6 space-y-4 shadow-2xl border-2 border-slate-400 dark:border-slate-600 max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-700 shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-700 text-white flex items-center justify-center text-sm font-black">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-black text-slate-950 dark:text-white">Kho Tài Liệu Huấn Luyện AI Agent</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400">16 tài liệu PDF chuyên ngành nạp vào trí thức của Nguyễn Hoàng An</p>
+          </div>
+        </div>
+        <button id="btn-close-docs-modal" class="text-slate-500 hover:text-slate-950 dark:hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="overflow-y-auto chat-scroll flex-1 pr-1 space-y-2 text-xs">
+        <div class="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700 flex items-start gap-2.5">
+          <i class="fa-solid fa-file-pdf text-red-500 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">EN-Ebook-Complete-guide-to-banner-advertising.pdf</p>
+            <p class="text-slate-600 dark:text-slate-400">Cẩm nang toàn diện về kích thước, cấu trúc và chiến lược tối ưu chuyển đổi banner quảng cáo.</p>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700 flex items-start gap-2.5">
+          <i class="fa-solid fa-file-pdf text-red-500 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">Designing for Clarity.pdf</p>
+            <p class="text-slate-600 dark:text-slate-400">Nguyên lý thiết kế rõ ràng, phân cấp thị giác (Visual Hierarchy) và loại bỏ chi tiết gây nhiễu.</p>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700 flex items-start gap-2.5">
+          <i class="fa-solid fa-file-pdf text-red-500 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">Understanding Color- An Introduction for Designers.pdf</p>
+            <p class="text-slate-600 dark:text-slate-400">Tâm lý học màu sắc, quy luật tương phản 4.5:1 của nút CTA và bảng màu theo ngành hàng.</p>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700 flex items-start gap-2.5">
+          <i class="fa-solid fa-file-pdf text-red-500 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">Graphic Design and Print Production Fundamentals.pdf</p>
+            <p class="text-slate-600 dark:text-slate-400">Nguyên lý nền tảng bố cục: quy tắc một phần ba, cân bằng đối xứng và điểm nhấn trọng tâm.</p>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700 flex items-start gap-2.5">
+          <i class="fa-solid fa-file-pdf text-red-500 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">Introduction to Typography.pdf & Typography.pdf</p>
+            <p class="text-slate-600 dark:text-slate-400">Quy tắc phân cấp chữ, mật độ chữ dưới 20% diện tích và độ dễ đọc trên màn hình điện thoại.</p>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700 flex items-start gap-2.5">
+          <i class="fa-solid fa-file-pdf text-red-500 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">Logo Design Guide.pdf & Know Logo</p>
+            <p class="text-slate-600 dark:text-slate-400">Tiêu chuẩn nhận diện thương hiệu, vị trí đặt logo và tính toàn vẹn của nhãn hàng trên banner.</p>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700 flex items-start gap-2.5">
+          <i class="fa-solid fa-file-pdf text-red-500 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">The Graphic Design Book - A Comprehensive Guide</p>
+            <p class="text-slate-600 dark:text-slate-400">Tổng hợp nguyên tắc thiết kế thực chiến, hướng dẫn bóc tách và chẩn đoán lỗi thiết kế nhanh.</p>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700 flex items-start gap-2.5">
+          <i class="fa-solid fa-file-pdf text-red-500 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">ABSTRACTICCMI2017TsiotsouHatzithomas.pdf</p>
+            <p class="text-slate-600 dark:text-slate-400">Nghiên cứu khoa học về tâm lý học kích thích chú ý và hành vi nhấp chuột của người xem quảng cáo.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-3 border-t border-slate-200 dark:border-slate-700 shrink-0">
+        <span class="text-[11px] text-slate-500">Tài liệu lưu trữ nội bộ tại thư mục <code>trainingdocs/</code></span>
+        <button id="btn-done-docs-modal" class="px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs shadow">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
 
   <!-- HIGH CONTRAST API KEY MODAL -->
   <div id="api-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -124,7 +241,7 @@
         <button id="btn-close-modal" class="text-slate-500 hover:text-slate-950 dark:hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
-        Nhập Google Gemini API Key hoặc OpenAI API Key của bạn để phân tích hình ảnh thực tế.
+        Nhập Google Gemini API Key hoặc OpenAI API Key của bạn để kết nối AI phân tích ảnh thực tế. Nếu chưa có Key, hệ thống sẽ sử dụng chế độ mô phỏng chuyên gia.
       </p>
       <div>
         <label for="input-api-key" class="block text-xs font-extrabold text-slate-900 dark:text-slate-200 mb-1">Mã API Key</label>
