@@ -1,8 +1,222 @@
 // =============================================================================
 // ADVISION AI - HỆ THỐNG CỐ VẤN THẨM ĐỊNH HÌNH ẢNH QUẢNG CÁO
-// 100% KẾT NỐI VÀ SINH CÂU TRẢ LỜI ĐỘNG TỪ API (GEMINI / OPENAI)
 // NHÂN VẬT: HOÀNG AN - TỰ XƯNG "MÌNH", GỌI BẰNG TÊN, GÕ CHỮ TỰ NHIÊN
+// TÍCH HỢP BỘ 22 QUY CHUẨN THẨM ĐỊNH ĐÃ CHƯNG CẤT TỪ 8 TÀI LIỆU NGHIÊN CỨU
 // =============================================================================
+
+// BỘ 22 QUY CHUẨN THẨM ĐỊNH (GROUNDED DESIGN RULEBOOK)
+const DESIGN_RULES = [
+  {
+    "rule_id": "layout_rule_of_thirds",
+    "category": "layout_composition",
+    "title": "Quy tắc một phần ba trong bố cục thị giác",
+    "description": "Chia khu vực thiết kế thành một lưới 3x3 gồm 9 ô vuông bằng nhau bằng 2 đường ngang và 2 đường dọc. Đặt điểm nhấn chính (focal point) của hình ảnh hoặc thông điệp quảng cáo tại hoặc gần các giao điểm lưới để tạo độ cân bằng thị giác tự nhiên.",
+    "threshold": "Lưới 3x3, điểm nhấn tại 4 điểm giao cắt",
+    "severity": "critical",
+    "source_book": "The Graphic Design Book- A Comprehensive Guide for Beginners.pdf",
+    "source_location": "Section 3: Layout and Composition - The Rule of Thirds"
+  },
+  {
+    "rule_id": "layout_3x4_grid_partition",
+    "category": "layout_composition",
+    "title": "Cấu trúc lưới 3x4 phân chia bố cục",
+    "description": "Sử dụng hệ thống lưới cơ sở 3 cột x 4 hàng với các phương án phân chia duy nhất để tổ chức các khối nội dung, tiêu đề và hình ảnh trên trang quảng cáo.",
+    "threshold": "Lưới 3 x 4 (12 ô cơ sở)",
+    "severity": "moderate",
+    "source_book": "Designing for Clarity.pdf",
+    "source_location": "Layout - The 892 unique ways to partition a 3 x 4 grid"
+  },
+  {
+    "rule_id": "layout_golden_ratio_section",
+    "category": "layout_composition",
+    "title": "Tỷ lệ vàng trong phân chia không gian thiết kế",
+    "description": "Áp dụng tỷ lệ hằng số vàng (Golden Ratio ~ 1 : 1.618) để tính toán tỷ lệ khung hình, kích thước tỷ lệ giữa các phần tử và xác định độ rộng của vùng nội dung so với khoảng trắng bao quanh.",
+    "threshold": "Tỷ lệ 1 : 1.618",
+    "severity": "moderate",
+    "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+    "source_location": "Chapter 3: Types of Grids (The Golden Section)"
+  },
+  {
+    "rule_id": "layout_hang_lines_rule",
+    "category": "layout_composition",
+    "title": "Quy tắc đường treo nằm ngang (Hang Lines)",
+    "description": "Chia mặt phẳng thiết kế theo chiều ngang thành 3 phần bằng nhau để tạo các đường treo (hang lines), phân định ranh giới riêng biệt giữa vùng dành cho hình ảnh và vùng dành cho văn bản.",
+    "threshold": "Phân chia mặt phẳng ngang thành 3 phần",
+    "severity": "moderate",
+    "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+    "source_location": "Chapter 3: Hang Lines"
+  },
+  {
+    "rule_id": "layout_single_vs_multicolumn_grid",
+    "category": "layout_composition",
+    "title": "Phân bổ lưới đơn cột và đa cột theo độ phức tạp",
+    "description": "Áp dụng lưới 1 cột cho thông điệp đơn giản; đối với quảng cáo phức tạp hợp nhất nhiều hình ảnh và văn bản, bắt buộc sử dụng lưới đa cột để phân vùng các cấp bậc thông tin.",
+    "threshold": "1 cột (đơn giản); ≥ 2-4 cột (phức tạp)",
+    "severity": "moderate",
+    "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+    "source_location": "Chapter 3.4: Single-Column & Multi-Column Grid"
+  },
+  {
+    "rule_id": "color_luminosity_ratio_schopenhauer",
+    "category": "color_contrast",
+    "title": "Tỷ lệ diện tích cân bằng độ sáng màu sắc Schopenhauer",
+    "description": "Diện tích hiển thị của từng cặp màu tương phản phải tỷ lệ nghịch với chỉ số phản xạ ánh sáng (Vàng: 9, Cam: 8, Đỏ: 6, Lục: 6, Lam: 4, Tím: 3). Cụ thể diện tích Tím : Vàng = 3 : 1; Lam : Cam = 2 : 1; Đỏ : Lục = 1 : 1.",
+    "threshold": "Tím/Vàng = 3:1, Lam/Cam = 2:1, Đỏ/Lục = 1:1",
+    "severity": "critical",
+    "source_book": "Understanding Color- An Introduction for Designers.pdf",
+    "source_location": "Chapter 7: Schopenhauer's Circle of Color Harmony"
+  },
+  {
+    "rule_id": "color_rgb_gamut_range",
+    "category": "color_contrast",
+    "title": "Quy chuẩn không gian màu RGB 8-bit cho quảng cáo số",
+    "description": "Thiết kế quảng cáo hiển thị trên màn hình số bắt buộc phải sử dụng hệ màu cộng RGB với dải giá trị từ 0 đến 255 cho mỗi kênh 8-bit. Không dùng CMYK cho quảng cáo số để tránh bị đục màu.",
+    "threshold": "Kênh màu 8-bit (dải 0 - 255/kênh), RGB Mode",
+    "severity": "critical",
+    "source_book": "The Graphic Design Book- A Comprehensive Guide for Beginners.pdf",
+    "source_location": "Section 3: Color - RGB Additive Model"
+  },
+  {
+    "rule_id": "color_black_shading_increment",
+    "category": "color_contrast",
+    "title": "Quy tắc giảm độ thuần màu bằng bước tăng sắc đen",
+    "description": "Mức độ rực rỡ của màu thuần được làm dịu hoặc tạo độ trầm bằng cách bổ sung thêm sắc đen (Black/K) theo từng nấc tỷ lệ chuẩn 6%.",
+    "threshold": "Bước điều chỉnh 6% sắc đen",
+    "severity": "suggestion",
+    "source_book": "Understanding Color- An Introduction for Designers.pdf",
+    "source_location": "Chapter 9: Process Colors Act as Filters"
+  },
+  {
+    "rule_id": "color_simultaneous_contrast_balance",
+    "category": "color_contrast",
+    "title": "Tương phản đồng thời và cân bằng 3 màu gốc",
+    "description": "Trạng thái nghỉ ngơi và cân bằng thị giác đạt được khi cả 3 sắc độ màu gốc cùng hiện diện trong trường thị giác thông qua việc phối hợp các màu bổ túc.",
+    "threshold": "Hiện diện đủ 3 sắc độ gốc trong bố cục",
+    "severity": "moderate",
+    "source_book": "Understanding Color- An Introduction for Designers.pdf",
+    "source_location": "Chapter 5: Ground Subtraction & Equilibrium"
+  },
+  {
+    "rule_id": "typo_typeface_quantity_limit",
+    "category": "typography",
+    "title": "Giới hạn số lượng Typeface trong một thiết kế",
+    "description": "Chỉ chọn tối đa 2 (hoặc không quá 3) font chữ: kết hợp 1 Serif (cho tiêu đề) và 1 Sans Serif (cho văn bản nội dung), hoặc ngược lại. Tránh dùng quá nhiều kiểu chữ gây rối mắt.",
+    "threshold": "Số lượng Typeface ≤ 2 (1 Serif + 1 Sans Serif)",
+    "severity": "critical",
+    "source_book": "Designing for Clarity.pdf",
+    "source_location": "Using Typefaces Together - 1 Serif 1 Sans Serif"
+  },
+  {
+    "rule_id": "typo_leading_ratio",
+    "category": "typography",
+    "title": "Tỷ lệ khoảng cách dòng văn bản (Leading Ratio)",
+    "description": "Khoảng cách giữa các dòng (leading) trong đoạn văn bản nội dung phải lớn hơn kích thước font chữ (font size) từ 1.25 đến 1.5 lần để đảm bảo độ dễ đọc và không bị dính dòng.",
+    "threshold": "Leading = 1.25x - 1.5x Font Size (125% - 150%)",
+    "severity": "critical",
+    "source_book": "The Graphic Design Book- A Comprehensive Guide for Beginners.pdf",
+    "source_location": "Section 3: Typography - Leading"
+  },
+  {
+    "rule_id": "typo_point_pica_unit_standard",
+    "category": "typography",
+    "title": "Tiêu chuẩn hệ thống đo lường Typography",
+    "description": "Áp dụng hệ thống typographic chuẩn: 1 Point = 1/72 inch (đo chiều cao font) và 12 Points = 1 Pica (đo độ rộng cột văn bản). Khi ghép font chữ, căn chỉnh theo chiều cao x (x-height).",
+    "threshold": "1 Point = 1/72 inch; 1 Pica = 12 Points",
+    "severity": "moderate",
+    "source_book": "The Graphic Design Book- A Comprehensive Guide for Beginners.pdf",
+    "source_location": "Section 3: Typography - Size & Point System"
+  },
+  {
+    "rule_id": "typo_font_size_contrast_noticeable",
+    "category": "typography",
+    "title": "Tương phản kích thước Font phân cấp rõ rệt",
+    "description": "Sự chênh lệch kích thước font chữ giữa tiêu đề và văn bản nội dung phải đủ lớn để nhận biết lập tức (Headline 28pt - 72pt, Body 12pt - 18pt). Tránh dùng kích thước quá gần nhau.",
+    "threshold": "Chênh lệch kích thước rõ rệt (12pt vs 28pt+)",
+    "severity": "critical",
+    "source_book": "Designing for Clarity.pdf",
+    "source_location": "Size - Make Font Sizes Noticeably Different"
+  },
+  {
+    "rule_id": "typo_kerning_pairs_quality",
+    "category": "typography",
+    "title": "Tiêu chuẩn cặp Kerning lập trình sẵn trong Font",
+    "description": "Font chữ chất lượng cao phải có từ 600 đến 800 giá trị kerning được lập trình sẵn để tự động xử lý khoảng hở thô giữa các ký tự.",
+    "threshold": "600 - 800 kerning pairs",
+    "severity": "moderate",
+    "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+    "source_location": "Chapter 3.4: Kerning Values in Fonts"
+  },
+  {
+    "rule_id": "cta_copy_congruency_interaction",
+    "category": "cta_optimization",
+    "title": "Tương thích thông điệp CTA với mức độ nhận diện thương hiệu",
+    "description": "Đối với thương hiệu đã có độ nhận diện cao, thông điệp kêu gọi cảm xúc mang lại thái độ tích cực cao hơn hẳn khi hình ảnh có tính tương thích (Congruent: Mean=3.53 vs Incongruent: Mean=2.60; p < 0.012).",
+    "threshold": "Thái độ M=3.53 (Congruent) vs M=2.60 (Incongruent), p < 0.012",
+    "severity": "critical",
+    "source_book": "ABSTRACTICCMI2017TsiotsouHatzithomas.pdf",
+    "source_location": "Banner Advertising Effectiveness Study - Experiment 2"
+  },
+  {
+    "rule_id": "cta_aida_model_attention",
+    "category": "cta_optimization",
+    "title": "Mô hình truyền thông AIDA cho vị trí Nút CTA",
+    "description": "Hình ảnh quảng cáo và Nút CTA phải tuân theo 4 bước A-I-D-A: Thu hút (Attention) -> Quan tâm (Interest) -> Khao khát (Desire) -> Hành động (Action). Nút CTA phải nằm ở điểm chốt chặn cuối cùng của luồng thị giác.",
+    "threshold": "Trình tự 4 giai đoạn truyền thông A-I-D-A",
+    "severity": "critical",
+    "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+    "source_location": "Chapter 2.2: AIDA Framework"
+  },
+  {
+    "rule_id": "cta_figure_ground_isolation",
+    "category": "cta_optimization",
+    "title": "Tách biệt Nút CTA bằng độ tương phản Chính/Nền",
+    "description": "Nút CTA bắt buộc phải có độ tương phản độ sáng (Value contrast) và màu sắc đủ lớn so với vùng nền xung quanh để tạo ra điểm tập trung thị giác độc tôn.",
+    "threshold": "Độ tương phản giá trị cao (High Value/Hue Contrast)",
+    "severity": "critical",
+    "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+    "source_location": "Chapter 3: Figure/Ground & Negative Space"
+  },
+  {
+    "rule_id": "logo_scaling_legibility_minimum",
+    "category": "branding",
+    "title": "Ngưỡng thu nhỏ và hiển thị đơn sắc của Logo",
+    "description": "Biểu tượng logo phải đảm bảo tính đơn giản để khi thu nhỏ xuống kích thước cực tiểu (như favicon 16x16px hoặc icon điện thoại) vẫn giữ nguyên nét; đồng thời có phương án hiển thị 1 màu.",
+    "threshold": "Giữ độ nhận diện ở kích thước 16x16px / 32x32px",
+    "severity": "critical",
+    "source_book": "Logo Design Guide.pdf",
+    "source_location": "Section 2: Logo Design - Simple & Size reductions"
+  },
+  {
+    "rule_id": "logo_negative_space_meaning",
+    "category": "branding",
+    "title": "Tận dụng Khoảng trống Âm trong Thiết kế Logo",
+    "description": "Sử dụng khoảng trống âm (negative space) xung quanh hoặc bên trong các chữ cái để lồng ghép biểu tượng ẩn mang ý nghĩa bổ trợ cho thương hiệu.",
+    "threshold": "Tích hợp ý nghĩa hai lớp (dual-meaning figure/ground)",
+    "severity": "suggestion",
+    "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+    "source_location": "Chapter 3: Figure/Ground in Wordmarks"
+  },
+  {
+    "rule_id": "logo_typeface_alteration_avoidance",
+    "category": "branding",
+    "title": "Tôn trọng dạng chữ nguyên bản và Kerning thủ công",
+    "description": "Khi thiết kế wordmark/logo, ưu tiên sử dụng chữ viết nguyên bản không bị biến dạng cơ học và điều chỉnh kerning thủ công từng khoảng cách chữ.",
+    "threshold": "Kerning thủ công 100%; 0% machine skew",
+    "severity": "moderate",
+    "source_book": "Logo Design Guide.pdf",
+    "source_location": "Section 2: Logo Design - Well-crafted logo"
+  },
+  {
+    "rule_id": "brand_competitor_visual_divergence",
+    "category": "branding",
+    "title": "Phân tích vị thế thị giác đối thủ cạnh tranh",
+    "description": "Thiết kế nhận diện thương hiệu phải đánh giá bảng màu và ngôn ngữ thị giác của đối thủ cạnh tranh để chọn ra màu sắc chủ đạo và kiểu dáng có tính phân biệt, tránh trùng lặp.",
+    "threshold": "Phân tích 100% đối thủ trực tiếp trong phân khúc",
+    "severity": "moderate",
+    "source_book": "Logo Design Guide.pdf",
+    "source_location": "Section 2: Research & Competitive landscape review"
+  }
+];
 
 // Trạng thái người dùng và hội thoại
 let userName = localStorage.getItem('ADVISION_USER_NAME') || "";
@@ -13,9 +227,8 @@ let currentBase64 = null;
 let currentMimeType = null;
 let currentFileName = null;
 
-// Lưu trữ ảnh đang thẩm định và toàn bộ lịch sử trao đổi đa lượt để gửi lên API
 let activeImageData = null; 
-let conversationHistory = []; // Chứa các lượt trao đổi [{ role: 'user' | 'model', text: '...' }]
+let conversationHistory = [];
 let isAiTyping = false;
 
 // Element Selectors
@@ -40,6 +253,7 @@ const btnDocsModal = document.getElementById('btn-docs-modal');
 const docsModal = document.getElementById('docs-modal');
 const btnCloseDocsModal = document.getElementById('btn-close-docs-modal');
 const btnDoneDocsModal = document.getElementById('btn-done-docs-modal');
+const docsRulesList = document.getElementById('docs-rules-list');
 
 const btnResetChat = document.getElementById('btn-reset-chat');
 const userInfoBadge = document.getElementById('user-info-badge');
@@ -47,14 +261,61 @@ const badgeUserName = document.getElementById('badge-user-name');
 const badgeIndustryContainer = document.getElementById('badge-industry-container');
 const badgeIndustryName = document.getElementById('badge-industry-name');
 
-// Load API Key đã lưu
+// Load API Key đã lưu & cập nhật chấm trạng thái
 const savedKey = localStorage.getItem('GEMINI_API_KEY') || "";
 if (savedKey) inputApiKey.value = savedKey;
-
-// Cập nhật giao diện badge
+updateApiStatusIndicator();
 updateUserBadge();
+renderRulesModal();
 
-// HÀM XỬ LÝ TRÍCH XUẤT TÊN THÔNG MINH VÀ TẠO CÁC BIẾN THỂ GỌI TÊN
+// CẬP NHẬT CHẤM TRẠNG THÁI API KEY
+function updateApiStatusIndicator() {
+  const dot = document.getElementById('api-status-dot');
+  if (!dot) return;
+  const key = localStorage.getItem('GEMINI_API_KEY');
+  if (key && key.trim()) {
+    dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20";
+    dot.title = "API Key đã kết nối";
+  } else {
+    dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400";
+    dot.title = "Chưa cài đặt API Key";
+  }
+}
+
+// RENDER DANH SÁCH 22 QUY CHUẨN VÀO MODAL
+function renderRulesModal() {
+  if (!docsRulesList) return;
+  const categoryLabels = {
+    layout_composition: { label: "Bố cục & Lưới", color: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" },
+    color_contrast: { label: "Màu sắc & Tương phản", color: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300" },
+    typography: { label: "Kiểu chữ & Phân cấp", color: "bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300" },
+    cta_optimization: { label: "Nút Kêu gọi CTA", color: "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300" },
+    branding: { label: "Thương hiệu & Logo", color: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300" }
+  };
+
+  docsRulesList.innerHTML = DESIGN_RULES.map((rule, idx) => {
+    const cat = categoryLabels[rule.category] || { label: rule.category, color: "bg-slate-100 text-slate-700" };
+    return `
+      <div class="p-3 bg-slate-50/80 dark:bg-slate-800/40 rounded-xl border border-slate-200/60 dark:border-borderDark hover:border-slate-300 transition-all">
+        <div class="flex items-center justify-between gap-2 mb-1.5">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold text-slate-400">#${String(idx + 1).padStart(2, '0')}</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${cat.color}">${cat.label}</span>
+          </div>
+          <span class="text-[10px] font-mono text-slate-500 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">${rule.threshold}</span>
+        </div>
+        <p class="font-semibold text-slate-900 dark:text-white text-xs mb-1">${rule.title}</p>
+        <p class="text-slate-500 dark:text-slate-400 leading-relaxed text-[11px] mb-2">${rule.description}</p>
+        <div class="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 pt-1.5 border-t border-slate-200/40 dark:border-slate-700/40">
+          <i class="fa-regular fa-bookmark text-slate-400"></i>
+          <span class="font-medium truncate">${rule.source_book} (${rule.source_location})</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// HÀM XỬ LÝ TRÍCH XUẤT TÊN THÔNG MINH
 function extractSmartName(rawText) {
   if (!rawText) return { mainName: "bạn", variations: ["bạn"] };
   
@@ -71,10 +332,10 @@ function extractSmartName(rawText) {
   const variations = [];
 
   if (parts.length >= 3) {
-    const lastName = parts[parts.length - 1]; // Ví dụ: Cương
-    const middleLast = parts.slice(parts.length - 2).join(' '); // Thái Cương
-    const firstLast = `${parts[0]} ${lastName}`; // Trần Cương
-    const fullName = parts.join(' '); // Trần Thái Cương
+    const lastName = parts[parts.length - 1];
+    const middleLast = parts.slice(parts.length - 2).join(' ');
+    const firstLast = `${parts[0]} ${lastName}`;
+    const fullName = parts.join(' ');
     variations.push(lastName, middleLast, firstLast, fullName);
   } else if (parts.length === 2) {
     const lastName = parts[1];
@@ -99,42 +360,54 @@ function getDynamicCallName() {
   return nameVariations[randomIndex];
 }
 
-// SYSTEM PROMPT TRUYỀN THẲNG VÀO API
+// SYSTEM PROMPT TRUYỀN VÀO API (KÈM BỘ 22 QUY CHUẨN THẨM ĐỊNH)
 function getSystemPrompt() {
   const callName = getDynamicCallName();
-  return `Bạn là Hoàng An, chuyên gia phân tích hình ảnh quảng cáo và thiết kế đồ họa.
+  
+  const rulesText = DESIGN_RULES.map(r => 
+    `- [${r.rule_id}] ${r.title} (Ngưỡng: ${r.threshold}) -> Căn cứ: ${r.source_book} (${r.source_location})`
+  ).join('\n');
+
+  return `Bạn là Hoàng An, chuyên gia thẩm định hình ảnh quảng cáo và giám đốc nghệ thuật thiết kế đồ họa.
 
 QUY TẮC CỐT LÕI:
-1. Xưng hô: Bạn luôn tự xưng là "mình" và gọi đối phương bằng tên của họ (${callName}). Tuyệt đối không xưng "em" hay "tôi".
-2. Giọng điệu và ngôn ngữ: Mọi câu nói phải mạch lạc, trau chuốt, có đầy đủ chủ ngữ và vị ngữ. Viết văn tự nhiên, đều chữ, rõ ràng, không in đậm nhạt lung tung theo dòng.
-3. Đang trong cuộc trò chuyện thì TUYỆT ĐỐI KHÔNG ĐƯỢC CHÀO LẠI (không nói "Chào bạn, mình là Hoàng An..."). Tiếp nối mạch lạc câu chuyện.
-4. Tuyệt đối KHÔNG dùng từ tiếng Anh "banner". Luôn dùng tiếng Việt: "hình ảnh quảng cáo", "ảnh quảng cáo" hoặc "bức ảnh".
-5. Tuyệt đối KHÔNG dùng các dòng kẻ nét đứt như "--------------------------------".
+1. Xưng hô: Luôn tự xưng là "mình" và gọi đối phương bằng tên của họ (${callName}). Tuyệt đối không xưng "em" hay "tôi".
+2. Giọng điệu: Tự nhiên, ấm áp, nhã nhặn, sắc bén về chuyên môn. Câu nói có đầy đủ chủ ngữ vị ngữ.
+3. Tuyệt đối KHÔNG chào lại giữa cuộc trò chuyện.
+4. Tuyệt đối KHÔNG dùng từ tiếng Anh "banner". Luôn dùng "hình ảnh quảng cáo", "ảnh quảng cáo" hoặc "bức ảnh".
+5. Tuyệt đối KHÔNG dùng dòng kẻ nét đứt như "--------------------------------".
 6. Tuyệt đối KHÔNG dùng ký tự mũi tên "->", "-->", "⇒", "→" và không dùng ký tự ">".
-7. Bắt buộc dùng TIẾNG VIỆT CÓ DẤU ĐẦY ĐỦ, chuẩn ngữ pháp và chính tả.
+7. Bắt buộc dùng TIẾNG VIỆT CÓ DẤU ĐẦY ĐỦ, chuẩn ngữ pháp.
+
+BỘ QUY CHUẨN THẨM ĐỊNH KHOA HỌC (22 RULES TRÍCH XUẤT TỪ SÁCH CHUYÊN NGÀNH):
+${rulesText}
+
+QUY TẮC BẮT BUỘC KHI PHÂN TÍCH VÀ ĐỀ XUẤT:
+- Khi nhận xét ưu điểm, điểm cần cải thiện hoặc đưa ra đề xuất, bạn PHẢI TRÍCH DẪN RÕ RÀNG tên tài liệu và chương sách từ bộ quy chuẩn trên để làm căn cứ khoa học đáng tin cậy.
+- Ví dụ: "Theo tài liệu The Graphic Design Book (phần The Rule of Thirds)...", hoặc "Theo nghiên cứu của Tsiotsou & Hatzithomas (2017)...", hoặc "Theo cuốn Designing for Clarity (phần Using Typefaces Together)...".
 
 QUY TẮC TƯƠNG TÁC TỪNG KHỐI THEO YÊU CẦU:
-- Khi người dùng gửi một bức ảnh quảng cáo mới, bạn CHỈ TRẢ LỜI DUY NHẤT [Khối 1: Kết luận chung]:
+- Khi người dùng gửi bức ảnh quảng cáo mới, bạn CHỈ TRẢ LỜI DUY NHẤT [Khối 1: Kết luận chung]:
   + Kết luận bức ảnh ĐẠT TIÊU CHUẨN hoặc CHƯA ĐẠT TIÊU CHUẨN để chạy quảng cáo.
-  + Chấm điểm thiết kế cụ thể trên thang điểm 10 dựa trên các tiêu chí thị giác thực tế của bức ảnh (sản phẩm, chữ viết, màu sắc, nút bấm).
+  + Chấm điểm thiết kế cụ thể trên thang điểm 10 dựa trên các tiêu chí thị giác thực tế của bức ảnh.
   + Đưa ra 2-3 câu nhận xét tổng quan có đầy đủ chủ ngữ vị ngữ.
-  + Sau đó, bạn HỎI người dùng ngắn gọn xem họ có muốn mình phân tích chi tiết về bố cục thị giác và mật độ chữ viết của bức ảnh này không.
-  + TUYỆT ĐỐI KHÔNG trả lời dồn dập các khối 2, 3, 4, 5 cùng một lúc để tránh làm người đọc bị ngợp.
-- Khi người dùng đồng ý hoặc yêu cầu xem tiếp (ví dụ: xem bố cục chữ, xem ưu nhược điểm, xem đề xuất):
-  + Bạn nhìn lại bức ảnh thực tế và trả lời sâu về phần đó.
+  + Sau đó hỏi ${callName} xem có muốn mình phân tích chi tiết về bố cục thị giác và mật độ chữ viết của bức ảnh này không.
+  + Tuyệt đối không trả lời dồn dập các khối khác cùng lúc.
+- Khi người dùng đồng ý xem tiếp (bố cục chữ, ưu nhược điểm, đề xuất chỉnh sửa):
+  + Bạn nhìn lại bức ảnh thực tế và trả lời sâu về phần đó, có kèm trích dẫn sách.
   + Cuối mỗi phần, tiếp tục hỏi xem họ có muốn xem phần tiếp theo hay không.`;
 }
 
-// HIỂN THỊ LỜI CHÀO BAN ĐẦU VỚI HIỆU ỨNG GÕ CHỮ
+// HIỂN THỊ LỜI CHÀO BAN ĐẦU
 async function playInitialGreeting() {
   chatContainer.innerHTML = '';
-  showTypingIndicator("Hoàng An đang soạn lời chào...");
-  await delay(800);
+  showTypingIndicator("Hoàng An đang chuẩn bị...");
+  await delay(700);
   hideTypingIndicator();
 
   const greetingLines = [
     "Chào bạn, mình là Hoàng An.",
-    "Mình rất vui được đồng hành cùng bạn trong việc xem xét và tối ưu hóa các hình ảnh quảng cáo.",
+    "Mình rất vui được đồng hành cùng bạn trong việc thẩm định và tối ưu hóa các hình ảnh quảng cáo.",
     "Trước khi bắt đầu, bạn có thể chia sẻ cho mình biết tên của bạn để chúng mình tiện xưng hô được không?"
   ];
   await streamLines(greetingLines);
@@ -154,7 +427,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// XỬ LÝ SỰ KIỆN ĐÍNH KÈM HÌNH ẢNH
+// SỰ KIỆN ĐÍNH KÈM HÌNH ẢNH
 btnAttachImage.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', (e) => {
   if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
@@ -203,10 +476,11 @@ btnSaveKey.addEventListener('click', () => {
   const key = inputApiKey.value.trim();
   localStorage.setItem('GEMINI_API_KEY', key);
   apiModal.classList.add('hidden');
-  alert('Đã lưu API Key thành công! Bây giờ mọi câu trả lời sẽ được sinh trực tiếp từ AI.');
+  updateApiStatusIndicator();
+  alert('Đã lưu API Key thành công! Hệ thống đã sẵn sàng kết nối AI.');
 });
 
-// MODAL TÀI LIỆU ĐÀO TẠO PDF
+// MODAL TÀI LIỆU ĐÀO TẠO & QUY CHUẨN
 btnDocsModal.addEventListener('click', () => docsModal.classList.remove('hidden'));
 btnCloseDocsModal.addEventListener('click', () => docsModal.classList.add('hidden'));
 btnDoneDocsModal.addEventListener('click', () => docsModal.classList.add('hidden'));
@@ -255,7 +529,7 @@ function updateInputPlaceholder() {
     const callName = getDynamicCallName();
     chatInput.placeholder = `Sản phẩm ${callName} đang làm thuộc ngành nào (thời trang, mỹ phẩm...)?`;
   } else {
-    chatInput.placeholder = "Nhắn tin trao đổi hoặc bấm 📎 để gửi hình ảnh quảng cáo...";
+    chatInput.placeholder = "Nhắn tin trao đổi hoặc bấm 📎 để gửi ảnh quảng cáo...";
   }
 }
 
@@ -294,7 +568,7 @@ chatForm.addEventListener('submit', async (e) => {
     ];
     
     showTypingIndicator("Hoàng An đang soạn câu trả lời...");
-    await delay(900);
+    await delay(800);
     hideTypingIndicator();
     await streamLines(replyLines);
     return;
@@ -314,44 +588,42 @@ chatForm.addEventListener('submit', async (e) => {
     ];
     
     showTypingIndicator("Hoàng An đang soạn câu trả lời...");
-    await delay(900);
+    await delay(800);
     hideTypingIndicator();
     await streamLines(replyLines);
     return;
   }
 
-  // BƯỚC 3: NGƯỜI DÙNG GỬI ẢNH ➔ GỌI VISION API TRỰC TIẾP TỪ GEMINI / OPENAI
+  // BƯỚC 3: NGƯỜI DÙNG GỬI ẢNH -> GỌI VISION API KÈM RULEBOOK
   if (sentBase64) {
     const apiKey = localStorage.getItem('GEMINI_API_KEY') || "";
 
-    // Nếu chưa có API Key, nhắc người dùng dán mã để AI kết nối trực tiếp
     if (!apiKey) {
-      showTypingIndicator("Hoàng An đang kiểm tra kết nối AI...");
-      await delay(800);
+      showTypingIndicator("Hoàng An đang kiểm tra kết nối...");
+      await delay(700);
       hideTypingIndicator();
 
       const noKeyNotice = [
-        "Để mình có thể kết nối với trí tuệ nhân tạo và trực tiếp bóc tách hình ảnh quảng cáo thực tế của bạn, bạn hãy bấm vào nút **API Key** ở góc trên để dán mã vào nhé.",
-        "Mã Gemini API Key được Google cấp hoàn toàn miễn phí tại trang Google AI Studio (aistudio.google.com). Sau khi lưu Key, mình sẽ phân tích ngay lập tức!"
+        "Để mình có thể kết nối với trí tuệ nhân tạo và trực tiếp thẩm định hình ảnh quảng cáo của bạn dựa trên 22 quy chuẩn thiết kế, bạn hãy bấm vào nút **API Key** ở góc trên để dán mã vào nhé.",
+        "Mã Gemini API Key được Google cấp hoàn toàn miễn phí tại Google AI Studio (aistudio.google.com). Sau khi lưu Key, mình sẽ phân tích ngay lập tức!"
       ];
       await streamLines(noKeyNotice);
       apiModal.classList.remove('hidden');
       return;
     }
 
-    // Lưu dữ liệu ảnh đang hoạt động
     activeImageData = {
       base64: sentBase64,
       mimeType: sentMimeType,
       fileName: sentFileName
     };
-    conversationHistory = []; // Reset lịch sử cho bức ảnh mới
+    conversationHistory = [];
 
-    showTypingIndicator("Hoàng An đang gửi ảnh lên AI để bóc tách...");
+    showTypingIndicator("Hoàng An đang soi ảnh dựa trên bộ 22 quy chuẩn thiết kế...");
 
     const callName = getDynamicCallName();
     const userPromptText = `Đây là bức ảnh quảng cáo sản phẩm ngành ${userIndustry || "thương mại"} của ${callName}. Ghi chú kèm theo: "${text || "Hãy thẩm định bức ảnh này"}".
-Hãy phân tích bức ảnh và BẮT ĐẦU bằng [Khối 1: Kết luận chung] gồm: Đạt hay chưa đạt tiêu chuẩn, điểm số trên thang điểm 10, nhận xét tổng quan 2-3 câu có đầy đủ chủ ngữ vị ngữ. Sau đó hỏi ${callName} xem có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không.`;
+Hãy phân tích bức ảnh dựa trên bộ 22 quy chuẩn thiết kế đã cho và BẮT ĐẦU bằng [Khối 1: Kết luận chung] gồm: Đạt hay chưa đạt tiêu chuẩn, điểm số trên thang điểm 10, nhận xét tổng quan 2-3 câu có đầy đủ chủ ngữ vị ngữ. Sau đó hỏi ${callName} xem có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không.`;
 
     let apiResponse = "";
     try {
@@ -367,7 +639,6 @@ Hãy phân tích bức ảnh và BẮT ĐẦU bằng [Khối 1: Kết luận chu
 
     hideTypingIndicator();
 
-    // Lưu lại lượt thoại vào lịch sử
     conversationHistory.push({ role: 'user', text: userPromptText });
     conversationHistory.push({ role: 'model', text: apiResponse });
 
@@ -382,25 +653,24 @@ Hãy phân tích bức ảnh và BẮT ĐẦU bằng [Khối 1: Kết luận chu
     return;
   }
 
-  // BƯỚC 4: NGƯỜI DÙNG PHẢN HỒI TIẾP THEO ➔ GỌI API THEO ĐA LƯỢT (MULTI-TURN CHAT API)
+  // BƯỚC 4: NGƯỜI DÙNG PHẢN HỒI TIẾP THEO (MULTI-TURN CHAT)
   if (text) {
     const apiKey = localStorage.getItem('GEMINI_API_KEY') || "";
 
     if (!apiKey) {
-      showTypingIndicator("Hoàng An đang kiểm tra kết nối AI...");
-      await delay(800);
+      showTypingIndicator("Hoàng An đang kiểm tra kết nối...");
+      await delay(700);
       hideTypingIndicator();
 
       const noKeyNotice = [
-        "Bạn hãy bấm vào nút **API Key** ở góc trên màn hình để nhập mã Gemini API Key trước nhé.",
-        "Khi có API Key, mọi câu trả lời đều sẽ được AI sinh tự động dựa trên ngữ cảnh thực tế của bạn!"
+        "Bạn hãy bấm vào nút **API Key** ở góc trên màn hình để nhập mã Gemini API Key trước nhé."
       ];
       await streamLines(noKeyNotice);
       apiModal.classList.remove('hidden');
       return;
     }
 
-    showTypingIndicator("Hoàng An đang gửi câu hỏi tới AI...");
+    showTypingIndicator("Hoàng An đang tra cứu quy chuẩn thiết kế...");
 
     let apiResponse = "";
     try {
@@ -416,13 +686,11 @@ Hãy phân tích bức ảnh và BẮT ĐẦU bằng [Khối 1: Kết luận chu
 
     hideTypingIndicator();
 
-    // Lưu vào lịch sử hội thoại
     conversationHistory.push({ role: 'user', text: text });
     conversationHistory.push({ role: 'model', text: apiResponse });
 
     const lines = apiResponse.split('\n').map(l => sanitizeStrictRules(l)).filter(l => l.length > 0);
 
-    // Gợi ý nút hành động tiếp theo tùy theo ngữ cảnh
     let nextActions = null;
     const lower = text.toLowerCase();
     if (lower.includes('bố cục') || lower.includes('chữ')) {
@@ -436,8 +704,8 @@ Hãy phân tích bức ảnh và BẮT ĐẦU bằng [Khối 1: Kết luận chu
       ];
     } else if (lower.includes('đề xuất') || lower.includes('chỉnh sửa')) {
       nextActions = [
-        { text: "Chạy trên Facebook", action: "reply_facebook" },
-        { text: "Chạy trên TikTok", action: "reply_tiktok" }
+        { text: "Tối ưu cho Facebook", action: "reply_facebook" },
+        { text: "Tối ưu cho TikTok", action: "reply_tiktok" }
       ];
     }
 
@@ -445,7 +713,7 @@ Hãy phân tích bức ảnh và BẮT ĐẦU bằng [Khối 1: Kết luận chu
   }
 });
 
-// HÀM LÀM SẠCH VÀ CHUẨN HÓA CÂU CHỮ TRẢ VỀ TỪ API
+// LÀM SẠCH VÀ CHUẨN HÓA CÂU CHỮ
 function sanitizeStrictRules(str) {
   if (!str) return "";
   return str
@@ -465,19 +733,19 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// GIAO DIỆN NGƯỜI DÙNG GỬI TIN NHẮN
+// GIAO DIỆN NGƯỜI DÙNG GỬI TIN NHẮN (MODERN BUBBLE)
 function appendUserMessage(text, imgSrc) {
-  let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-52 rounded-lg border-2 border-slate-400 dark:border-slate-600 mb-2 object-cover">` : '';
-  let textHtml = text ? `<p>${text}</p>` : '';
+  let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-64 rounded-xl border border-slate-200 dark:border-borderDark mb-2.5 object-cover shadow-sm">` : '';
+  let textHtml = text ? `<p class="leading-relaxed">${text}</p>` : '';
 
   const html = `
-    <div class="flex gap-3 justify-end">
-      <div class="bg-slate-900 dark:bg-slate-800 text-white p-4 rounded-2xl rounded-tr-none text-base font-normal max-w-xl leading-relaxed shadow-sm border border-slate-700">
+    <div class="flex gap-3 justify-end items-start group">
+      <div class="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 px-4 py-3 rounded-2xl rounded-tr-sm text-[15px] font-normal max-w-lg leading-relaxed shadow-sm">
         ${imgHtml}
         ${textHtml}
       </div>
-      <div class="w-9 h-9 rounded-lg bg-slate-800 dark:bg-slate-700 flex items-center justify-center text-white font-black text-sm shrink-0 border border-slate-600">
-        <i class="fa-solid fa-user"></i>
+      <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5 border border-slate-300 dark:border-slate-700">
+        <i class="fa-regular fa-user"></i>
       </div>
     </div>
   `;
@@ -485,21 +753,21 @@ function appendUserMessage(text, imgSrc) {
   scrollToBottom();
 }
 
-// HIỂN THỊ ICON ĐANG NHẬP CHỮ (TYPING INDICATOR)
+// HIỂN THỊ TYPING INDICATOR TINH TẾ
 function showTypingIndicator(message = "Hoàng An đang soạn câu trả lời...") {
   isAiTyping = true;
   const html = `
-    <div id="typing-indicator" class="flex gap-4">
-      <div class="w-9 h-9 rounded-lg bg-blue-700 text-white font-bold flex items-center justify-center text-sm shrink-0 shadow">
-        <i class="fa-solid fa-user-tie"></i>
+    <div id="typing-indicator" class="flex gap-3 items-center">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-700 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
+        HA
       </div>
-      <div class="text-sm text-slate-800 dark:text-slate-200 flex items-center gap-3 bg-slate-100 dark:bg-[#161e2e] border-2 border-slate-300 dark:border-slate-700 px-4 py-3 rounded-xl">
-        <div class="flex items-center gap-1.5">
+      <div class="inline-flex items-center gap-2.5 bg-white dark:bg-cardDark border border-slate-200/80 dark:border-borderDark px-4 py-2.5 rounded-2xl rounded-tl-sm text-xs text-slate-500 dark:text-slate-400 shadow-sm">
+        <div class="flex items-center gap-1">
           <div class="typing-dot"></div>
           <div class="typing-dot"></div>
           <div class="typing-dot"></div>
         </div>
-        <span class="text-xs text-slate-600 dark:text-slate-400">${message}</span>
+        <span>${message}</span>
       </div>
     </div>
   `;
@@ -513,18 +781,18 @@ function hideTypingIndicator() {
   if (el) el.remove();
 }
 
-// HIỆU ỨNG GÕ CHỮ TỪNG DÒNG MƯỢT MÀ VÀ FADE TỪ TRÁI SANG PHẢI
+// HIỆU ỨNG HIỂN THỊ TỪNG DÒNG VÀ SUGGESTION CHIPS HIỆN ĐẠI
 async function streamLines(linesArray, actionButtons = null) {
   isAiTyping = true;
   
   const messageWrapperId = 'agent-msg-' + Date.now();
   const html = `
-    <div class="flex gap-4">
-      <div class="w-9 h-9 rounded-lg bg-blue-700 text-white font-bold flex items-center justify-center text-sm shrink-0 shadow self-start mt-1">
-        <i class="fa-solid fa-user-tie"></i>
+    <div class="flex gap-3.5 items-start">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-700 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-1 shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
+        HA
       </div>
-      <div class="space-y-3 text-base text-slate-900 dark:text-slate-100 leading-relaxed flex-1 prose-contrast">
-        <div id="${messageWrapperId}" class="bg-slate-100 dark:bg-[#161e2e] border-2 border-slate-300 dark:border-slate-700 p-5 rounded-2xl shadow-sm space-y-2.5 text-slate-900 dark:text-slate-100">
+      <div class="space-y-3 text-[15px] leading-relaxed flex-1 prose-refined">
+        <div id="${messageWrapperId}" class="bg-white dark:bg-cardDark border border-slate-200/80 dark:border-borderDark p-4 sm:p-5 rounded-2xl rounded-tl-sm shadow-sm space-y-2.5 text-slate-800 dark:text-slate-200">
         </div>
       </div>
     </div>
@@ -532,27 +800,26 @@ async function streamLines(linesArray, actionButtons = null) {
   chatContainer.insertAdjacentHTML('beforeend', html);
   const container = document.getElementById(messageWrapperId);
 
-  // In ra từng dòng với hiệu ứng fade-in từ trái sang phải
   for (let i = 0; i < linesArray.length; i++) {
     const line = linesArray[i].trim();
     if (!line) continue;
 
     const p = document.createElement('p');
-    p.className = 'fade-in-text font-normal text-slate-900 dark:text-slate-100';
+    p.className = 'fade-in-text font-normal text-slate-800 dark:text-slate-200 leading-relaxed';
     p.textContent = line;
     container.appendChild(p);
     scrollToBottom();
 
-    await delay(160);
+    await delay(130);
   }
 
-  // Nếu có nút hành động nhanh, hiển thị phía dưới
   if (actionButtons && actionButtons.length > 0) {
     const actionsDiv = document.createElement('div');
-    actionsDiv.className = 'flex flex-wrap gap-2 pt-2 border-t border-slate-200 dark:border-slate-700/60 mt-3 fade-in-text';
+    actionsDiv.className = 'flex flex-wrap gap-2 pt-2.5 border-t border-slate-100 dark:border-borderDark mt-3 fade-in-text';
     actionsDiv.innerHTML = actionButtons.map(btn => `
-      <button type="button" onclick="triggerQuickAction('${btn.text}')" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 transition-all shadow-sm">
-        ${btn.text}
+      <button type="button" onclick="triggerQuickAction('${btn.text}')" class="text-xs font-medium px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-all shadow-sm flex items-center gap-1.5">
+        <span>${btn.text}</span>
+        <i class="fa-solid fa-arrow-right text-[9px] opacity-50"></i>
       </button>
     `).join('');
     container.appendChild(actionsDiv);
@@ -562,7 +829,6 @@ async function streamLines(linesArray, actionButtons = null) {
   isAiTyping = false;
 }
 
-// HÀM KÍCH HOẠT NÚT HÀNH ĐỘNG NHANH
 window.triggerQuickAction = function(actionText) {
   chatInput.value = actionText;
   chatForm.dispatchEvent(new Event('submit'));
@@ -573,7 +839,7 @@ function scrollToBottom() {
 }
 
 // =============================================================================
-// CÁC HÀM GỌI API THỰC TẾ (REAL API ENGINE CHO GEMINI VÀ OPENAI)
+// CÁC HÀM GỌI API GEMINI VÀ OPENAI
 // =============================================================================
 
 // 1. GỌI GEMINI VISION API CHO ẢNH MỚI
@@ -613,15 +879,13 @@ async function callGeminiVisionApi(apiKey, base64Data, mimeType, userText) {
   throw lastErr || new Error("Không thể kết nối với Gemini API");
 }
 
-// 2. GỌI GEMINI MULTI-TURN CHAT (GỬI KÈM NGỮ CẢNH ẢNH + LỊCH SỬ TRAO ĐỔI)
+// 2. GỌI GEMINI MULTI-TURN CHAT
 async function callGeminiMultiTurnChat(apiKey, newText) {
   const models = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-flash-latest'];
   let lastErr = null;
 
-  // Xây dựng contents array chứa toàn bộ lịch sử và ảnh ban đầu
   const contents = [];
 
-  // Thêm lượt đầu tiên kèm ảnh (nếu có)
   if (activeImageData) {
     const firstTurnParts = [
       { text: `${getSystemPrompt()}\n\nBức ảnh quảng cáo người dùng đã tải lên:` },
@@ -632,7 +896,6 @@ async function callGeminiMultiTurnChat(apiKey, newText) {
     contents.push({ role: 'user', parts: [{ text: getSystemPrompt() }] });
   }
 
-  // Thêm các lượt hội thoại tiếp theo
   for (let i = 0; i < conversationHistory.length; i++) {
     const item = conversationHistory[i];
     contents.push({
@@ -641,10 +904,9 @@ async function callGeminiMultiTurnChat(apiKey, newText) {
     });
   }
 
-  // Thêm câu hỏi mới của người dùng
   contents.push({
     role: 'user',
-    parts: [{ text: `${newText}\n(Lưu ý: Bạn là Hoàng An, tự xưng là mình, gọi người dùng bằng tên, không chào lại, trả lời có đầy đủ chủ vị, không dùng từ banner, không dùng dòng kẻ)` }]
+    parts: [{ text: `${newText}\n(Lưu ý: Bạn là Hoàng An, tự xưng là mình, gọi đối phương bằng tên, trả lời có đầy đủ chủ vị, trích dẫn căn cứ khoa học từ bộ 22 quy chuẩn thiết kế)` }]
   });
 
   for (const modelName of models) {

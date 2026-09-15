@@ -1,0 +1,29 @@
+{
+  "name": "ai-ad-image-analyzer-web",
+  "version": "1.0.0",
+  "description": "> **Hệ Thống Cố Vấn Thẩm Định & Đánh Giá Tiêu Chuẩn Hình Ảnh Quảng Cáo Ứng Dụng AI Agent Multimodal**",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ieroxkuon/ai-ad-image-analyzer-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ieroxkuon/ai-ad-image-analyzer-web/issues"
+  },
+  "homepage": "https://github.com/ieroxkuon/ai-ad-image-analyzer-web#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.4.0"
+  }
+}
