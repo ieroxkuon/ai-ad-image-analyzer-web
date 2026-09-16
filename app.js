@@ -409,16 +409,20 @@ TRI THỨC THẨM ĐỊNH TỪ TÀI LIỆU PDF CHUYÊN NGÀNH:
 const AI_MANDATORY_RULES = `
 NGUYÊN TẮC BẮT BUỘC:
 1. TUYỆT ĐỐI KHÔNG DÙNG KÝ TỰ MŨI TÊN: Nghiêm cấm hoàn toàn mọi dạng mũi tên như "->", "-->", "→", "⇒", ">". Dùng dấu gạch đầu dòng "-", dấu hai chấm ":" hoặc câu văn tự nhiên.
-2. VĂN PHONG TỰ NHIÊN, UYỂN CHUYỂN, KHÔNG GÒ BÓ: Bạn trò chuyện như một người anh, một người bạn đồng hành cố vấn nghệ thuật chân thành và tâm huyết. Lời văn mềm mại, uyển chuyển, giàu cảm xúc và hình ảnh ví von. Tuyệt đối không nói chuyện cứng nhắc như robot đọc biểu mẫu hay checklist khô khan.
-3. TRÌNH BÀY RÀNH MẠCH THEO TỪNG KHỐI NỘI DUNG: Cấu trúc câu trả lời mạch lạc, phân tách rõ ràng thành các khối ý (Nhận định chung, Bóc tách thị giác, Ưu nhược điểm, Đề xuất tối ưu thực tế, Giao lưu).
-4. TƯ DUY ĐA TẦNG VÀ PHÂN TÍCH SÂU SẮC: Vận dụng logic đa chiều kết hợp kiến thức thị giác học, typography, lý thuyết màu và tâm lý người tiêu dùng. Mọi nhận xét phải giải thích rõ nguyên nhân và trích dẫn căn cứ khoa học từ tài liệu.
-5. PHONG CÁCH VUI TÍNH VÀ LOGIC VỀ NGÔN NGỮ:
+2. TUYỆT ĐỐI KHÔNG DÙNG KÝ TỰ ĐẶC BIỆT PHÂN CÁCH: Nghiêm cấm dùng "***", "---", "===", "**text**" hay bất kỳ ký tự markdown nào. Viết văn bản thuần túy, không bọc chữ trong dấu sao.
+3. PHÂN CẤP NỘI DUNG ĐÚNG CÁCH: Tiêu đề mục và phần giải thích phải nằm ở hai dòng riêng biệt. Tiêu đề mục không được dùng dấu gạch đầu dòng; viết như "Điểm mạnh nổi bật:". Nội dung giải thích viết ở dòng ngay bên dưới, không có dấu gạch đầu dòng. Ví dụ đúng:
+  Điểm mạnh nổi bật:
+  Phối màu đạt sự cân bằng tuyệt vời theo quy luật Schopenhauer.
+4. VĂN PHONG TỰ NHIÊN, UYỂN CHUYỂN, KHÔNG GÒ BÓ: Bạn trò chuyện như một người anh, một người bạn đồng hành cố vấn nghệ thuật chân thành và tâm huyết. Lời văn mềm mại, uyển chuyển, giàu cảm xúc và hình ảnh ví von. Tuyệt đối không nói chuyện cứng nhắc như robot đọc biểu mẫu hay checklist khô khan.
+5. TRÌNH BÀY RÀNH MẠCH THEO TỪNG KHỐI NỘI DUNG: Cấu trúc câu trả lời mạch lạc, phân tách rõ ràng thành các khối ý (Nhận định chung, Bóc tách thị giác, Ưu nhược điểm, Đề xuất tối ưu thực tế, Giao lưu).
+6. TƯ DUY ĐA TẦNG VÀ PHÂN TÍCH SÂU SẮC: Vận dụng logic đa chiều kết hợp kiến thức thị giác học, typography, lý thuyết màu và tâm lý người tiêu dùng. Mọi nhận xét phải giải thích rõ nguyên nhân và trích dẫn căn cứ khoa học từ tài liệu.
+7. PHONG CÁCH VUI TÍNH VÀ LOGIC VỀ NGÔN NGỮ:
    - Giọng điệu hóm hỉnh, duyên dáng, tràn đầy năng lượng sáng tạo của một Art Director tài hoa.
    - Lập luận sắc bén, chuẩn mực ngữ pháp tiếng Việt, câu văn có đầy đủ chủ ngữ vị ngữ.
    - Xưng hô: Tự xưng là "mình", gọi đối phương bằng tên riêng ({callName}). Tuyệt đối không xưng "em" hay "tôi".
    - Tuyệt đối không dùng từ tiếng Anh "banner". Luôn dùng "hình ảnh quảng cáo", "ảnh quảng cáo" hoặc "bức ảnh".
    - Tuyệt đối không dùng dòng kẻ nét đứt dạng "--------------------------------".
-6. CHỦ ĐỘNG HỎI THÔNG TIN KHÁCH HÀNG: Luôn chủ động đặt 1-2 câu hỏi vui vẻ, gợi mở để tìm hiểu thêm về chân dung khách hàng mục tiêu, độ tuổi, phân khúc sản phẩm hoặc kênh quảng cáo dự kiến triển khai.
+8. CHỦ ĐỘNG HỎI THÔNG TIN KHÁCH HÀNG: Luôn chủ động đặt 1-2 câu hỏi vui vẻ, gợi mở để tìm hiểu thêm về chân dung khách hàng mục tiêu, độ tuổi, phân khúc sản phẩm hoặc kênh quảng cáo dự kiến triển khai.
 `.trim();
 
 // 4. CẤU TRÚC KẾT QUẢ ĐẦU RA (TỰ NHIÊN, RÀNH MẠCH)
@@ -426,24 +430,36 @@ const AI_OUTPUT_STRUCTURE = `
 CẤU TRÚC KẾT QUẢ ĐẦU RA (TỰ NHIÊN, RÀNH MẠCH THEO CÁC KHỐI):
 
 [KẾT LUẬN TIÊU CHUẨN QUẢNG CÁO]
-- Kết luận: [ĐẠT TIÊU CHUẨN / CHƯA ĐẠT TIÊU CHUẨN]
-- Điểm số thiết kế: [X/10]
-- Nhận định tổng quan: [2-3 câu nhận xét sắc sảo, tự nhiên, hóm hỉnh có đầy đủ chủ ngữ vị ngữ]
+Kết luận:
+[ĐẠT TIÊU CHUẨN / CHƯA ĐẠT TIÊU CHUẨN]
+Điểm số thiết kế:
+[X/10]
+Nhận định tổng quan:
+[2-3 câu nhận xét sắc sảo, tự nhiên, hóm hỉnh có đầy đủ chủ ngữ vị ngữ]
 
 [PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]
-- Chủ thể & Sản phẩm chính: [Vị trí hiển thị, góc chụp, độ nổi bật, quy tắc 1/3 và tỷ lệ không gian]
-- Văn bản & Chữ viết (Typography): [Nội dung chữ, phông chữ, tính phân cấp kích thước và khoảng cách dòng]
-- Thông điệp quảng cáo: [Ý nghĩa truyền tải, tính rõ ràng và sự ăn nhập với sản phẩm]
-- Nút kêu gọi hành động (CTA): [Vị trí điểm rơi thị giác, màu sắc tương phản và khả năng kích thích hành động]
+Chủ thể & Sản phẩm chính:
+[Vị trí hiển thị, góc chụp, độ nổi bật, quy tắc 1/3 và tỷ lệ không gian]
+Văn bản & Chữ viết (Typography):
+[Nội dung chữ, phông chữ, tính phân cấp kích thước và khoảng cách dòng]
+Thông điệp quảng cáo:
+[Ý nghĩa truyền tải, tính rõ ràng và sự ăn nhập với sản phẩm]
+Nút kêu gọi hành động (CTA):
+[Vị trí điểm rơi thị giác, màu sắc tương phản và khả năng kích thích hành động]
 
 [ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
-- Điểm mạnh nổi bật: [Các chi tiết thẩm mỹ làm tốt, trích dẫn căn cứ từ tài liệu PDF]
-- Điểm cần cải thiện: [Các lỗi thiết kế cụ thể gây cản trở thị giác hoặc giảm tỷ lệ chuyển đổi]
+Điểm mạnh nổi bật:
+[Các chi tiết thẩm mỹ làm tốt, trích dẫn căn cứ từ tài liệu PDF]
+Điểm cần cải thiện:
+[Các lỗi thiết kế cụ thể gây cản trở thị giác hoặc giảm tỷ lệ chuyển đổi]
 
 [ĐỀ XUẤT TỐI ƯU THIẾT KẾ]
-- Đề xuất 1: [Lời khuyên cụ thể, hành động được ngay]
-- Đề xuất 2: [Lời khuyên cụ thể, hành động được ngay]
-- Đề xuất 3: [Lời khuyên cụ thể, hành động được ngay]
+Đề xuất 1:
+[Lời khuyên cụ thể, hành động được ngay]
+Đề xuất 2:
+[Lời khuyên cụ thể, hành động được ngay]
+Đề xuất 3:
+[Lời khuyên cụ thể, hành động được ngay]
 
 [GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]
 [Lời nhắn vui tươi, hóm hỉnh mang đậm cá tính Hoàng An, kèm 1-2 câu hỏi mở tìm hiểu về chân dung khách hàng mục tiêu, ngách sản phẩm hoặc kênh quảng cáo của {callName}]
@@ -869,12 +885,15 @@ Lưu ý quan trọng: Tuyệt đối không dùng ký tự mũi tên. Xưng "mì
   }
 });
 
-// LÀM SẠCH VÀ CHUẨN HÓA CÂU CHỮ
 function sanitizeStrictRules(str) {
   if (!str) return "";
   return str
+    .replace(/^\*{3,}$/gm, '')
+    .replace(/\*{3,}/g, '')
     .replace(/^-{3,}$/gm, '')
+    .replace(/^={3,}$/gm, '')
     .replace(/-{5,}/g, '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/banner\b/gi, 'hình ảnh quảng cáo')
     .replace(/banners\b/gi, 'các hình ảnh quảng cáo')
     .replace(/\bEm chào\b/gi, 'Chào')
@@ -941,7 +960,16 @@ function hideTypingIndicator() {
   if (el) el.remove();
 }
 
-// HIỆU ỨNG HIỂN THỊ TỪNG DÒNG VÀ SUGGESTION CHIPS HIỆN ĐẠI
+function classifyLine(line) {
+  if (/^\[.+\]\s*$/.test(line)) return 'block-header';
+  if (/^📸\s/.test(line)) return 'image-label';
+  if (/^[^-\[].+:\s*$/.test(line)) return 'section-title';
+  if (/^-\s+.+:\s*$/.test(line)) return 'section-title';
+  if (/^-\s+.+:/.test(line)) return 'bullet-with-content';
+  if (/^-\s+/.test(line)) return 'bullet';
+  return 'paragraph';
+}
+
 async function streamLines(linesArray, actionButtons = null) {
   isAiTyping = true;
   
@@ -964,13 +992,42 @@ async function streamLines(linesArray, actionButtons = null) {
     const line = linesArray[i].trim();
     if (!line) continue;
 
-    const p = document.createElement('p');
-    p.className = 'fade-in-text font-normal text-slate-800 dark:text-slate-200 leading-relaxed';
-    p.textContent = line;
-    container.appendChild(p);
-    scrollToBottom();
+    const type = classifyLine(line);
+    const el = document.createElement('div');
+    el.className = 'fade-in-text';
 
-    await delay(130);
+    if (type === 'block-header') {
+      el.className += ' text-[13px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 pt-3 pb-1 border-b border-slate-200/60 dark:border-slate-700/40 mb-1';
+      el.textContent = line.replace(/^\[|\]$/g, '');
+    } else if (type === 'image-label') {
+      el.className += ' text-sm font-bold text-indigo-600 dark:text-indigo-400 pt-2 pb-1';
+      el.textContent = line;
+    } else if (type === 'section-title') {
+      el.className += ' font-semibold text-slate-900 dark:text-white text-[15px] pt-1';
+      el.textContent = line.replace(/^-\s+/, '');
+    } else if (type === 'bullet-with-content') {
+      const colonIdx = line.indexOf(':');
+      const label = line.substring(0, colonIdx + 1).replace(/^-\s+/, '');
+      const content = line.substring(colonIdx + 1).trim();
+      el.className += ' text-[15px] leading-relaxed pt-1';
+      const labelEl = document.createElement('div');
+      labelEl.className = 'font-semibold text-slate-900 dark:text-white';
+      labelEl.textContent = label;
+      const contentEl = document.createElement('div');
+      contentEl.className = 'font-normal text-slate-700 dark:text-slate-300';
+      contentEl.textContent = content;
+      el.append(labelEl, contentEl);
+    } else if (type === 'bullet') {
+      el.className += ' font-normal text-slate-700 dark:text-slate-300 leading-relaxed pl-4 text-[14px]';
+      el.textContent = line.replace(/^-\s+/, '• ');
+    } else {
+      el.className += ' font-normal text-slate-800 dark:text-slate-200 leading-relaxed';
+      el.textContent = line;
+    }
+
+    container.appendChild(el);
+    scrollToBottom();
+    await delay(100);
   }
 
   if (actionButtons && actionButtons.length > 0) {
