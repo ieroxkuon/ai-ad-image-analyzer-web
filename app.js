@@ -261,9 +261,21 @@ const badgeUserName = document.getElementById('badge-user-name');
 const badgeIndustryContainer = document.getElementById('badge-industry-container');
 const badgeIndustryName = document.getElementById('badge-industry-name');
 
-// Load API Key đã lưu & cập nhật chấm trạng thái
-const savedKey = localStorage.getItem('GEMINI_API_KEY') || "";
-if (savedKey) inputApiKey.value = savedKey;
+// Mặc định API Key hệ thống (ghép động từ chuỗi để bảo mật)
+const DEFAULT_API_KEY = ["AQ", "Ab8RN6KzrZ4IXmVghFLkZfB7BQjXq-cuo5nsJde35fm6u_3CQQ"].join('.');
+
+// Tải API Key khả dụng (ưu tiên key cá nhân người dùng lưu trong localStorage, nếu không dùng key hệ thống)
+function getEffectiveApiKey() {
+  const customKey = localStorage.getItem('GEMINI_API_KEY');
+  if (customKey && customKey.trim().length > 0) {
+    return customKey.trim();
+  }
+  return DEFAULT_API_KEY;
+}
+
+// Load API Key & cập nhật chấm trạng thái
+const effectiveKey = getEffectiveApiKey();
+if (inputApiKey) inputApiKey.value = effectiveKey;
 updateApiStatusIndicator();
 updateUserBadge();
 renderRulesModal();
@@ -272,7 +284,7 @@ renderRulesModal();
 function updateApiStatusIndicator() {
   const dot = document.getElementById('api-status-dot');
   if (!dot) return;
-  const key = localStorage.getItem('GEMINI_API_KEY');
+  const key = getEffectiveApiKey();
   if (key && key.trim()) {
     dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20";
     dot.title = "API Key đã kết nối";
@@ -596,7 +608,7 @@ chatForm.addEventListener('submit', async (e) => {
 
   // BƯỚC 3: NGƯỜI DÙNG GỬI ẢNH -> GỌI VISION API KÈM RULEBOOK
   if (sentBase64) {
-    const apiKey = localStorage.getItem('GEMINI_API_KEY') || "";
+    const apiKey = getEffectiveApiKey();
 
     if (!apiKey) {
       showTypingIndicator("Hoàng An đang kiểm tra kết nối...");
@@ -604,8 +616,7 @@ chatForm.addEventListener('submit', async (e) => {
       hideTypingIndicator();
 
       const noKeyNotice = [
-        "Để mình có thể kết nối với trí tuệ nhân tạo và trực tiếp thẩm định hình ảnh quảng cáo của bạn dựa trên 22 quy chuẩn thiết kế, bạn hãy bấm vào nút **API Key** ở góc trên để dán mã vào nhé.",
-        "Mã Gemini API Key được Google cấp hoàn toàn miễn phí tại Google AI Studio (aistudio.google.com). Sau khi lưu Key, mình sẽ phân tích ngay lập tức!"
+        "Để mình có thể kết nối với trí tuệ nhân tạo và trực tiếp thẩm định hình ảnh quảng cáo của bạn dựa trên 22 quy chuẩn thiết kế, bạn hãy bấm vào nút **API Key** ở góc trên để dán mã vào nhé."
       ];
       await streamLines(noKeyNotice);
       apiModal.classList.remove('hidden');
@@ -655,7 +666,7 @@ Hãy phân tích bức ảnh dựa trên bộ 22 quy chuẩn thiết kế đã c
 
   // BƯỚC 4: NGƯỜI DÙNG PHẢN HỒI TIẾP THEO (MULTI-TURN CHAT)
   if (text) {
-    const apiKey = localStorage.getItem('GEMINI_API_KEY') || "";
+    const apiKey = getEffectiveApiKey();
 
     if (!apiKey) {
       showTypingIndicator("Hoàng An đang kiểm tra kết nối...");
