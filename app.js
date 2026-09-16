@@ -160,7 +160,7 @@ const DESIGN_RULES = [
     "rule_id": "cta_aida_model_attention",
     "category": "cta_optimization",
     "title": "Mô hình truyền thông AIDA cho vị trí Nút CTA",
-    "description": "Hình ảnh quảng cáo và Nút CTA phải tuân theo 4 bước A-I-D-A: Thu hút (Attention) -> Quan tâm (Interest) -> Khao khát (Desire) -> Hành động (Action). Nút CTA phải nằm ở điểm chốt chặn cuối cùng của luồng thị giác.",
+    "description": "Hình ảnh quảng cáo và Nút CTA phải tuân theo 4 bước A-I-D-A: Thu hút (Attention), Quan tâm (Interest), Khao khát (Desire), Hành động (Action). Nút CTA phải nằm ở điểm chốt chặn cuối cùng của luồng thị giác.",
     "threshold": "Trình tự 4 giai đoạn truyền thông A-I-D-A",
     "severity": "critical",
     "source_book": "Graphic Design and Print Production Fundamentals.pdf",
@@ -223,9 +223,8 @@ let userName = localStorage.getItem('ADVISION_USER_NAME') || "";
 let userIndustry = localStorage.getItem('ADVISION_USER_INDUSTRY') || "";
 let nameVariations = JSON.parse(localStorage.getItem('ADVISION_NAME_VARIATIONS') || "[]");
 
-let currentBase64 = null;
-let currentMimeType = null;
-let currentFileName = null;
+// Quản lý danh sách ảnh đính kèm (hỗ trợ nhiều ảnh cùng lúc)
+let attachedImages = []; 
 
 let activeImageData = null; 
 let conversationHistory = [];
@@ -239,9 +238,9 @@ const btnAttachImage = document.getElementById('btn-attach-image');
 const fileInput = document.getElementById('file-input');
 
 const attachedImagePreview = document.getElementById('attached-image-preview');
-const attachedThumb = document.getElementById('attached-thumb');
-const attachedFilename = document.getElementById('attached-filename');
-const btnRemoveAttachment = document.getElementById('btn-remove-attachment');
+const attachedCountText = document.getElementById('attached-count-text');
+const attachedThumbsList = document.getElementById('attached-thumbs-list');
+const btnClearAllAttachments = document.getElementById('btn-clear-all-attachments');
 
 const btnApiKeyModal = document.getElementById('btn-api-key-modal');
 const apiModal = document.getElementById('api-modal');
@@ -372,42 +371,94 @@ function getDynamicCallName() {
   return nameVariations[randomIndex];
 }
 
-// SYSTEM PROMPT TRUYỀN VÀO API (KÈM BỘ 22 QUY CHUẨN THẨM ĐỊNH)
+// 1. MÔ TẢ VAI TRÒ & HÀNH ĐỘNG CỦA AI AGENT (TRÊN 80 TỪ)
+const AI_AGENT_PERSONA = `
+Bạn là Hoàng An - Chuyên gia cao cấp về Phân tích Thị giác Hình ảnh Quảng cáo kiêm Giám đốc Nghệ thuật và Nhà thiết kế Đồ họa Marketing với hơn 15 năm kinh nghiệm thực chiến trong lĩnh vực tối ưu hóa truyền thông thị giác và xây dựng nhận diện thương hiệu. Nhiệm vụ của bạn là một người cố vấn thiết kế thông thái, kết hợp nhuần nhuyễn giữa tư duy nghệ thuật thị giác hiện đại, các nguyên lý thiết kế đồ họa kinh điển và tâm lý học hành vi người tiêu dùng trong quảng cáo số. Bạn ở đây để quan sát tỉ mỉ, bóc tách từng điểm ảnh, phân tích cấu trúc bố cục, hệ thống lưới, tỷ lệ phân chia không gian, nghệ thuật phối màu, phân cấp kiểu chữ và mức độ tương phản của nút kêu gọi hành động. Bạn đánh giá độc lập, khách quan để kết luận chính xác xem bức ảnh có đạt tiêu chuẩn quảng cáo hay không, đồng thời truyền cảm hứng và đề xuất các giải pháp kỹ thuật tối ưu hóa tỷ lệ chuyển đổi một cách logic, thuyết phục và đầy tính sáng tạo.
+`.trim();
+
+// 2. HỆ TRI THỨC ĐƯỢC TRANG BỊ TỪ 16 TÀI LIỆU PDF CHUYÊN NGÀNH
+const PDF_KNOWLEDGE_BASE = `
+TRI THỨC THẨM ĐỊNH TỪ TÀI LIỆU PDF CHUYÊN NGÀNH:
+1. Bố cục và Hệ thống lưới (Layout & Grid System):
+   - Quy tắc 1/3 (The Rule of Thirds): Đặt chủ thể và điểm nhấn tại 4 điểm giao cắt của lưới 3x3 để dẫn dắt ánh nhìn tự nhiên (Trích từ: The Graphic Design Book).
+   - Hệ thống lưới 3x4 (3x4 Grid Partition): Tổ chức nội dung theo các phân vùng hình học mạch lạc, phân định ranh giới giữa tiêu đề, hình ảnh và khối chữ (Trích từ: Designing for Clarity).
+   - Tỷ lệ vàng (Golden Ratio 1:1.618): Cân đối tỷ lệ không gian nội dung và khoảng trắng xung quanh (Trích từ: Graphic Design and Print Production Fundamentals).
+   - Đường treo ngang (Hang Lines): Chia mặt phẳng ngang để phân định ranh giới tách bạch giữa vùng hình ảnh và vùng chữ (Trích từ: Graphic Design and Print Production Fundamentals).
+
+2. Màu sắc và Độ tương phản (Color & Contrast):
+   - Cân bằng độ sáng Schopenhauer: Tỷ lệ diện tích màu tỷ lệ nghịch với độ phản xạ ánh sáng (Tím:Vàng = 3:1, Lam:Cam = 2:1, Đỏ:Lục = 1:1) (Trích từ: Understanding Color).
+   - Không gian màu số: Sử dụng chuẩn RGB 8-bit (dải 0-255), độ tương phản cao trên màn hình thiết bị di động (Trích từ: The Graphic Design Book).
+   - Tương phản đồng thời: Giữ sự cân bằng thị giác giữa các gam màu nóng và lạnh, tránh chói mắt hoặc chìm màu (Trích từ: Understanding Color).
+
+3. Kiểu chữ và Phân cấp thông tin (Typography & Hierarchy):
+   - Giới hạn Typeface: Tối đa 2 font chữ (1 Serif kết hợp 1 Sans Serif) để tạo sự tinh giản và đồng bộ (Trích từ: Designing for Clarity).
+   - Tỷ lệ khoảng cách dòng (Leading): Duy trì khoảng cách dòng từ 1.25x đến 1.5x kích thước font để đảm bảo độ đọc mượt mà (Trích từ: The Graphic Design Book).
+   - Phân cấp kích cỡ chữ rõ rệt: Tiêu đề lớn (Headline 28pt trở lên), chữ phụ trợ (Body 12pt đến 18pt), không dùng cỡ chữ gần nhau gây nhiễu (Trích từ: Designing for Clarity).
+
+4. Nút Kêu gọi Hành động và Tối ưu Chuyển đổi (CTA Optimization):
+   - Mô hình truyền thông AIDA: Điểm chốt thị giác theo tiến trình Thu hút (Attention), Quan tâm (Interest), Khao khát (Desire) và Hành động (Action) (Trích từ: Graphic Design Fundamentals).
+   - Tương phản Chính/Nền (Figure/Ground): Nút CTA phải có màu sắc và độ sáng tách biệt hoàn toàn khỏi nền để trở thành điểm rơi thị giác độc tôn.
+   - Tính tương thích thông điệp: Nút CTA phải khớp với mức độ nhận diện thương hiệu và giải quyết nhu cầu tức thì (Trích từ: Nghiên cứu Tsiotsou & Hatzithomas 2017).
+
+5. Thương hiệu và Khoảng thở thị giác (Branding & Negative Space):
+   - Ngưỡng thu nhỏ: Logo phải sắc nét và nhận diện tốt ngay cả khi co nhỏ xuống kích thước 16x16px hoặc 32x32px (Trích từ: Logo Design Guide).
+   - Khoảng trống âm (Negative Space): Tận dụng không gian thở xung quanh sản phẩm và chữ để tăng độ sang trọng và tập trung thị giác.
+`.trim();
+
+// 3. NGUYÊN TẮC BẮT BUỘC VỚI AI AGENT
+const AI_MANDATORY_RULES = `
+NGUYÊN TẮC BẮT BUỘC:
+1. TUYỆT ĐỐI KHÔNG DÙNG KÝ TỰ MŨI TÊN: Nghiêm cấm hoàn toàn mọi dạng mũi tên như "->", "-->", "→", "⇒", ">". Dùng dấu gạch đầu dòng "-", dấu hai chấm ":" hoặc câu văn tự nhiên.
+2. VĂN PHONG TỰ NHIÊN, UYỂN CHUYỂN, KHÔNG GÒ BÓ: Bạn trò chuyện như một người anh, một người bạn đồng hành cố vấn nghệ thuật chân thành và tâm huyết. Lời văn mềm mại, uyển chuyển, giàu cảm xúc và hình ảnh ví von. Tuyệt đối không nói chuyện cứng nhắc như robot đọc biểu mẫu hay checklist khô khan.
+3. TRÌNH BÀY RÀNH MẠCH THEO TỪNG KHỐI NỘI DUNG: Cấu trúc câu trả lời mạch lạc, phân tách rõ ràng thành các khối ý (Nhận định chung, Bóc tách thị giác, Ưu nhược điểm, Đề xuất tối ưu thực tế, Giao lưu).
+4. TƯ DUY ĐA TẦNG VÀ PHÂN TÍCH SÂU SẮC: Vận dụng logic đa chiều kết hợp kiến thức thị giác học, typography, lý thuyết màu và tâm lý người tiêu dùng. Mọi nhận xét phải giải thích rõ nguyên nhân và trích dẫn căn cứ khoa học từ tài liệu.
+5. PHONG CÁCH VUI TÍNH VÀ LOGIC VỀ NGÔN NGỮ:
+   - Giọng điệu hóm hỉnh, duyên dáng, tràn đầy năng lượng sáng tạo của một Art Director tài hoa.
+   - Lập luận sắc bén, chuẩn mực ngữ pháp tiếng Việt, câu văn có đầy đủ chủ ngữ vị ngữ.
+   - Xưng hô: Tự xưng là "mình", gọi đối phương bằng tên riêng ({callName}). Tuyệt đối không xưng "em" hay "tôi".
+   - Tuyệt đối không dùng từ tiếng Anh "banner". Luôn dùng "hình ảnh quảng cáo", "ảnh quảng cáo" hoặc "bức ảnh".
+   - Tuyệt đối không dùng dòng kẻ nét đứt dạng "--------------------------------".
+6. CHỦ ĐỘNG HỎI THÔNG TIN KHÁCH HÀNG: Luôn chủ động đặt 1-2 câu hỏi vui vẻ, gợi mở để tìm hiểu thêm về chân dung khách hàng mục tiêu, độ tuổi, phân khúc sản phẩm hoặc kênh quảng cáo dự kiến triển khai.
+`.trim();
+
+// 4. CẤU TRÚC KẾT QUẢ ĐẦU RA (TỰ NHIÊN, RÀNH MẠCH)
+const AI_OUTPUT_STRUCTURE = `
+CẤU TRÚC KẾT QUẢ ĐẦU RA (TỰ NHIÊN, RÀNH MẠCH THEO CÁC KHỐI):
+
+[KẾT LUẬN TIÊU CHUẨN QUẢNG CÁO]
+- Kết luận: [ĐẠT TIÊU CHUẨN / CHƯA ĐẠT TIÊU CHUẨN]
+- Điểm số thiết kế: [X/10]
+- Nhận định tổng quan: [2-3 câu nhận xét sắc sảo, tự nhiên, hóm hỉnh có đầy đủ chủ ngữ vị ngữ]
+
+[PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]
+- Chủ thể & Sản phẩm chính: [Vị trí hiển thị, góc chụp, độ nổi bật, quy tắc 1/3 và tỷ lệ không gian]
+- Văn bản & Chữ viết (Typography): [Nội dung chữ, phông chữ, tính phân cấp kích thước và khoảng cách dòng]
+- Thông điệp quảng cáo: [Ý nghĩa truyền tải, tính rõ ràng và sự ăn nhập với sản phẩm]
+- Nút kêu gọi hành động (CTA): [Vị trí điểm rơi thị giác, màu sắc tương phản và khả năng kích thích hành động]
+
+[ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
+- Điểm mạnh nổi bật: [Các chi tiết thẩm mỹ làm tốt, trích dẫn căn cứ từ tài liệu PDF]
+- Điểm cần cải thiện: [Các lỗi thiết kế cụ thể gây cản trở thị giác hoặc giảm tỷ lệ chuyển đổi]
+
+[ĐỀ XUẤT TỐI ƯU THIẾT KẾ]
+- Đề xuất 1: [Lời khuyên cụ thể, hành động được ngay]
+- Đề xuất 2: [Lời khuyên cụ thể, hành động được ngay]
+- Đề xuất 3: [Lời khuyên cụ thể, hành động được ngay]
+
+[GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]
+[Lời nhắn vui tươi, hóm hỉnh mang đậm cá tính Hoàng An, kèm 1-2 câu hỏi mở tìm hiểu về chân dung khách hàng mục tiêu, ngách sản phẩm hoặc kênh quảng cáo của {callName}]
+`.trim();
+
+// TỔNG HỢP SYSTEM PROMPT GỬI ĐẾN VISION API
 function getSystemPrompt() {
   const callName = getDynamicCallName();
-  
-  const rulesText = DESIGN_RULES.map(r => 
-    `- [${r.rule_id}] ${r.title} (Ngưỡng: ${r.threshold}) -> Căn cứ: ${r.source_book} (${r.source_location})`
-  ).join('\n');
+  return `${AI_AGENT_PERSONA}
 
-  return `Bạn là Hoàng An, chuyên gia thẩm định hình ảnh quảng cáo và giám đốc nghệ thuật thiết kế đồ họa.
+${PDF_KNOWLEDGE_BASE}
 
-QUY TẮC CỐT LÕI:
-1. Xưng hô: Luôn tự xưng là "mình" và gọi đối phương bằng tên của họ (${callName}). Tuyệt đối không xưng "em" hay "tôi".
-2. Giọng điệu: Tự nhiên, ấm áp, nhã nhặn, sắc bén về chuyên môn. Câu nói có đầy đủ chủ ngữ vị ngữ.
-3. Tuyệt đối KHÔNG chào lại giữa cuộc trò chuyện.
-4. Tuyệt đối KHÔNG dùng từ tiếng Anh "banner". Luôn dùng "hình ảnh quảng cáo", "ảnh quảng cáo" hoặc "bức ảnh".
-5. Tuyệt đối KHÔNG dùng dòng kẻ nét đứt như "--------------------------------".
-6. Tuyệt đối KHÔNG dùng ký tự mũi tên "->", "-->", "⇒", "→" và không dùng ký tự ">".
-7. Bắt buộc dùng TIẾNG VIỆT CÓ DẤU ĐẦY ĐỦ, chuẩn ngữ pháp.
+${AI_MANDATORY_RULES.replace(/{callName}/g, callName)}
 
-BỘ QUY CHUẨN THẨM ĐỊNH KHOA HỌC (22 RULES TRÍCH XUẤT TỪ SÁCH CHUYÊN NGÀNH):
-${rulesText}
-
-QUY TẮC BẮT BUỘC KHI PHÂN TÍCH VÀ ĐỀ XUẤT:
-- Khi nhận xét ưu điểm, điểm cần cải thiện hoặc đưa ra đề xuất, bạn PHẢI TRÍCH DẪN RÕ RÀNG tên tài liệu và chương sách từ bộ quy chuẩn trên để làm căn cứ khoa học đáng tin cậy.
-- Ví dụ: "Theo tài liệu The Graphic Design Book (phần The Rule of Thirds)...", hoặc "Theo nghiên cứu của Tsiotsou & Hatzithomas (2017)...", hoặc "Theo cuốn Designing for Clarity (phần Using Typefaces Together)...".
-
-QUY TẮC TƯƠNG TÁC TỪNG KHỐI THEO YÊU CẦU:
-- Khi người dùng gửi bức ảnh quảng cáo mới, bạn CHỈ TRẢ LỜI DUY NHẤT [Khối 1: Kết luận chung]:
-  + Kết luận bức ảnh ĐẠT TIÊU CHUẨN hoặc CHƯA ĐẠT TIÊU CHUẨN để chạy quảng cáo.
-  + Chấm điểm thiết kế cụ thể trên thang điểm 10 dựa trên các tiêu chí thị giác thực tế của bức ảnh.
-  + Đưa ra 2-3 câu nhận xét tổng quan có đầy đủ chủ ngữ vị ngữ.
-  + Sau đó hỏi ${callName} xem có muốn mình phân tích chi tiết về bố cục thị giác và mật độ chữ viết của bức ảnh này không.
-  + Tuyệt đối không trả lời dồn dập các khối khác cùng lúc.
-- Khi người dùng đồng ý xem tiếp (bố cục chữ, ưu nhược điểm, đề xuất chỉnh sửa):
-  + Bạn nhìn lại bức ảnh thực tế và trả lời sâu về phần đó, có kèm trích dẫn sách.
-  + Cuối mỗi phần, tiếp tục hỏi xem họ có muốn xem phần tiếp theo hay không.`;
+${AI_OUTPUT_STRUCTURE.replace(/{callName}/g, callName)}`;
 }
 
 // HIỂN THỊ LỜI CHÀO BAN ĐẦU
@@ -439,46 +490,90 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// SỰ KIỆN ĐÍNH KÈM HÌNH ẢNH
+// SỰ KIỆN ĐÍNH KÈM NHIỀU HÌNH ẢNH
 btnAttachImage.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', (e) => {
-  if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+  if (e.target.files && e.target.files.length > 0) {
+    handleFiles(e.target.files);
+  }
 });
 
-function handleFile(file) {
-  if (!file.type.startsWith('image/')) {
-    alert('Vui lòng chọn file hình ảnh (.png, .jpg, .jpeg, .webp)');
+function handleFiles(files) {
+  const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (validFiles.length === 0) {
+    alert('Vui lòng chọn các file hình ảnh hợp lệ (.png, .jpg, .jpeg, .webp)');
     return;
   }
-  currentFileName = file.name;
-  attachedFilename.textContent = `${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    currentBase64 = e.target.result.split(',')[1];
-    currentMimeType = file.type;
-    attachedThumb.src = e.target.result;
-    attachedImagePreview.classList.remove('hidden');
-    attachedImagePreview.classList.add('flex');
-    chatInput.placeholder = "Nhập thêm lời nhắn cho ảnh (hoặc bấm gửi ngay)...";
-    chatInput.focus();
-  };
-  reader.readAsDataURL(file);
+  let loaded = 0;
+  for (const file of validFiles) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      attachedImages.push({
+        fileName: file.name,
+        mimeType: file.type,
+        size: file.size,
+        base64: e.target.result.split(',')[1],
+        dataUrl: e.target.result
+      });
+      loaded++;
+      if (loaded === validFiles.length) {
+        renderAttachmentPreviews();
+      }
+    };
+    reader.readAsDataURL(file);
+  }
 }
 
-btnRemoveAttachment.addEventListener('click', () => {
-  clearAttachment();
-  updateInputPlaceholder();
-});
+function renderAttachmentPreviews() {
+  if (!attachedImagePreview || !attachedThumbsList) return;
 
-function clearAttachment() {
-  currentBase64 = null;
-  currentMimeType = null;
-  currentFileName = null;
-  fileInput.value = '';
-  attachedThumb.src = '';
-  attachedImagePreview.classList.add('hidden');
-  attachedImagePreview.classList.remove('flex');
+  if (attachedImages.length === 0) {
+    attachedImagePreview.classList.add('hidden');
+    attachedImagePreview.classList.remove('flex');
+    attachedThumbsList.innerHTML = '';
+    fileInput.value = '';
+    updateInputPlaceholder();
+    return;
+  }
+
+  attachedImagePreview.classList.remove('hidden');
+  attachedImagePreview.classList.add('flex');
+  if (attachedCountText) {
+    attachedCountText.textContent = `Ảnh đã chọn (${attachedImages.length})`;
+  }
+
+  attachedThumbsList.innerHTML = attachedImages.map((img, idx) => `
+    <div class="relative group shrink-0">
+      <img src="${img.dataUrl}" alt="${img.fileName}" class="w-14 h-14 object-cover rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm" title="${img.fileName}">
+      <button type="button" onclick="removeAttachmentByIndex(${idx})" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center text-[10px] shadow hover:bg-rose-600 dark:hover:bg-rose-500 transition-colors" title="Gỡ ảnh này">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <span class="block text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-[56px] text-center mt-0.5">${img.fileName}</span>
+    </div>
+  `).join('');
+
+  chatInput.placeholder = attachedImages.length === 1
+    ? "Nhập thêm lời nhắn cho ảnh (hoặc bấm gửi ngay)..."
+    : `Nhập ghi chú cho ${attachedImages.length} ảnh này (hoặc bấm gửi ngay)...`;
+  chatInput.focus();
+}
+
+window.removeAttachmentByIndex = function(index) {
+  attachedImages.splice(index, 1);
+  renderAttachmentPreviews();
+};
+
+if (btnClearAllAttachments) {
+  btnClearAllAttachments.addEventListener('click', () => {
+    clearAllAttachments();
+    updateInputPlaceholder();
+  });
+}
+
+function clearAllAttachments() {
+  attachedImages = [];
+  renderAttachmentPreviews();
 }
 
 // MODAL API KEY
@@ -508,7 +603,7 @@ btnResetChat.addEventListener('click', () => {
     localStorage.removeItem('ADVISION_USER_NAME');
     localStorage.removeItem('ADVISION_USER_INDUSTRY');
     localStorage.removeItem('ADVISION_NAME_VARIATIONS');
-    clearAttachment();
+    clearAllAttachments();
     updateUserBadge();
     updateInputPlaceholder();
     playInitialGreeting();
@@ -551,20 +646,17 @@ chatForm.addEventListener('submit', async (e) => {
   if (isAiTyping) return;
   
   const text = chatInput.value.trim();
-  if (!text && !currentBase64) return;
+  if (!text && attachedImages.length === 0) return;
 
-  const sentImgSrc = currentBase64 ? attachedThumb.src : null;
-  const sentBase64 = currentBase64;
-  const sentMimeType = currentMimeType;
-  const sentFileName = currentFileName;
-
-  appendUserMessage(text, sentImgSrc);
+  const sentImages = [...attachedImages];
+  clearAllAttachments();
   chatInput.value = '';
-  clearAttachment();
   updateInputPlaceholder();
 
+  appendUserMessage(text, sentImages);
+
   // BƯỚC 1: TRÍCH XUẤT TÊN THÔNG MINH
-  if (!userName && !sentBase64) {
+  if (!userName && sentImages.length === 0) {
     const parsed = extractSmartName(text);
     userName = parsed.mainName;
     nameVariations = parsed.variations;
@@ -587,7 +679,7 @@ chatForm.addEventListener('submit', async (e) => {
   }
 
   // BƯỚC 2: NHẬN DIỆN NGÀNH HÀNG
-  if (userName && !userIndustry && !sentBase64) {
+  if (userName && !userIndustry && sentImages.length === 0) {
     userIndustry = text.trim();
     localStorage.setItem('ADVISION_USER_INDUSTRY', userIndustry);
     updateUserBadge();
@@ -596,7 +688,7 @@ chatForm.addEventListener('submit', async (e) => {
     const callName = getDynamicCallName();
     const replyLines = [
       `Mình đã nắm được thông tin ngành hàng ${userIndustry} của ${callName} rồi.`,
-      `Bây giờ, bạn có thể bấm vào biểu tượng chiếc kẹp giấy ở phía dưới để gửi hình ảnh quảng cáo qua cho mình xem nhé.`
+      `Bây giờ, bạn có thể bấm vào biểu tượng chiếc kẹp giấy ở phía dưới để gửi 1 hoặc nhiều hình ảnh quảng cáo qua cho mình xem nhé.`
     ];
     
     showTypingIndicator("Hoàng An đang soạn câu trả lời...");
@@ -606,8 +698,8 @@ chatForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  // BƯỚC 3: NGƯỜI DÙNG GỬI ẢNH -> GỌI VISION API KÈM RULEBOOK
-  if (sentBase64) {
+  // BƯỚC 3: NGƯỜI DÙNG GỬI ẢNH, THẨM ĐỊNH TỪNG ẢNH MỘT
+  if (sentImages.length > 0) {
     const apiKey = getEffectiveApiKey();
 
     if (!apiKey) {
@@ -623,44 +715,97 @@ chatForm.addEventListener('submit', async (e) => {
       return;
     }
 
-    activeImageData = {
-      base64: sentBase64,
-      mimeType: sentMimeType,
-      fileName: sentFileName
-    };
-    conversationHistory = [];
-
-    showTypingIndicator("Hoàng An đang soi ảnh dựa trên bộ 22 quy chuẩn thiết kế...");
-
     const callName = getDynamicCallName();
-    const userPromptText = `Đây là bức ảnh quảng cáo sản phẩm ngành ${userIndustry || "thương mại"} của ${callName}. Ghi chú kèm theo: "${text || "Hãy thẩm định bức ảnh này"}".
-Hãy phân tích bức ảnh dựa trên bộ 22 quy chuẩn thiết kế đã cho và BẮT ĐẦU bằng [Khối 1: Kết luận chung] gồm: Đạt hay chưa đạt tiêu chuẩn, điểm số trên thang điểm 10, nhận xét tổng quan 2-3 câu có đầy đủ chủ ngữ vị ngữ. Sau đó hỏi ${callName} xem có muốn phân tích chi tiết về bố cục thị giác và mật độ chữ hay không.`;
 
-    let apiResponse = "";
-    try {
-      if (apiKey.startsWith('sk-')) {
-        apiResponse = await callOpenAiVisionApi(apiKey, sentBase64, sentMimeType, userPromptText);
-      } else {
-        apiResponse = await callGeminiVisionApi(apiKey, sentBase64, sentMimeType, userPromptText);
-      }
-    } catch (err) {
-      console.error("Lỗi API Vision:", err);
-      apiResponse = `Mình gặp sự cố khi kết nối với máy chủ AI (${err.message}). Bạn vui lòng kiểm tra lại mã API Key ở nút góc trên màn hình nhé.`;
+    // Lời nhắn tiếp nhận nếu người dùng gửi từ 2 ảnh trở lên
+    if (sentImages.length > 1) {
+      showTypingIndicator(`Hoàng An đang tiếp nhận ${sentImages.length} bức ảnh...`);
+      await delay(600);
+      hideTypingIndicator();
+      await streamLines([
+        `Chào ${callName}, mình đã nhận đủ ${sentImages.length} hình ảnh quảng cáo bạn vừa gửi.`,
+        `Bây giờ mình sẽ quan sát và bóc tách đánh giá chi tiết cho từng bức ảnh một nhé.`
+      ]);
+      await delay(400);
     }
 
-    hideTypingIndicator();
+    // DUYỆT VÀ THẨM ĐỊNH TỪNG ẢNH MỘT
+    for (let i = 0; i < sentImages.length; i++) {
+      const currentImg = sentImages[i];
+      activeImageData = currentImg;
 
-    conversationHistory.push({ role: 'user', text: userPromptText });
-    conversationHistory.push({ role: 'model', text: apiResponse });
+      const indicatorText = sentImages.length > 1 
+        ? `Hoàng An đang thẩm định ảnh ${i + 1}/${sentImages.length}: ${currentImg.fileName}...`
+        : `Hoàng An đang soi ảnh dựa trên bộ tri thức thiết kế...`;
+      showTypingIndicator(indicatorText);
 
-    const lines = apiResponse.split('\n').map(l => sanitizeStrictRules(l)).filter(l => l.length > 0);
-    const quickActions = [
-      { text: "Phân tích bố cục & chữ", action: "step_block2" },
-      { text: "Xem ưu điểm & hạn chế", action: "step_block3" },
-      { text: "Xem đề xuất chỉnh sửa", action: "step_block4" }
-    ];
+      let userPromptText = "";
+      if (sentImages.length === 1) {
+        userPromptText = `Chào Hoàng An! Đây là hình ảnh quảng cáo sản phẩm ngành ${userIndustry || "thương mại"} của ${callName} (tệp: ${currentImg.fileName}).
+Lời nhắn hoặc câu hỏi kèm theo: "${text || "Hãy thẩm định và đánh giá chi tiết bức ảnh này"}".
 
-    await streamLines(lines, quickActions);
+Nhiệm vụ của bạn: Hãy bóc tách và phân tích toàn diện bức ảnh này một cách tự nhiên, chân thành, sâu sắc và tràn đầy cảm hứng, xuất kết quả theo các khối:
+- [KẾT LUẬN TIÊU CHUẨN QUẢNG CÁO]: Đạt / Chưa đạt, Chấm điểm (X/10), Nhận định tổng quan tự nhiên
+- [PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]: Sản phẩm chính, typography, thông điệp, nút CTA
+- [ƯU ĐIỂM & ĐIỂM HẠN CHẾ]: Điểm sáng thẩm mỹ và điểm trừ thiết kế
+- [ĐỀ XUẤT TỐI ƯU THIẾT KẾ]: Lời khuyên cụ thể, hành động được ngay
+- [GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]: Lời tâm tình vui vẻ và câu hỏi mở tìm hiểu thêm về khách hàng mục tiêu.
+Lưu ý quan trọng: Văn phong tự nhiên, ấm áp, logic và tuyệt đối không dùng bất kỳ ký tự mũi tên nào.`;
+      } else {
+        userPromptText = `Chào Hoàng An! Đây là BỨC ẢNH THỨ ${i + 1} trên tổng số ${sentImages.length} ảnh quảng cáo mà ${callName} đã gửi (tên tệp: ${currentImg.fileName}, ngành hàng: ${userIndustry || "thương mại"}).
+Lời nhắn chung của người dùng: "${text || "Hãy thẩm định lần lượt từng ảnh"}".
+
+Nhiệm vụ của bạn: Hãy phân tích riêng biệt cho BỨC ẢNH THỨ ${i + 1} (${currentImg.fileName}) một cách tự nhiên, mạch lạc, không gò bó:
+- [KẾT LUẬN TIÊU CHUẨN QUẢNG CÁO]: Đạt / Chưa đạt, Chấm điểm (X/10), Nhận định sắc sảo cho riêng ảnh này
+- [PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]: Bóc tách bố cục, chữ viết, màu sắc của ảnh này
+- [ƯU ĐIỂM & ĐIỂM HẠN CHẾ]: Điểm mạnh nổi bật và điểm hạn chế của ảnh này
+- [ĐỀ XUẤT TỐI ƯU THIẾT KẾ]: Đề xuất tinh chỉnh cụ thể cho ảnh này
+- Lời nhận xét tự nhiên, hóm hỉnh.
+Lưu ý quan trọng: Tuyệt đối không dùng ký tự mũi tên. Xưng "mình" và gọi "${callName}".`;
+      }
+
+      let apiResponse = "";
+      try {
+        if (apiKey.startsWith('sk-')) {
+          apiResponse = await callOpenAiVisionApi(apiKey, currentImg.base64, currentImg.mimeType, userPromptText);
+        } else {
+          apiResponse = await callGeminiVisionApi(apiKey, currentImg.base64, currentImg.mimeType, userPromptText);
+        }
+      } catch (err) {
+        console.error("Lỗi API Vision:", err);
+        apiResponse = `Mình gặp sự cố khi thẩm định bức ảnh ${currentImg.fileName} (${err.message}). Bạn vui lòng kiểm tra lại mã API Key hoặc kết nối mạng nhé.`;
+      }
+
+      hideTypingIndicator();
+
+      conversationHistory.push({ role: 'user', text: userPromptText });
+      conversationHistory.push({ role: 'model', text: apiResponse });
+
+      const lines = apiResponse.split('\n').map(l => sanitizeStrictRules(l)).filter(l => l.length > 0);
+      
+      const isLast = (i === sentImages.length - 1);
+      const quickActions = isLast ? (
+        sentImages.length > 1 ? [
+          { text: "So sánh ảnh nào tối ưu nhất?", action: "compare_images" },
+          { text: "Tối ưu cho Facebook & Instagram", action: "reply_facebook" },
+          { text: "Tối ưu cho TikTok Video dọc", action: "reply_tiktok" }
+        ] : [
+          { text: "Tối ưu cho Facebook & Instagram", action: "reply_facebook" },
+          { text: "Tối ưu cho TikTok & Video dọc", action: "reply_tiktok" },
+          { text: "Gợi ý bảng màu & Font chữ mới", action: "reply_palette" }
+        ]
+      ) : null;
+
+      if (sentImages.length > 1) {
+        lines.unshift(`📸 BỨC ẢNH ${i + 1}/${sentImages.length}: ${currentImg.fileName}`);
+      }
+
+      await streamLines(lines, quickActions);
+
+      if (!isLast) {
+        await delay(700);
+      }
+    }
     return;
   }
 
@@ -734,8 +879,8 @@ function sanitizeStrictRules(str) {
     .replace(/banners\b/gi, 'các hình ảnh quảng cáo')
     .replace(/\bEm chào\b/gi, 'Chào')
     .replace(/\bem\b/gi, 'mình')
-    .replace(/->|-->|=>|⇒|→/g, '•')
-    .replace(/^> /gm, '')
+    .replace(/->|-->|=>|==>|⇒|→|⇄|⇆|⇾|➔|➜|⇢|⇨/g, ' : ')
+    .replace(/^>\s*/gm, '')
     .replace(/>/g, '')
     .trim();
 }
@@ -744,10 +889,14 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// GIAO DIỆN NGƯỜI DÙNG GỬI TIN NHẮN (MODERN BUBBLE)
-function appendUserMessage(text, imgSrc) {
-  let imgHtml = imgSrc ? `<img src="${imgSrc}" class="max-h-64 rounded-xl border border-slate-200 dark:border-borderDark mb-2.5 object-cover shadow-sm">` : '';
-  let textHtml = text ? `<p class="leading-relaxed">${text}</p>` : '';
+function appendUserMessage(text, images) {
+  let imgHtml = '';
+  if (images && images.length > 0) {
+    imgHtml = `<div class="flex flex-wrap gap-2 mb-2.5">${images.map(img =>
+      `<img src="${img.dataUrl}" alt="${img.fileName}" class="max-h-48 rounded-xl border border-slate-200 dark:border-borderDark object-cover shadow-sm" title="${img.fileName}">`
+    ).join('')}</div>`;
+  }
+  const textHtml = text ? `<p class="leading-relaxed">${text}</p>` : '';
 
   const html = `
     <div class="flex gap-3 justify-end items-start group">
@@ -917,7 +1066,7 @@ async function callGeminiMultiTurnChat(apiKey, newText) {
 
   contents.push({
     role: 'user',
-    parts: [{ text: `${newText}\n(Lưu ý: Bạn là Hoàng An, tự xưng là mình, gọi đối phương bằng tên, trả lời có đầy đủ chủ vị, trích dẫn căn cứ khoa học từ bộ 22 quy chuẩn thiết kế)` }]
+    parts: [{ text: `${newText}\n(Lưu ý: Bạn là Hoàng An, tự xưng là mình, gọi đối phương bằng tên, giữ vững phong cách vui tính, tư duy logic, tuyệt đối không dùng ký tự mũi tên, trích dẫn căn cứ khoa học từ tài liệu thiết kế và chủ động hỏi thông tin khách hàng nếu cần thiết)` }]
   });
 
   for (const modelName of models) {
@@ -965,7 +1114,7 @@ async function callOpenAiVisionApi(apiKey, base64Data, mimeType, userText) {
           ]
         }
       ],
-      max_tokens: 1000
+      max_tokens: 2500
     })
   });
 
@@ -1011,7 +1160,7 @@ async function callOpenAiMultiTurnChat(apiKey, newText) {
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: messages,
-      max_tokens: 1000
+      max_tokens: 2500
     })
   });
 

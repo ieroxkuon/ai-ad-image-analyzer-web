@@ -32,120 +32,146 @@ try:
 except ImportError:
     HAS_GEMINI = False
 
-# Prompt hệ thống đặc chế cho AI Agent (AdVision Master) theo chỉ đạo của Người hướng dẫn
+# SYSTEM PROMPT CHO AI AGENT HOÀNG AN (ART DIRECTOR & VISION ANALYZER)
 SYSTEM_PROMPT = """
-Bạn là AdVision Master - Chuyên gia cao cấp về Phân tích Thị giác Hình ảnh Quảng cáo và Giám đốc Nghệ thuật Thiết kế Đồ họa Marketing với hơn 15 năm kinh nghiệm. Nhiệm vụ của bạn là đóng vai trò một người cố vấn thiết kế thông minh, kết hợp giữa tư duy nghệ thuật thị giác (Visual Arts), nguyên lý thiết kế đồ họa (Graphic Design Principles) và chiến lược tâm lý học khách hàng trong Marketing. Bạn ở đây để quan sát, bóc tách từng điểm ảnh, cấu trúc chữ, phối màu và bố cục của banner, từ đó đưa ra lời kết luận chính xác nhất về việc bức ảnh có đạt tiêu chuẩn quảng cáo hay không, đồng thời truyền cảm hứng giúp người dùng tối ưu hóa hiệu suất chuyển đổi quảng cáo một cách logic và sáng tạo nhất.
+Bạn là Hoàng An - Chuyên gia cao cấp về Phân tích Thị giác Hình ảnh Quảng cáo kiêm Giám đốc Nghệ thuật và Nhà thiết kế Đồ họa Marketing với hơn 15 năm kinh nghiệm thực chiến trong lĩnh vực tối ưu hóa truyền thông thị giác và xây dựng nhận diện thương hiệu. Nhiệm vụ của bạn là một người cố vấn thiết kế thông thái, kết hợp nhuần nhuyễn giữa tư duy nghệ thuật thị giác hiện đại, các nguyên lý thiết kế đồ họa kinh điển và tâm lý học hành vi người tiêu dùng trong quảng cáo số. Bạn ở đây để quan sát tỉ mỉ, bóc tách từng điểm ảnh, phân tích cấu trúc bố cục, hệ thống lưới, tỷ lệ phân chia không gian, nghệ thuật phối màu, phân cấp kiểu chữ và mức độ tương phản của nút kêu gọi hành động. Bạn đánh giá độc lập, khách quan để kết luận chính xác xem bức ảnh có đạt tiêu chuẩn quảng cáo hay không, đồng thời truyền cảm hứng và đề xuất các giải pháp kỹ thuật tối ưu hóa tỷ lệ chuyển đổi một cách logic, thuyết phục và đầy tính sáng tạo.
 
-NHIỆM VỤ TRUNG TÂM:
-Đánh giá bức ảnh được cung cấp và trả lời chính xác câu hỏi: "BỨC ẢNH NÀY CÓ ĐẠT TIÊU CHUẨN QUẢNG CÁO HAY KHÔNG?"
+TRI THỨC THẨM ĐỊNH TỪ TÀI LIỆU PDF CHUYÊN NGÀNH:
+1. Bố cục và Hệ thống lưới (Layout & Grid System):
+   - Quy tắc 1/3 (The Rule of Thirds): Đặt chủ thể và điểm nhấn tại 4 điểm giao cắt của lưới 3x3 để dẫn dắt ánh nhìn tự nhiên (Trích từ: The Graphic Design Book).
+   - Hệ thống lưới 3x4 (3x4 Grid Partition): Tổ chức nội dung theo các phân vùng hình học mạch lạc, phân định ranh giới giữa tiêu đề, hình ảnh và khối chữ (Trích từ: Designing for Clarity).
+   - Tỷ lệ vàng (Golden Ratio 1:1.618): Cân đối tỷ lệ không gian nội dung và khoảng trắng xung quanh (Trích từ: Graphic Design and Print Production Fundamentals).
+   - Đường treo ngang (Hang Lines): Chia mặt phẳng ngang để phân định ranh giới tách bạch giữa vùng hình ảnh và vùng chữ (Trích từ: Graphic Design and Print Production Fundamentals).
 
-CÁC QUY TẮC BẮT BUỘC:
-1. TUYỆT ĐỐI KHÔNG DÙNG KÝ TỰ MŨI TÊN (như ->, -->, ⇒) trong bất kỳ phần nào của câu trả lời.
-2. Trình bày câu trả lời theo các KHỐI VĂN BẢN (Text Blocks) phân định rõ ràng.
-3. Phong cách nói chuyện: Vui tính, hóm hỉnh, cởi mở nhưng cực kỳ sắc bén và logic về ngôn ngữ.
-4. Cuối bài phân tích, hãy chủ động đặt 1-2 câu hỏi vui vẻ để hỏi thêm thông tin về khách hàng mục tiêu hoặc ngách sản phẩm của họ.
+2. Màu sắc và Độ tương phản (Color & Contrast):
+   - Cân bằng độ sáng Schopenhauer: Tỷ lệ diện tích màu tỷ lệ nghịch với độ phản xạ ánh sáng (Tím:Vàng = 3:1, Lam:Cam = 2:1, Đỏ:Lục = 1:1) (Trích từ: Understanding Color).
+   - Không gian màu số: Sử dụng chuẩn RGB 8-bit (dải 0-255), độ tương phản cao trên màn hình thiết bị di động (Trích từ: The Graphic Design Book).
+   - Tương phản đồng thời: Giữ sự cân bằng thị giác giữa các gam màu nóng và lạnh, tránh chói mắt hoặc chìm màu (Trích từ: Understanding Color).
 
-CẤU TRÚC KẾT QUẢ ĐẦU RA (OUTPUT BLOCK STRUCTURE):
+3. Kiểu chữ và Phân cấp thông tin (Typography & Hierarchy):
+   - Giới hạn Typeface: Tối đa 2 font chữ (1 Serif kết hợp 1 Sans Serif) để tạo sự tinh giản và đồng bộ (Trích từ: Designing for Clarity).
+   - Tỷ lệ khoảng cách dòng (Leading): Duy trì khoảng cách dòng từ 1.25x đến 1.5x kích thước font để đảm bảo độ đọc mượt mà (Trích từ: The Graphic Design Book).
+   - Phân cấp kích cỡ chữ rõ rệt: Tiêu đề lớn (Headline 28pt trở lên), chữ phụ trợ (Body 12pt đến 18pt), không dùng cỡ chữ gần nhau gây nhiễu (Trích từ: Designing for Clarity).
 
---------------------------------
-ĐÁNH GIÁ TIÊU CHUẨN QUẢNG CÁO
---------------------------------
-[KHỐI 1: KẾT LUẬN CHUNG]
-KẾT LUẬN: [ĐẠT TIÊU CHUẨN / CHƯA ĐẠT TIÊU CHUẨN]
-Điểm số thiết kế: [X/10]
+4. Nút Kêu gọi Hành động và Tối ưu Chuyển đổi (CTA Optimization):
+   - Mô hình truyền thông AIDA: Điểm chốt thị giác theo tiến trình Thu hút (Attention), Quan tâm (Interest), Khao khát (Desire) và Hành động (Action) (Trích từ: Graphic Design Fundamentals).
+   - Tương phản Chính/Nền (Figure/Ground): Nút CTA phải có màu sắc và độ sáng tách biệt hoàn toàn khỏi nền để trở thành điểm rơi thị giác độc tôn.
+   - Tính tương thích thông điệp: Nút CTA phải khớp với mức độ nhận diện thương hiệu và giải quyết nhu cầu tức thì (Trích từ: Nghiên cứu Tsiotsou & Hatzithomas 2017).
 
-[KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC]
-- Chủ thể & Sản phẩm chính: [Nhận diện sản phẩm, vị trí, độ nổi bật]
-- Văn bản & Chữ viết: [Trích xuất nội dung chữ, đánh giá mật độ text, phông chữ]
-- Thông điệp quảng cáo: [Thông điệp truyền tải]
-- Nút kêu gọi hành động (CTA): [Đánh giá kích thước, vị trí, màu sắc tương phản]
+5. Thương hiệu và Khoảng thở thị giác (Branding & Negative Space):
+   - Ngưỡng thu nhỏ: Logo phải sắc nét và nhận diện tốt ngay cả khi co nhỏ xuống kích thước 16x16px hoặc 32x32px (Trích từ: Logo Design Guide).
+   - Khoảng trống âm (Negative Space): Tận dụng không gian thở xung quanh sản phẩm và chữ để tăng độ sang trọng và tập trung thị giác.
+
+NGUYÊN TẮC BẮT BUỘC:
+1. TUYỆT ĐỐI KHÔNG DÙNG KÝ TỰ MŨI TÊN: Nghiêm cấm hoàn toàn mọi dạng mũi tên như "->", "-->", "→", "⇒", ">". Dùng dấu gạch đầu dòng "-", dấu hai chấm ":" hoặc câu văn tự nhiên.
+2. TRÌNH BÀY THEO CÁC KHỐI VĂN BẢN (TEXT BLOCKS): Xuất kết quả theo đúng 5 khối văn bản rành mạch, phân tách rõ ràng.
+3. TƯ DUY ĐA TẦNG VÀ PHÂN TÍCH SÂU SẮC: Vận dụng logic đa chiều kết hợp kiến thức thị giác học, typography, lý thuyết màu và tâm lý người tiêu dùng. Mọi nhận xét phải giải thích rõ nguyên nhân và trích dẫn căn cứ khoa học từ tài liệu.
+4. PHONG CÁCH VUI TÍNH VÀ LOGIC VỀ NGÔN NGỮ:
+   - Giọng điệu hóm hỉnh, duyên dáng, tràn đầy năng lượng sáng tạo, dùng hình ảnh ví von thú vị của một Art Director đẳng cấp.
+   - Lập luận sắc bén, chuẩn mực ngữ pháp tiếng Việt, câu văn có đầy đủ chủ ngữ vị ngữ.
+   - Xưng hô: Tự xưng là "mình", gọi đối phương bằng tên riêng. Tuyệt đối không xưng "em" hay "tôi".
+   - Tuyệt đối không dùng từ tiếng Anh "banner". Luôn dùng "hình ảnh quảng cáo", "ảnh quảng cáo" hoặc "bức ảnh".
+   - Tuyệt đối không dùng dòng kẻ nét đứt dạng "--------------------------------".
+5. CHỦ ĐỘNG HỎI THÔNG TIN KHÁCH HÀNG: Tại Khối 5, luôn chủ động đặt 1-2 câu hỏi vui vẻ, gợi mở để tìm hiểu thêm về chân dung khách hàng mục tiêu, độ tuổi, phân khúc sản phẩm hoặc kênh quảng cáo dự kiến triển khai.
+
+CẤU TRÚC KẾT QUẢ ĐẦU RA (OUTPUT CHUẨN XÁC THEO 5 KHỐI):
+
+[KHỐI 1: KẾT LUẬN TIÊU CHUẨN QUẢNG CÁO]
+- Kết luận: [ĐẠT TIÊU CHUẨN / CHƯA ĐẠT TIÊU CHUẨN]
+- Điểm số thiết kế: [X/10]
+- Nhận định tổng quan: [2-3 câu nhận xét sắc sảo, hóm hỉnh có đầy đủ chủ ngữ vị ngữ]
+
+[KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]
+- Chủ thể & Sản phẩm chính: [Vị trí hiển thị, góc chụp, độ nổi bật, quy tắc 1/3 và tỷ lệ không gian]
+- Văn bản & Chữ viết (Typography): [Nội dung chữ, phông chữ, tính phân cấp kích thước và khoảng cách dòng]
+- Thông điệp quảng cáo: [Ý nghĩa truyền tải, tính rõ ràng và sự ăn nhập với sản phẩm]
+- Nút kêu gọi hành động (CTA): [Vị trí điểm rơi thị giác, màu sắc tương phản và khả năng kích thích hành động]
 
 [KHỐI 3: ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
-- Điểm mạnh nổi bật: [Cụ thể các chi tiết làm tốt]
-- Điểm cần cải thiện: [Cụ thể các hạn chế tồn tại]
+- Điểm mạnh nổi bật: [Các chi tiết thẩm mỹ làm tốt, trích dẫn căn cứ từ tài liệu PDF]
+- Điểm cần cải thiện: [Các lỗi thiết kế cụ thể gây cản trở thị giác hoặc giảm tỷ lệ chuyển đổi]
 
 [KHỐI 4: ĐỀ XUẤT TỐI ƯU THIẾT KẾ]
-- Đề xuất 1: [Lời khuyên cụ thể]
-- Đề xuất 2: [Lời khuyên cụ thể]
+- Đề xuất 1: [Lời khuyên cụ thể, hành động được ngay]
+- Đề xuất 2: [Lời khuyên cụ thể, hành động được ngay]
+- Đề xuất 3: [Lời khuyên cụ thể, hành động được ngay]
 
-[KHỐI 5: GIAO LƯU & HỎI THÔNG TIN KHÁCH HÀNG]
-[Lời nhắn vui vẻ, hóm hỉnh và câu hỏi cởi mở về sản phẩm/khách hàng của người dùng]
---------------------------------
+[KHỐI 5: GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]
+[Lời nhắn vui tươi, hóm hỉnh mang đậm cá tính Hoàng An, kèm 1-2 câu hỏi mở tìm hiểu về chân dung khách hàng mục tiêu, ngách sản phẩm hoặc kênh quảng cáo của bạn]
 """
 
 # Dữ liệu mô phỏng (Mock Data) chuẩn bị sẵn cho 3 banner khi ở chế độ Demo/Offline
 MOCK_ANALYSES = {
-    "banner_01.png": """--------------------------------
-IMAGE ANALYSIS
---------------------------------
-Main subject: Laptop Gaming cao cấp (RGB keyboard, thiết kế góc cạnh sành điệu)
+    "banner_01.png": """[KHỐI 1: KẾT LUẬN TIÊU CHUẨN QUẢNG CÁO]
+- Kết luận: CHƯA ĐẠT TIÊU CHUẨN (Cần tối ưu kích thước nút kêu gọi hành động)
+- Điểm số thiết kế: 7.2/10
+- Nhận định tổng quan: Chiếc Laptop Gaming hiển thị cực kỳ ấn tượng với dải đèn RGB sống động và bố cục công nghệ hiện đại. Tuy nhiên, nút mua hàng đang bị lọt thỏm giữa không gian, khiến khách hàng dù hào hứng nhưng lại chần chừ nhấp chuột.
 
-TEXT:
-"GIẢM 30% - LAPTOP GAMING - MUA NGAY"
+[KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]
+- Chủ thể & Sản phẩm chính: Laptop Gaming cao cấp đặt tại vùng 1/3 trung tâm lệch phải, góc nghiêng 45 độ tôn rõ bàn phím cơ và màn hình.
+- Văn bản & Chữ viết (Typography): Dòng chữ "GIẢM 30%" có kích thước phân cấp tốt (khoảng 36pt), tuy nhiên phông chữ dòng "LAPTOP GAMING" chưa đủ độ dày dặn.
+- Thông điệp quảng cáo: Ưu đãi giảm giá 30% trực diện, dễ hiểu, phù hợp với tệp game thủ.
+- Nút kêu gọi hành động (CTA): Nút "MUA NGAY" màu vàng sáng nhưng diện tích hiển thị còn khiêm tốn so với tổng diện tích hình ảnh.
 
-MESSAGE:
-Chương trình khuyến mãi giảm giá 30% cho dòng sản phẩm Laptop Gaming.
+[KHỐI 3: ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
+- Điểm mạnh nổi bật: Độ tương phản màu sắc RGB trên nền tối đạt chuẩn màn hình số (sách The Graphic Design Book), sản phẩm sắc nét và có chiều sâu thị giác.
+- Điểm cần cải thiện: Nút CTA chưa tạo được độ độc tôn thị giác (theo nguyên lý Figure/Ground trong sách Graphic Design Fundamentals).
 
-CTA:
-MUA NGAY
+[KHỐI 4: ĐỀ XUẤT TỐI ƯU THIẾT KẾ]
+- Đề xuất 1: Nâng kích thước nút CTA "MUA NGAY" thêm 20% và bo góc nhẹ để tăng diện tích tiếp xúc ngón tay trên điện thoại di động.
+- Đề xuất 2: Giảm độ sáng của các vệt sáng phụ phía sau màn hình laptop để mắt người xem tập trung trọn vẹn vào sản phẩm chính.
+- Đề xuất 3: Tăng độ đậm (Bold) cho từ khóa chính để tạo sự phân cấp tương phản kích thước rõ rệt (theo sách Designing for Clarity).
 
-EVALUATION:
-- Product visibility: Good (Sản phẩm laptop đặt ở vị trí trung tâm, nổi bật với đèn RGB)
-- Text amount: Moderate (Lượng chữ vừa phải, tập trung vào ưu đãi chính)
-- CTA visibility: Needs improvement (Nút MUA NGAY màu vàng nổi bật nhưng kích thước hơi nhỏ so với tổng thể banner)
+[KHỐI 5: GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]
+Chào bạn! Bức ảnh quảng cáo Laptop này nhìn rất chiến và đậm chất game thủ!
+Để mình hỗ trợ bạn tối ưu chuẩn xác hơn, bạn có thể chia sẻ thêm đối tượng khách hàng bạn nhắm tới là học sinh sinh viên hay game thủ chuyên nghiệp, và bạn dự kiến chạy quảng cáo này trên Facebook hay Google Display Network không?""",
 
-RECOMMENDATION:
-- Tăng kích thước nút CTA "MUA NGAY" và thêm hiệu ứng viền để thu hút ánh nhìn hơn.
-- Giảm độ tương phản của hiệu ứng ánh sáng nền để làm nổi bật sản phẩm chính hơn nữa.
---------------------------------""",
+    "banner_02.png": """[KHỐI 1: KẾT LUẬN TIÊU CHUẨN QUẢNG CÁO]
+- Kết luận: ĐẠT TIÊU CHUẨN (Thiết kế bắt mắt, khơi gợi vị giác tốt)
+- Điểm số thiết kế: 8.5/10
+- Nhận định tổng quan: Ly cà phê sữa đá chân thực đến từng giọt nước đọng trên thành ly, mang lại cảm giác giải nhiệt tức thì. Bố cục phân tầng thông tin rất gãy gọn và ấm cúng.
 
-    "banner_02.png": """--------------------------------
-IMAGE ANALYSIS
---------------------------------
-Main subject: Ly Cà Phê Sữa Đá Việt Nam (Kèm hạt cà phê và đá lạnh)
+[KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]
+- Chủ thể & Sản phẩm chính: Ly cà phê sữa đá Việt Nam đặt vững chãi tại vị trí giao điểm 1/3, các hạt cà phê văng tự nhiên tạo nhịp điệu sinh động.
+- Văn bản & Chữ viết (Typography): Tiêu đề "CÀ PHÊ SỮA ĐÁ" nổi bật, phân cấp rõ rệt so với thông tin khuyến mãi "GIẢM 20% THỨ 2".
+- Thông điệp quảng cáo: Đậm vị truyền thống kết hợp kích cầu đầu tuần rất khéo léo.
+- Nút kêu gọi hành động (CTA): Nút "THỬ NGAY" có kích thước vừa vặn, màu sắc hài hòa với tổng thể tông nâu ấm.
 
-TEXT:
-"CÀ PHÊ SỮA ĐÁ - ĐẬM VỊ VIỆT - GIẢM 20% THỨ 2 - THỬ NGAY"
+[KHỐI 3: ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
+- Điểm mạnh nổi bật: Áp dụng chuẩn xác quy tắc cân bằng thị giác và tương phản màu bổ túc (sách Understanding Color), kích thích vị giác mạnh mẽ.
+- Điểm cần cải thiện: Dải thông tin phụ "THỨ 2" hơi sát mép viền dưới, cần thêm khoảng thở an toàn.
 
-MESSAGE:
-Quảng cáo cà phê sữa đá truyền thống với ưu đãi giảm 20% vào mỗi Thứ 2 hàng tuần.
+[KHỐI 4: ĐỀ XUẤT TỐI ƯU THIẾT KẾ]
+- Đề xuất 1: Nhích khối chữ và nút CTA lên phía trên 15 pixel để tạo khoảng đệm lề an toàn (padding margin) cho màn hình di động.
+- Đề xuất 2: Giữ nguyên hình ảnh ly cà phê vì độ sắc nét và ánh sáng đã đạt chuẩn xuất sắc.
 
-CTA:
-THỬ NGAY
+[KHỐI 5: GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]
+Nhìn ly cà phê sữa đá này làm mình cũng muốn đứng dậy pha ngay một ly để thưởng thức!
+Bạn đang chạy chiến dịch này cho chuỗi cửa hàng đồ uống hay tiệm cà phê địa phương, và tệp khách hàng quen thuộc của quán là dân văn phòng hay giới trẻ vậy bạn?""",
 
-EVALUATION:
-- Product visibility: Good (Ly cà phê sữa đá chân thực, bắt mắt, cảm giác mát lạnh)
-- Text amount: Moderate (Có thêm dòng thông tin ưu đãi phụ làm phong phú thông tin)
-- CTA visibility: Good (Nút THỬ NGAY thiết kế rõ ràng ở vị trí dễ quan sát)
+    "banner_03.png": """[KHỐI 1: KẾT LUẬN TIÊU CHUẨN QUẢNG CÁO]
+- Kết luận: CHƯA ĐẠT TIÊU CHUẨN (Bố cục quá tải chữ, cần giải phóng không gian thở)
+- Điểm số thiết kế: 6.0/10
+- Nhận định tổng quan: Chiếc Smartphone flagship 2026 sở hữu ngoại hình cực kỳ sang trọng và viền màn hình vô cực quyến rũ. Đáng tiếc là phần chân ảnh lại bị "nghẹt thở" bởi quá nhiều dòng chữ mô tả chi tiết quà tặng, làm lu mờ giá trị cao cấp của sản phẩm.
 
-RECOMMENDATION:
-- Đưa dải thông tin "GIẢM 20% THỨ 2" lên vị trí nổi bật hơn gần tiêu đề chính.
-- Sử dụng phông chữ Calligraphy cho phần "Đậm Vị Việt" để tạo điểm nhấn thương hiệu.
---------------------------------""",
+[KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]
+- Chủ thể & Sản phẩm chính: Điện thoại flagship ở trung tâm, hiệu ứng phản chiếu ánh sáng tinh tế.
+- Văn bản & Chữ viết (Typography): Có đến 4 cỡ chữ và kiểu font khác nhau đang cùng xuất hiện, vi phạm nguyên tắc giới hạn 2 Typeface (sách Designing for Clarity).
+- Thông điệp quảng cáo: "ĐẶT HÀNG TRƯỚC TẶNG QUÀ 5 TRIỆU" là thông điệp tốt nhưng bị phân tán bởi các dòng ghi chú phụ.
+- Nút kêu gọi hành động (CTA): Nút "ĐẶT HÀNG NGAY" màu xám bạc tiệp màu nền nên bị chìm hoàn toàn.
 
-    "banner_03.png": """--------------------------------
-IMAGE ANALYSIS
---------------------------------
-Main subject: Siêu phẩm Smartphone 2026 (Thiết kế tràn viền, kính cường lực)
+[KHỐI 3: ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
+- Điểm mạnh nổi bật: Hình ảnh sản phẩm dựng 3D sắc nét, phong cách tương lai sang trọng.
+- Điểm cần cải thiện: Mật độ văn bản vượt ngưỡng 20% diện tích, nút CTA thiếu độ tương phản tách biệt Chính/Nền.
 
-TEXT:
-"SIÊU PHẨM SMARTPHONE 2026 - ĐẶT HÀNG TRƯỚC TẶNG QUÀ 5 TRIỆU - ĐẶT HÀNG NGAY"
+[KHỐI 4: ĐỀ XUẤT TỐI ƯU THIẾT KẾ]
+- Đề xuất 1: Lược bỏ toàn bộ các dòng chú thích quà tặng li ti, chỉ giữ lại một con số ấn tượng "QUÀ 5 TRIỆU" với font chữ to rõ.
+- Đề xuất 2: Đổi màu nút CTA sang tông Xanh dương neon hoặc Cam ánh kim để tạo điểm rơi thị giác không thể bỏ qua.
+- Đề xuất 3: Đồng bộ toàn bộ chữ về tối đa 2 font chữ chuẩn (theo sách Designing for Clarity).
 
-MESSAGE:
-Chương trình đặt hàng trước điện thoại flagship mới với gói quà tặng hấp dẫn trị giá 5 triệu đồng.
-
-CTA:
-ĐẶT HÀNG NGAY
-
-EVALUATION:
-- Product visibility: Good (Điện thoại hiển thị sang trọng với hiệu ứng ánh sáng tương lai)
-- Text amount: High (Nhiều chữ chi tiết ở phần chân banner)
-- CTA visibility: Moderate (Nút ĐẶT HÀNG NGAY dạng pill button đẹp mắt nhưng màu sắc tiệp với phông nền)
-
-RECOMMENDATION:
-- Đổi màu sắc tương phản nổi bật hơn cho nút CTA "ĐẶT HÀNG NGAY" (ví dụ: Cam neon hoặc Đỏ mờ).
-- Thu gọn bớt phần mô tả chi tiết quà tặng để người xem tập trung vào giá trị chính "QUÀ 5 TRIỆU".
---------------------------------"""
+[KHỐI 5: GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]
+Chiếc điện thoại này thực sự toát lên thần thái của một thiết bị tương lai rất đẳng cấp!
+Sản phẩm flagship này bạn hướng tới nhóm khách hàng đam mê công nghệ cao cấp hay phân khúc quà tặng doanh nghiệp, và ngân sách chiến dịch này bạn dự kiến chạy trên nền tảng nào?"""
 }
 
 # Tự động đọc file .env nếu có
@@ -224,29 +250,28 @@ def analyze_banner(image_path: str) -> str:
         return MOCK_ANALYSES[file_name]
     else:
         # Generic mock cho file ảnh bất kỳ
-        return f"""--------------------------------
-IMAGE ANALYSIS
---------------------------------
-Main subject: Quảng cáo sản phẩm ({file_name})
+        return f"""[KHỐI 1: KẾT LUẬN TIÊU CHUẨN QUẢNG CÁO]
+- Kết luận: CHƯA ĐẠT TIÊU CHUẨN (Cần tối ưu phân cấp thông tin và nút CTA)
+- Điểm số thiết kế: 6.5/10
+- Nhận định tổng quan: Hình ảnh quảng cáo ({file_name}) có chủ thể rõ ràng nhưng bố cục tổng thể cần tạo thêm khoảng thở và nhấn mạnh vào nút kêu gọi hành động.
 
-TEXT:
-"KHUYẾN MÃI ĐẶC BIỆT - MUA NGAY"
+[KHỐI 2: PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]
+- Chủ thể & Sản phẩm chính: Sản phẩm hiển thị ở khu vực trung tâm, độ nhận diện tương đối tốt.
+- Văn bản & Chữ viết (Typography): Lượng chữ vừa phải nhưng cần phân cấp rõ rệt giữa tiêu đề và văn bản phụ trợ (theo sách Designing for Clarity).
+- Thông điệp quảng cáo: Thông điệp khuyến mãi ngắn gọn, dễ tiếp cận.
+- Nút kêu gọi hành động (CTA): Nút "MUA NGAY" cần tăng độ tương phản sắc độ so với phông nền.
 
-MESSAGE:
-Quảng cáo sản phẩm thương mại.
+[KHỐI 3: ƯU ĐIỂM & ĐIỂM HẠN CHẾ]
+- Điểm mạnh nổi bật: Hình ảnh sản phẩm trung thực, màu sắc hài hòa.
+- Điểm cần cải thiện: Nút CTA chưa đủ lực kéo thị giác, vi phạm nguyên lý tách biệt Chính/Nền (Figure/Ground).
 
-CTA:
-MUA NGAY
+[KHỐI 4: ĐỀ XUẤT TỐI ƯU THIẾT KẾ]
+- Đề xuất 1: Nâng kích thước nút CTA thêm 15% và dùng màu sắc tương phản mạnh hơn.
+- Đề xuất 2: Căn chỉnh lại khoảng cách dòng của tiêu đề theo tỷ lệ chuẩn 1.3x font size.
 
-EVALUATION:
-- Product visibility: Good
-- Text amount: Moderate
-- CTA visibility: Needs improvement
-
-RECOMMENDATION:
-- Nâng cao kích thước nút CTA.
-- Tối ưu tương phản màu sắc chữ.
---------------------------------"""
+[KHỐI 5: GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]
+Chào bạn! Bức ảnh này có tiềm năng rất lớn nếu được tinh chỉnh lại một chút về điểm rơi thị giác!
+Bạn có thể chia sẻ thêm đối tượng khách hàng mục tiêu của sản phẩm này và kênh phân phối chính bạn dự định triển khai không?"""
 
 def main():
     print("=" * 60)
