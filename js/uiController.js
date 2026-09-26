@@ -197,6 +197,7 @@ const UIController = {
 
   // Phân loại dòng văn bản để định dạng trực quan
   classifyLine(line) {
+    if (/^\[GỢI Ý PROMPT.*?\]\s*$/i.test(line)) return 'redesign-prompt-header';
     if (/^\[.+\]\s*$/.test(line)) return 'block-header';
     if (/^📸\s/.test(line)) return 'image-label';
     if (/^[^-\[].+:\s*$/.test(line)) return 'section-title';
@@ -204,6 +205,23 @@ const UIController = {
     if (/^-\s+.+:/.test(line)) return 'bullet-with-content';
     if (/^-\s+/.test(line)) return 'bullet';
     return 'paragraph';
+  },
+
+  // Tiện ích sao chép văn bản vào Clipboard mượt mà
+  async copyToClipboard(button, text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      const originalHtml = button.innerHTML;
+      button.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> <span class="text-emerald-400">Đã sao chép!</span>`;
+      button.classList.add('bg-emerald-950/40', 'border-emerald-700/60');
+      setTimeout(() => {
+        button.innerHTML = originalHtml;
+        button.classList.remove('bg-emerald-950/40', 'border-emerald-700/60');
+      }, 2200);
+    } catch (err) {
+      console.error("Không thể copy:", err);
+      alert("Đã sao chép: " + text.substring(0, 50) + "...");
+    }
   },
 
   // Hiệu ứng hiển thị chữ từng dòng mượt mà (Streaming Lines)
@@ -224,6 +242,8 @@ const UIController = {
     this.elements.chatContainer.insertAdjacentHTML('beforeend', html);
     const container = document.getElementById(messageWrapperId);
 
+    let isInsidePromptBlock = false;
+
     for (let i = 0; i < linesArray.length; i++) {
       const line = linesArray[i].trim();
       if (!line) continue;
@@ -231,6 +251,59 @@ const UIController = {
       const type = this.classifyLine(line);
       const el = document.createElement('div');
       el.className = 'fade-in-text';
+
+      if (type === 'redesign-prompt-header') {
+        isInsidePromptBlock = true;
+        el.className = 'mt-3 p-3.5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 text-white border border-slate-700 shadow-md space-y-2.5';
+        el.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-700/80 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </span>
+              <span class="text-xs font-bold tracking-wide text-slate-200">Prompt Tái Thiết Kế (DALL-E 3 / Midjourney / ChatGPT)</span>
+            </div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Gen AI Ready</span>
+          </div>
+        `;
+        container.appendChild(el);
+        this.scrollToBottom();
+        await this.delay(90);
+        continue;
+      }
+
+      if (isInsidePromptBlock) {
+        // Kiểm tra nếu chuyển sang block mới khác
+        if (type === 'block-header') {
+          isInsidePromptBlock = false;
+        } else {
+          // Render nội dung prompt kèm nút copy
+          const promptBox = document.createElement('div');
+          promptBox.className = 'p-3 bg-black/40 rounded-xl border border-slate-700/60 font-mono text-xs text-emerald-300 leading-relaxed space-y-2 select-all break-words';
+          
+          const cleanPromptText = line.replace(/^(Prompt.*?:\s*)/i, '').replace(/^[\\"\']+|[\\"\']+$/g, '');
+          promptBox.textContent = cleanPromptText;
+
+          const copyBtn = document.createElement('button');
+          copyBtn.type = 'button';
+          copyBtn.className = 'mt-2 text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600/80 transition-all flex items-center gap-1.5 shadow-sm';
+          copyBtn.innerHTML = `<i class="fa-regular fa-copy text-xs"></i> <span>Sao chép Prompt cho ChatGPT</span>`;
+          copyBtn.addEventListener('click', () => this.copyToClipboard(copyBtn, cleanPromptText));
+
+          const wrapper = container.lastElementChild;
+          if (wrapper && wrapper.classList.contains('bg-gradient-to-br')) {
+            wrapper.appendChild(promptBox);
+            wrapper.appendChild(copyBtn);
+          } else {
+            container.appendChild(promptBox);
+            container.appendChild(copyBtn);
+          }
+
+          this.scrollToBottom();
+          await this.delay(90);
+          continue;
+        }
+      }
 
       if (type === 'block-header') {
         el.className += ' text-[13px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 pt-3 pb-1 border-b border-slate-200/60 dark:border-slate-700/40 mb-1';

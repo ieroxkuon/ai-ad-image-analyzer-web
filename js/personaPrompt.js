@@ -99,6 +99,10 @@ Nút kêu gọi hành động (CTA):
 
 [GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]
 [Lời nhắn vui tươi, hóm hỉnh mang đậm cá tính Hoàng An, kèm 1-2 câu hỏi mở tìm hiểu về chân dung khách hàng mục tiêu, ngách sản phẩm hoặc kênh quảng cáo của {callName}]
+
+[GỢI Ý PROMPT TÁI SINH THIẾT KẾ CHO CHATGPT & MIDJOURNEY]
+Prompt tiếng Anh chuẩn đồ họa:
+[Viết 1 đoạn prompt tiếng Anh chuyên nghiệp (Commercial advertising photography) mô tả chi tiết cách tạo lại bức ảnh này hoàn hảo nhất trên Midjourney v6/DALL-E 3: chủ thể sắc nét, bố cục 1/3, ánh sáng studio, khoảng thở negative space, bảng màu hài hòa, không bị dính chữ, 8k resolution]
 `.trim(),
 
   // Tổng hợp System Prompt gửi tới AI Agent
@@ -124,6 +128,7 @@ Nhiệm vụ của bạn: Hãy bóc tách và phân tích toàn diện bức ả
 - [ƯU ĐIỂM & ĐIỂM HẠN CHẾ]: Điểm sáng thẩm mỹ và điểm trừ thiết kế
 - [ĐỀ XUẤT TỐI ƯU THIẾT KẾ]: Lời khuyên cụ thể, hành động được ngay
 - [GIAO LƯU & TÌM HIỂU KHÁCH HÀNG]: Lời tâm tình vui vẻ và câu hỏi mở tìm hiểu thêm về khách hàng mục tiêu.
+- [GỢI Ý PROMPT TÁI SINH THIẾT KẾ CHO CHATGPT & MIDJOURNEY]: Cung cấp 1 prompt tiếng Anh chuẩn đồ họa để vẽ lại bức ảnh này hoàn hảo nhất.
 Lưu ý quan trọng: Văn phong tự nhiên, ấm áp, logic và tuyệt đối không dùng bất kỳ ký tự mũi tên nào.`;
     }
 
@@ -135,6 +140,7 @@ Nhiệm vụ của bạn: Hãy phân tích riêng biệt cho BỨC ẢNH THỨ $
 - [PHÂN TÍCH THỊ GIÁC & BỐ CỤC CHỮ]: Bóc tách bố cục, chữ viết, màu sắc của ảnh này
 - [ƯU ĐIỂM & ĐIỂM HẠN CHẾ]: Điểm mạnh nổi bật và điểm hạn chế của ảnh này
 - [ĐỀ XUẤT TỐI ƯU THIẾT KẾ]: Đề xuất tinh chỉnh cụ thể cho ảnh này
+- [GỢI Ý PROMPT TÁI SINH THIẾT KẾ CHO CHATGPT & MIDJOURNEY]: Prompt tiếng Anh để sinh lại ảnh tối ưu
 - Lời nhận xét tự nhiên, hóm hỉnh.
 Lưu ý quan trọng: Tuyệt đối không dùng ký tự mũi tên. Xưng "mình" và gọi "${callName}".`;
   },

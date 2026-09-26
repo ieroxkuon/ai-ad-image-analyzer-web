@@ -46,20 +46,31 @@ ai_ad_image_analyzer/
 │   ├── config.js                  # Hằng số, API Key mặc định, cấu hình mô hình AI
 │   ├── rulesService.js            # Quản lý nạp và tra cứu 22 quy chuẩn thiết kế
 │   ├── personaPrompt.js           # Persona Hoàng An, System Prompts, xử lý tên & ngành hàng
+│   ├── redesignGenerator.js       # [MỚI] Động cơ sinh Prompt tái thiết kế cho GenAI
 │   ├── apiService.js              # Xử lý kết nối Vision AI (Gemini, OpenAI, Fallback)
-│   ├── uiController.js            # Quản lý DOM, Modal, Preview nhiều ảnh, Streaming text
+│   ├── uiController.js            # Quản lý DOM, Modal, Preview ảnh, Streaming text & Prompt Card
 │   └── app.js                     # [BỘ ĐIỀU PHỐI CHÍNH - Controller] ~250 dòng sạch sẽ
 │
 ├── scripts/                       # [TẦNG KHOA HỌC & NGHIÊN CỨU AI]
-│   └── AI_Ad_Image_Analyzer.py    # Script phân tích hình ảnh độc lập bằng Python
+│   ├── AI_Ad_Image_Analyzer.py    # Script phân tích hình ảnh độc lập bằng Python
+│   └── compile_master_knowledge.py# [MỚI] Tự động biên dịch tri thức phục vụ NotebookLM
 │
-├── docs/                          # [TÀI LIỆU KỸ THUẬT & THIẾT KẾ HỆ THỐNG]
+├── docs/                          # [TÀI LIỆU KỸ THUẬT & PHƯƠNG PHÁP NGHIÊN CỨU]
+│   ├── SO_TAY_QUY_CHUAN_THIET_KE.md # Sổ tay 22 quy chuẩn chưng cất từ 16 PDF (Đưa lên Drive)
+│   ├── NGHIEN_CUU_VA_KIEN_TRUC_HE_THONG.md # Báo cáo thiết kế kiến trúc phân tầng & SoC
 │   ├── KE_HOACH_HE_THONG_TUAN_2.md
 │   └── KE_HOACH_TRAIN_AI_AGENT.md
 │
 ├── trainingdocs/                  # 16 tài liệu PDF nghiên cứu chuyên ngành đồ họa & quảng cáo
 └── images/                        # Hình ảnh mẫu nghiệm thu thực nghiệm
 ```
+
+---
+
+### ✨ TÍNH NĂNG NỔI BẬT: VÒNG LẶP THẨM ĐỊNH & TÁI SINH THIẾT KẾ
+* **Thẩm định khách quan:** Đối chiếu trực tiếp bức ảnh với 22 tiêu chuẩn đồ họa chuẩn quốc tế.
+* **Tự sinh Prompt tái thiết kế:** Tự động tạo câu lệnh Prompt tiếng Anh (Midjourney v6, DALL-E 3, ChatGPT) khắc phục triệt để các lỗi vi phạm của bức ảnh cũ.
+* **1-Click Copy:** Nút sao chép Prompt nhanh chóng để người dùng dán ngay vào ChatGPT/Midjourney tạo ảnh mới.
 
 ---
 
