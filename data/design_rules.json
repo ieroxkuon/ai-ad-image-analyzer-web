@@ -1,0 +1,248 @@
+{
+  "rulebook_version": "1.0",
+  "generated_source": "AdVision Grounded Knowledge Base",
+  "rules": [
+    {
+      "rule_id": "layout_rule_of_thirds",
+      "category": "layout_composition",
+      "title": "Quy tắc một phần ba trong bố cục thị giác",
+      "description": "Chia khu vực thiết kế thành một lưới 3x3 gồm 9 ô vuông bằng nhau bằng 2 đường ngang và 2 đường dọc. Đặt điểm nhấn chính (focal point) của hình ảnh hoặc thông điệp quảng cáo tại hoặc gần các giao điểm lưới để tạo độ cân bằng thị giác tự nhiên.",
+      "threshold": "Lưới 3x3 (9 ô vuông bằng nhau), vị trí điểm nhấn đặt tại 4 điểm giao cắt chính",
+      "severity": "critical",
+      "source_book": "The Graphic Design Book- A Comprehensive Guide for Beginners.pdf",
+      "source_location": "Section 3: Layout and Composition - The Rule of Thirds",
+      "impact": "Tối ưu hóa đường quét mắt tự nhiên của người xem, tăng khả năng ghi nhớ vị trí thông điệp chính và tạo sự cân bằng thị giác hài hòa."
+    },
+    {
+      "rule_id": "layout_3x4_grid_partition",
+      "category": "layout_composition",
+      "title": "Cấu trúc lưới 3x4 và các phương án phân chia bố cục",
+      "description": "Sử dụng hệ thống lưới cơ sở 3 cột x 4 hàng với 892 phương án phân chia duy nhất (unique partitions) để tổ chức các khối nội dung, tiêu đề và hình ảnh trên trang hoặc màn hình quảng cáo.",
+      "threshold": "Lưới 3 x 4 (12 ô cơ sở, 892 biến thể phân chia cấu trúc)",
+      "severity": "moderate",
+      "source_book": "Designing for Clarity.pdf",
+      "source_location": "Layout - The 892 unique ways to partition a 3 x 4 grid",
+      "impact": "Tạo cấu trúc thiết kế trật tự, nhất quán, giúp não bộ người xem dễ dàng phân loại thông tin mà không bị quá tải thị giác."
+    },
+    {
+      "rule_id": "layout_golden_ratio_section",
+      "category": "layout_composition",
+      "title": "Tỷ lệ vàng trong phân chia không gian thiết kế",
+      "description": "Áp dụng tỷ lệ hằng số vàng (Golden Ratio ~ 1 : 1.618) để tính toán tỷ lệ khung hình, kích thước tỷ lệ giữa các phần tử và xác định độ rộng của vùng nội dung so với khoảng trắng bao quanh.",
+      "threshold": "Tỷ lệ 1 : 1.618",
+      "severity": "moderate",
+      "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+      "source_location": "Chapter 3: Design Elements, Design Principles, and Compositional Organization - Types of Grids (The Golden Section)",
+      "impact": "Mang lại sự hài hòa toán học chuẩn mực cho bố cục, tạo cảm giác dễ chịu và thu hút thị giác thẩm mỹ cao."
+    },
+    {
+      "rule_id": "layout_hang_lines_rule",
+      "category": "layout_composition",
+      "title": "Quy tắc đường treo nằm ngang (Hang Lines)",
+      "description": "Chia mặt phẳng thiết kế theo chiều ngang thành 3 phần bằng nhau để tạo các đường treo (hang lines). Quy tắc này giúp cố định và phân định ranh giới riêng biệt giữa vùng dành cho hình ảnh và vùng dành cho các khối văn bản.",
+      "threshold": "Phân chia mặt phẳng ngang thành 3 phần bằng nhau (Rule of Thirds horizontal)",
+      "severity": "moderate",
+      "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+      "source_location": "Chapter 3: Design Elements, Design Principles, and Compositional Organization - Hang Lines",
+      "impact": "Giúp cố định các yếu tố thị giác theo nhịp điệu nhất định, tăng tính trật tự và giúp trải nghiệm đọc mượt mà hơn."
+    },
+    {
+      "rule_id": "layout_single_vs_multicolumn_grid",
+      "category": "layout_composition",
+      "title": "Phân bổ lưới đơn cột và đa cột theo độ phức tạp nội dung",
+      "description": "Áp dụng lưới 1 cột đối với thông điệp đơn giản; đối với quảng cáo phức tạp hợp nhất nhiều hình ảnh và văn bản, bắt buộc sử dụng lưới đa cột (multi-column) để phân vùng các cấp bậc thông tin.",
+      "threshold": "1 cột cho nội dung đơn giản; ≥ 2-4 cột cho bố cục phức tạp hợp nhất văn bản & hình ảnh",
+      "severity": "moderate",
+      "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+      "source_location": "Chapter 3.4 Organizational Principles - Single-Column & Multi-Column Grid",
+      "impact": "Tăng tính linh hoạt trong phối hợp bố cục, giúp phân rõ khu vực hình ảnh và văn bản để tránh tình trạng rối mắt."
+    },
+    {
+      "rule_id": "color_luminosity_ratio_schopenhauer",
+      "category": "color_contrast",
+      "title": "Tỷ lệ diện tích cân bằng độ sáng màu sắc Schopenhauer",
+      "description": "Để đạt sự cân bằng thị giác tự nhiên giữa các màu thuần độ, diện tích hiển thị của từng cặp màu tương phản phải tỷ lệ nghịch với chỉ số phản xạ ánh sáng (Vàng: 9, Cam: 8, Đỏ: 6, Lục: 6, Lam: 4, Tím: 3). Cụ thể diện tích Tím : Vàng = 3 : 1; Lam : Cam = 2 : 1; Đỏ : Lục = 1 : 1.",
+      "threshold": "Tỷ lệ diện tích: Tím/Vàng = 3:1, Lam/Cam = 2:1, Đỏ/Lục = 1:1 (Tổng độ sáng cân bằng = 12/36)",
+      "severity": "critical",
+      "source_book": "Understanding Color- An Introduction for Designers.pdf",
+      "source_location": "Chapter 7: Color Theory: A Brief History - Schopenhauer's Circle of Color Harmony",
+      "impact": "Đảm bảo sự cân bằng sinh lý cho mắt nhìn, ngăn ngừa sự lấn lướt thị giác của các màu có độ sáng cao như Vàng so với các màu tối như Tím."
+    },
+    {
+      "rule_id": "color_rgb_gamut_range",
+      "category": "color_contrast",
+      "title": "Quy chuẩn không gian màu RGB 8-bit cho quảng cáo kỹ thuật số",
+      "description": "Thiết kế quảng cáo hiển thị trên màn hình kỹ thuật số (TV, Web, Mobile) bắt buộc phải sử dụng hệ màu cộng RGB với dải giá trị từ 0 đến 255 cho mỗi kênh 8-bit. Tuyệt đối không dùng hệ CMYK cho quảng cáo số để tránh làm màu sắc bị đục (muddy).",
+      "threshold": "Kênh màu 8-bit (dải 0 - 255/kênh), RGB Mode (R=0-255, G=0-255, B=0-255)",
+      "severity": "critical",
+      "source_book": "The Graphic Design Book- A Comprehensive Guide for Beginners.pdf",
+      "source_location": "Section 3: Color - RGB: The Additive Colour Mixing Model",
+      "impact": "Đảm bảo độ rực rỡ và độ chính xác của màu sắc thương hiệu khi hiển thị trên các thiết bị hiển thị phát quang điện tử."
+    },
+    {
+      "rule_id": "color_cmyk_scale_print",
+      "category": "color_contrast",
+      "title": "Quy chuẩn thang màu trừ CMYK cho ấn phẩm in ấn",
+      "description": "Các ấn phẩm quảng cáo in ấn thực tế (Poster, Billboard, Packaging) bắt buộc sử dụng hệ màu trừ CMYK tính theo phần trăm dải từ 0% đến 100% cho từng mực in (Cyan, Magenta, Yellow, Key/Black).",
+      "threshold": "Thang đo 0% - 100% cho mỗi kênh C, M, Y, K (C=100, M=100, Y=100, K=100 là màu đen đậm)",
+      "severity": "critical",
+      "source_book": "The Graphic Design Book- A Comprehensive Guide for Beginners.pdf",
+      "source_location": "Section 3: Color - CMYK: The Subtractive Colour Mixing Model",
+      "impact": "Tránh rủi ro sai lệch màu sắc nghiêm trọng giữa màn hình thiết kế và sản phẩm in thực tế, giảm thiểu lãng phí chi phí in ấn."
+    },
+    {
+      "rule_id": "color_black_shading_increment",
+      "category": "color_contrast",
+      "title": "Quy tắc giảm độ thuần màu bằng bước tăng sắc đen",
+      "description": "Mức độ rực rỡ của một màu thuần (pure color) được làm dịu hoặc tạo độ trầm (shaded) bằng cách bổ sung thêm sắc đen (Black/K) theo từng nấc tỷ lệ chuẩn 6%.",
+      "threshold": "Bước điều chỉnh 6% sắc đen (6% increments)",
+      "severity": "suggestion",
+      "source_book": "Understanding Color- An Introduction for Designers.pdf",
+      "source_location": "Chapter 9: Color in Print - Process Colors Act as Filters",
+      "impact": "Giúp kiểm soát độ trầm của màu sắc một cách tinh tế, tạo ra các tông màu mượt mà mà không làm hỏng cấu trúc màu."
+    },
+    {
+      "rule_id": "color_simultaneous_contrast_balance",
+      "category": "color_contrast",
+      "title": "Tương phản đồng thời và trạng thái cân bằng 3 màu gốc",
+      "description": "Trạng thái nghỉ ngơi và cân bằng thị giác (equilibrium) của mắt người đạt được khi cả 3 sắc độ màu gốc (Đỏ, Lục, Lam hoặc Đỏ, Vàng, Lam) cùng hiện diện trong trường thị giác thông qua việc phối hợp các màu bổ túc (complements).",
+      "threshold": "Hiện diện đủ 3 sắc độ gốc (Red, Green, Blue / Red, Yellow, Blue) trong cùng bố cục",
+      "severity": "moderate",
+      "source_book": "Understanding Color- An Introduction for Designers.pdf",
+      "source_location": "Chapter 5: Effects of Color - Ground Subtraction & Equilibrium",
+      "impact": "Giảm mỏi mắt cho người xem, giúp hình ảnh quảng cáo giữ chân ánh nhìn lâu hơn và tạo cảm giác dễ chịu."
+    },
+    {
+      "rule_id": "typo_typeface_quantity_limit",
+      "category": "typography",
+      "title": "Giới hạn số lượng Typeface trong một thiết kế",
+      "description": "Chỉ chọn tối đa 2 (hoặc không quá 3) font chữ cho toàn bộ dự án thiết kế: kết hợp 1 Serif (cho tiêu đề) và 1 Sans Serif (cho văn bản nội dung), hoặc ngược lại. Tuyệt đối không phối hợp quá nhiều kiểu chữ gây rối mắt.",
+      "threshold": "Số lượng Typeface ≤ 2 (1 Serif + 1 Sans Serif)",
+      "severity": "critical",
+      "source_book": "Designing for Clarity.pdf",
+      "source_location": "Using Typefaces Together - 1 Serif 1 Sans Serif",
+      "impact": "Duy trì sự sạch sẽ, chuyên nghiệp, loại bỏ cảm giác hỗn loạn và tăng tốc độ tiếp nhận thông tin của người xem."
+    },
+    {
+      "rule_id": "typo_leading_ratio",
+      "category": "typography",
+      "title": "Tỷ lệ khoảng cách dòng văn bản (Leading Ratio)",
+      "description": "Khoảng cách giữa các dòng (leading) trong đoạn văn bản nội dung (body text) phải lớn hơn kích thước font chữ (font size) từ 1.25 đến 1.5 lần để đảm bảo độ dễ đọc và mắt không bị dính dòng.",
+      "threshold": "Leading = 1.25x - 1.5x Font Size (125% - 150%)",
+      "severity": "critical",
+      "source_book": "The Graphic Design Book- A Comprehensive Guide for Beginners.pdf",
+      "source_location": "Section 3: Typography - Leading",
+      "impact": "Giúp mắt dễ dàng di chuyển từ cuối dòng này sang đầu dòng tiếp theo mà không bị nhảy dòng, tối ưu hóa trải nghiệm đọc."
+    },
+    {
+      "rule_id": "typo_point_pica_unit_standard",
+      "category": "typography",
+      "title": "Tiêu chuẩn hệ thống đo lường Typography",
+      "description": "Áp dụng hệ thống đo lường typographic chuẩn: 1 Point = 1/72 inch (dùng đo chiều cao font chữ) và 12 Points = 1 Pica (dùng đo độ rộng cột văn bản). Khi ghép font chữ, cần căn chỉnh dựa trên chiều cao chữ x (x-height) tương đồng.",
+      "threshold": "1 Point = 1/72 inch; 1 Pica = 12 Points",
+      "severity": "moderate",
+      "source_book": "The Graphic Design Book- A Comprehensive Guide for Beginners.pdf",
+      "source_location": "Section 3: Typography - Size & Point System",
+      "impact": "Giúp căn chỉnh chính xác kích thước và khoảng cách giữa các phần tử chữ trên màn hình và ấn phẩm in."
+    },
+    {
+      "rule_id": "typo_font_size_contrast_noticeable",
+      "category": "typography",
+      "title": "Tương phản kích thước Font phân cấp rõ rệt",
+      "description": "Sự chênh lệch kích thước font chữ giữa tiêu đề và văn bản nội dung phải đủ lớn để nhận biết lập tức (ví dụ: Headline 28pt - 72pt, Body 12pt - 18pt). Tuyệt đối tránh dùng các kích thước quá gần nhau (như 12pt cho body và 14pt cho title) vì mắt khó nhận biết sự phân cấp.",
+      "threshold": "Chênh lệch kích thước rõ rệt (như 12pt vs 28pt+), cấm khoảng chênh hẹp (như 12pt vs 14pt)",
+      "severity": "critical",
+      "source_book": "Designing for Clarity.pdf",
+      "source_location": "Size - Make Font Sizes Noticeably Different",
+      "impact": "Giúp não bộ lập tức nhận diện mẫu phân cấp thông tin, dẫn dắt người xem đọc tiêu đề trước rồi mới đến nội dung."
+    },
+    {
+      "rule_id": "typo_kerning_pairs_quality",
+      "category": "typography",
+      "title": "Tiêu chuẩn cặp Kerning lập trình sẵn trong File Font",
+      "description": "Một font chữ đạt tiêu chuẩn kỹ thuật chất lượng cao bắt buộc phải có từ 600 đến 800 giá trị kerning (khoảng cách giữa 2 ký tự cụ thể như 'T' và 'o') được lập trình sẵn trong file để tự động xử lý khoảng hở thô.",
+      "threshold": "600 - 800 kerning pair values programmed per font file",
+      "severity": "moderate",
+      "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+      "source_location": "Chapter 3.4 Organizational Principles - Kerning Values in Fonts",
+      "impact": "Đảm bảo các từ ngữ hiển thị mượt mà, không bị khoảng hở thô ráp làm gián đoạn trải nghiệm đọc của khách hàng."
+    },
+    {
+      "rule_id": "cta_copy_congruency_interaction",
+      "category": "cta_optimization",
+      "title": "Độ tương thích thông điệp CTA với mức độ nhận diện thương hiệu",
+      "description": "Đối với thương hiệu đã có độ nhận diện (well-known brands), thông điệp kêu gọi cảm xúc (emotional copy) mang lại thái độ tích cực cao hơn hẳn khi hình ảnh quảng cáo có tính tương thích (Congruent: Mean=3.53 vs Incongruent: Mean=2.60; p < 0.012). Ngược lại, thông điệp dạng thông tin (informational copy) hiệu quả hơn khi kết hợp hình ảnh bất tương thích (Incongruent: Mean=3.40 vs Congruent: Mean=3.07).",
+      "threshold": "Đánh giá thái độ M=3.53 (Congruent Emotional) vs M=2.60 (Incongruent Emotional), mức ý nghĩa p < 0.012",
+      "severity": "critical",
+      "source_book": "ABSTRACTICCMI2017TsiotsouHatzithomas.pdf",
+      "source_location": "Banner Advertising Effectiveness: An Experimental Study - Experiment 2 Results",
+      "impact": "Tối ưu hóa thái độ đối với quảng cáo (Attitude toward the ad), trực tiếp gia tăng tỷ lệ kích nhấp (CTR) và chuyển đổi."
+    },
+    {
+      "rule_id": "cta_aida_model_attention",
+      "category": "cta_optimization",
+      "title": "Mô hình truyền thông AIDA cho vị trí Nút CTA",
+      "description": "Banner quảng cáo và Nút CTA phải thiết kế tuân theo trình tự 4 bước: A (Attraction - Thu hút chú ý), I (Interest - Giữ sự quan tâm), D (Desire - Tạo khao khát), A (Action - Kích hoạt hành động). Nút CTA phải nằm ở điểm chốt chặn cuối cùng của luồng thị giác sau khi người xem đã tiếp nhận A-I-D.",
+      "threshold": "Trình tự 4 giai đoạn truyền thông A-I-D-A",
+      "severity": "critical",
+      "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+      "source_location": "Chapter 2.2 Design Research and Concept Generation - AIDA Framework",
+      "impact": "Đảm bảo người xem nhận đủ giá trị thông tin trước khi yêu cầu thực hiện hành động nhấp/mua hàng, nâng cao tỷ lệ conversion."
+    },
+    {
+      "rule_id": "cta_figure_ground_isolation",
+      "category": "cta_optimization",
+      "title": "Tách biệt Nút CTA bằng độ tương phản Chính/Nền",
+      "description": "Nút CTA (Figure) bắt buộc phải có độ tương phản độ sáng (Value contrast) và màu sắc đủ lớn so với vùng nền xung quanh (Ground/Negative space) để tạo ra điểm tập trung thị giác độc tôn (dominant starting point).",
+      "threshold": "Độ tương phản giá trị cao (High Value/Hue Contrast) giữa Nút CTA và Nền",
+      "severity": "critical",
+      "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+      "source_location": "Chapter 3: Design Elements - Figure/Ground & Negative Space",
+      "impact": "Biến nút CTA thành điểm dừng mắt tự nhiên trên banner quảng cáo, trực tiếp tăng tỷ lệ nhấp chuột (CTR)."
+    },
+    {
+      "rule_id": "logo_scaling_legibility_minimum",
+      "category": "branding",
+      "title": "Ngưỡng thu nhỏ và hiển thị đơn sắc của Logo",
+      "description": "Biểu tượng logo phải đảm bảo tính đơn giản để khi thu nhỏ xuống kích thước cực tiểu (như favicon 16x16px hoặc icon ứng dụng di động) vẫn giữ nguyên nét và độ nhận diện; đồng thời bắt buộc phải có phương án hiển thị 1 màu (1-color fallback) cho các phương thức in ấn đặc thù.",
+      "threshold": "Giữ độ nhận diện ở kích thước Favicon/Mobile icon (16x16px / 32x32px); có sẵn phiên bản 1-color fallback",
+      "severity": "critical",
+      "source_book": "Logo Design Guide.pdf",
+      "source_location": "Section 2: Logo Design - Good logos are: Simple & Size reductions",
+      "impact": "Đảm bảo logo hoạt động nhất quán trên mọi nền tảng truyền thông từ banner lớn đến màn hình điện thoại nhỏ."
+    },
+    {
+      "rule_id": "logo_negative_space_meaning",
+      "category": "branding",
+      "title": "Tận dụng Khoảng trống Âm trong Thiết kế Logo",
+      "description": "Sử dụng khoảng trống âm (negative space) xung quanh hoặc bên trong các chữ cái/hình khối để lồng ghép biểu tượng ẩn mang ý nghĩa bổ trợ cho thương hiệu (như hình mũi tên ẩn trong logo FedEx).",
+      "threshold": "Tích hợp ý nghĩa hai lớp (dual-meaning figure/ground relationship)",
+      "severity": "suggestion",
+      "source_book": "Graphic Design and Print Production Fundamentals.pdf",
+      "source_location": "Chapter 3: Design Elements - Figure/Ground in Wordmarks (FedEx Example)",
+      "impact": "Gia tăng tính độc đáo (ownable), sự thông minh và khả năng ghi nhớ (memorability) của thương hiệu trong tâm trí khách hàng."
+    },
+    {
+      "rule_id": "logo_typeface_alteration_avoidance",
+      "category": "branding",
+      "title": "Tôn trọng dạng chữ nguyên bản và Kerning thủ công",
+      "description": "Khi thiết kế wordmark/logo, ưu tiên sử dụng chữ viết nguyên bản (unaltered typography) không bị biến dạng cơ học (machine-skewed type effects) và phải được điều chỉnh kerning thủ công từng khoảng cách chữ để đạt được sự cân đối.",
+      "threshold": "Kerning thủ công 100% cho mọi chữ cái trong Wordmark; Không sử dụng hiệu ứng nghiêng/bóp méo tự động (0% machine skew)",
+      "severity": "moderate",
+      "source_book": "Logo Design Guide.pdf",
+      "source_location": "Section 2: Logo Design - What contributes to a well-crafted logo?",
+      "impact": "Tạo nên ấn tượng về sự chỉn chu, cao cấp và chuyên nghiệp của thương hiệu trong mắt công chúng."
+    },
+    {
+      "rule_id": "brand_competitor_visual_divergence",
+      "category": "branding",
+      "title": "Phân tích vị thế thị giác đối thủ cạnh tranh",
+      "description": "Thiết kế nhận diện thương hiệu phải trải qua bước đánh giá bảng màu và ngôn ngữ thị giác của đối thủ cạnh tranh (Competitive Landscape Review) để chọn ra màu sắc chủ đạo và kiểu dáng có tính phân biệt (differentiation), tránh trùng lặp gây nhầm lẫn.",
+      "threshold": "Phân tích 100% các đối thủ trực tiếp trong cùng phân khúc thị trường",
+      "severity": "moderate",
+      "source_book": "Logo Design Guide.pdf",
+      "source_location": "Section 2: Logo Design - Research & Competitive landscape review",
+      "impact": "Giúp thương hiệu nổi bật trong không gian quảng cáo chật chội và truyền tải cá tính riêng biệt."
+    }
+  ]
+}

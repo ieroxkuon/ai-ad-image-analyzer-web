@@ -2,7 +2,7 @@
   "name": "ai-ad-image-analyzer-web",
   "version": "1.0.0",
   "description": "> **Hệ Thống Cố Vấn Thẩm Định & Đánh Giá Tiêu Chuẩn Hình Ảnh Quảng Cáo Ứng Dụng AI Agent Multimodal**",
-  "main": "app.js",
+  "main": "server.js",
   "directories": {
     "doc": "docs"
   },
