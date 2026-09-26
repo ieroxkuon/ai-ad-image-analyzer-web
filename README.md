@@ -53,9 +53,9 @@ ai_ad_image_analyzer/
 ├── scripts/                       # [TẦNG KHOA HỌC & NGHIÊN CỨU AI]
 │   └── AI_Ad_Image_Analyzer.py    # Script phân tích hình ảnh độc lập bằng Python
 │
-├── docs/                          # [HỒ SƠ HỌC THUẬT ĐỒ ÁN TỐT NGHIỆP]
-│   ├── de_cuong/                  # Đề cương đồ án chi tiết (Word / Markdown)
-│   └── kiem_soat_do_an.md         # Bảng kiểm soát tiến độ & đánh giá
+├── docs/                          # [TÀI LIỆU KỸ THUẬT & THIẾT KẾ HỆ THỐNG]
+│   ├── KE_HOACH_HE_THONG_TUAN_2.md
+│   └── KE_HOACH_TRAIN_AI_AGENT.md
 │
 ├── trainingdocs/                  # 16 tài liệu PDF nghiên cứu chuyên ngành đồ họa & quảng cáo
 └── images/                        # Hình ảnh mẫu nghiệm thu thực nghiệm
